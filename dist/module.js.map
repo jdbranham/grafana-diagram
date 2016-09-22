@@ -1,0 +1,1 @@
+{"version":3,"sources":["../src/module.js"],"names":["DiagramCtrl"],"mappings":";;;;;;;;AAAQA,c,mBAAAA,W;;;wBAGPA,W","file":"module.js","sourcesContent":["import {DiagramCtrl} from './diagramControl';\r\n\r\nexport {\r\n\tDiagramCtrl as PanelCtrl\r\n};"]}

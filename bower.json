@@ -1,0 +1,24 @@
+{
+  "name": "grafana-diagram",
+  "homepage": "https://github.com/jdbranham/grafana-diagram",
+  "authors": [
+    "Jeremy <jdbranham@hotmail.com>"
+  ],
+  "description": "A diagram panel plugin for grafana",
+  "main": "module.js",
+  "license": "APACHE 2.0",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "mermaid": "^6.0.0",
+    "ngmermaid": "ng-mermaid#*"
+  },
+  "resolutions": {
+    "mermaid": "^6.0.0"
+  }
+}
