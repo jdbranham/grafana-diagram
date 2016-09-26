@@ -15,10 +15,6 @@
     "tests"
   ],
   "dependencies": {
-    "mermaid": "^6.0.0",
-    "ngmermaid": "ng-mermaid#*"
-  },
-  "resolutions": {
-    "mermaid": "^6.0.0"
+    "mermaid": "~0.5"
   }
 }

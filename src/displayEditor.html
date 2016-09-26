@@ -1,0 +1,20 @@
+<div class="editor-row">
+	<div class="section gf-form-group">
+		<h5 class="section-heading">Threshold Options</h5>
+		<div class="gf-form">
+			<label class="gf-form-label width-10">Thresholds</label> <input
+				type="text" class="input-small gf-form-input width-10"
+				ng-model="ctrl.panel.thresholds" ng-change="ctrl.changeThresholds()"
+				placeholder="0,10" ng-model-onblur />
+		</div>
+		<div class="gf-form">
+			<label class="gf-form-label width-10">Colors</label>
+			<spectrum-picker class="gf-form-input width-3"
+				ng-model="ctrl.panel.colors[0]" ng-change="ctrl.changeThresholds()"></spectrum-picker>
+			<spectrum-picker class="gf-form-input width-3"
+				ng-model="ctrl.panel.colors[1]" ng-change="ctrl.changeThresholds()"></spectrum-picker>
+			<spectrum-picker class="gf-form-input width-3"
+				ng-model="ctrl.panel.colors[2]" ng-change="ctrl.changeThresholds()"></spectrum-picker>
+		</div>
+	</div>
+</div>
