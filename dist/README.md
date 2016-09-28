@@ -16,10 +16,10 @@ Roadmap -
 - [suggest something] 
 
 Diagram Definition  
-![Diagram Definition](./src/img/diagram_definition.png?raw=true)
+![Diagram Definition](https://raw.githubusercontent.com/jdbranham/grafana-diagram/master/src/img/diagram_definition.PNG?raw=true)  
 
 Diagram Display Options  
-![Diagram Display Options](./src/img/diagram_display.png?raw=true)  
+![Diagram Display Options](https://raw.githubusercontent.com/jdbranham/grafana-diagram/master/src/img/diagram_display.PNG?raw=true)  
 
 
 Special thanks to the Mermaid contributors -  
