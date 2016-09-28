@@ -1,3 +1,11 @@
 .diagram > svg div{
 	color: #333;
 }
+
+g.node > * {
+	fill: white;
+}
+
+.blue {
+	fill: blue;
+}
