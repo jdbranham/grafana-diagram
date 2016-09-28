@@ -16,10 +16,18 @@ Roadmap -
 - [suggest something] 
 
 Diagram Definition  
+<<<<<<< HEAD
 ![Diagram Definition](https://raw.githubusercontent.com/jdbranham/grafana-diagram/master/src/img/diagram_definition.PNG?raw=true)
+=======
+![Diagram Definition](./src/img/diagram_definition.PNG?raw=true)
+>>>>>>> branch 'master' of https://github.com/jdbranham/grafana-diagram.git
 
 Diagram Display Options  
+<<<<<<< HEAD
 ![Diagram Display Options](https://raw.githubusercontent.com/jdbranham/grafana-diagram/master/src/img/diagram_display.PNG?raw=true)  
+=======
+![Diagram Display Options](./src/img/diagram_display.PNG?raw=true)  
+>>>>>>> branch 'master' of https://github.com/jdbranham/grafana-diagram.git
 
 
 Special thanks to the Mermaid contributors -  
