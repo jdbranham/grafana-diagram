@@ -99,30 +99,35 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 				function DiagramCtrl($scope, $injector, $sce) {
 					_classCallCheck(this, DiagramCtrl);
 
-					var _this = _possibleConstructorReturn(this, (DiagramCtrl.__proto__ || Object.getPrototypeOf(DiagramCtrl)).call(this, $scope, $injector));
+					var _this2 = _possibleConstructorReturn(this, (DiagramCtrl.__proto__ || Object.getPrototypeOf(DiagramCtrl)).call(this, $scope, $injector));
 
-					_.defaults(_this.panel, panelDefaults);
-					_this.panel.graphId = 'graph_' + _this.panel.id;
+					_.defaults(_this2.panel, panelDefaults);
 
-					//this.debugInfoEnabled(true);
-					console.log($scope);
-
-					_this.$sce = $sce;
-					_this.events.on('init-edit-mode', _this.onInitEditMode.bind(_this));
-					_this.events.on('data-received', _this.onDataReceived.bind(_this));
-					_this.events.on('data-snapshot-load', _this.onDataReceived.bind(_this));
-
-					mermaidAPI.initialize({
-						startOnLoad: false,
-						cloneCssStyles: false,
-						logLevel: 1
-					});
-
-					mermaidAPI.parseError = _this.handleParseError.bind(_this);
-					return _this;
+					_this2.panel.graphId = 'diagram_' + _this2.panel.id;
+					_this2.containerDivId = 'container_' + _this2.panel.graphId;
+					_this2.svg = {};
+					_this2.$sce = $sce;
+					_this2.events.on('init-edit-mode', _this2.onInitEditMode.bind(_this2));
+					_this2.events.on('data-received', _this2.onDataReceived.bind(_this2));
+					_this2.events.on('data-snapshot-load', _this2.onDataReceived.bind(_this2));
+					_this2.initializeMermaid();
+					return _this2;
 				}
 
 				_createClass(DiagramCtrl, [{
+					key: 'initializeMermaid',
+					value: function initializeMermaid() {
+						mermaidAPI.initialize({
+							startOnLoad: false,
+							cloneCssStyles: false,
+							logLevel: 1,
+							flowchart: {
+								useMaxWidth: true
+							}
+						});
+						mermaidAPI.parseError = this.handleParseError.bind(this);
+					}
+				}, {
 					key: 'handleParseError',
 					value: function handleParseError(err, hash) {
 						this.svg = '<p>Diagram Definition:</p><pre>' + err + '</pre>';
@@ -149,28 +154,31 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 				}, {
 					key: 'seriesHandler',
 					value: function seriesHandler(seriesData) {
-						console.info('creating TimeSeries');
-						console.debug(seriesData);
 						var series = new TimeSeries({
 							datapoints: seriesData.datapoints,
 							alias: seriesData.target
 						});
-
 						series.flotpairs = series.getFlotPairs(this.panel.nullPointMode);
-						console.info('created TimeSeries from seriesdata');
-						console.debug(series);
 						return series;
+					}
+				}, {
+					key: 'clearDiagram',
+					value: function clearDiagram() {
+						$('#' + this.panel.graphId).remove();
+						this.svg = {};
 					}
 				}, {
 					key: 'updateDiagram',
 					value: function updateDiagram(data) {
 						if (this.panel.content.length > 0) {
-							var graphDefinition = this.panel.content + '\n';
-							mermaidAPI.render(this.panel.graphId, graphDefinition, function svgCallback(svgCode, bindFunctions) {
-								//console.log(svgCode);
-								var svg = this.updateStyle(svgCode, data);
-								this.svg = this.$sce.trustAsHtml(svg);
-							}.bind(this));
+							this.clearDiagram();
+							var _this = this;
+							var graphDefinition = this.panel.content;
+							var renderCallback = function renderCallback(svgCode, bindFunctions) {
+								var svg = _this.updateStyle(svgCode, data);
+								_this.svg = _this.$sce.trustAsHtml(svg);
+							};
+							mermaidAPI.render(this.panel.graphId, graphDefinition, renderCallback);
 						}
 					}
 				}, {
@@ -178,17 +186,12 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 					value: function updateStyle(svgCode, data) {
 						console.info('updating svg style');
 						var svg = $('<div>' + svgCode + '</div>');
-						console.debug($(svg));
-						console.debug(data);
 						for (var key in data) {
 							var seriesItem = data[key];
-							console.debug(seriesItem);
-							//var targetElement = $(svg).find('#A').first();
 							var targetElement = $(svg).find('#' + key).first();
 							console.info('setting node:' + key + ' to color:' + seriesItem.color);
 							targetElement.children().css('fill', seriesItem.color);
 						}
-						console.debug($(svg).html());
 						return $(svg).html();
 					}
 				}, {
@@ -279,6 +282,13 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 						result.scaledDecimals = result.decimals - Math.floor(Math.log(size) / Math.LN10) + 2;
 
 						return result;
+					}
+				}, {
+					key: 'link',
+					value: function link(scope, elem, attrs, ctrl) {
+						var diagramElement = elem.find('.diagram');
+						console.debug('found diagram panel');
+						console.debug(diagramElement);
 					}
 				}]);
 

@@ -31,22 +31,26 @@ class DiagramCtrl extends MetricsPanelCtrl {
 	constructor($scope, $injector, $sce) {
 		super($scope, $injector);
 		_.defaults(this.panel, panelDefaults);
-		this.panel.graphId = 'graph_' + this.panel.id;
 		
-		//this.debugInfoEnabled(true);
-		console.log($scope);
-		
+		this.panel.graphId = 'diagram_' + this.panel.id;
+		this.containerDivId = 'container_'+this.panel.graphId;
+		this.svg = {};		
 		this.$sce = $sce;
 		this.events.on('init-edit-mode', this.onInitEditMode.bind(this));
 		this.events.on('data-received', this.onDataReceived.bind(this));
 		this.events.on('data-snapshot-load', this.onDataReceived.bind(this));
-		
+		this.initializeMermaid();
+	}
+	
+	initializeMermaid(){
 		mermaidAPI.initialize({
 		    startOnLoad:false,
 		    cloneCssStyles: false,
-		    logLevel: 1
+		    logLevel: 1,
+		    flowchart:{
+				useMaxWidth: true
+			}
 		});
-		
 		mermaidAPI.parseError = this.handleParseError.bind(this);
 	}
 	
@@ -72,44 +76,41 @@ class DiagramCtrl extends MetricsPanelCtrl {
 	}
 
 	seriesHandler(seriesData) {
-		console.info('creating TimeSeries');
-		console.debug(seriesData);
 		var series = new TimeSeries({
 			datapoints: seriesData.datapoints,
 			alias: seriesData.target,
 		});
-
 	    series.flotpairs = series.getFlotPairs(this.panel.nullPointMode);
-	    console.info('created TimeSeries from seriesdata');
-	    console.debug(series);
 	    return series;
 	} // End seriesHandler()
+	
+	clearDiagram(){
+		$('#'+this.panel.graphId).remove();
+		this.svg = {};
+	}
 
 	updateDiagram(data){
 		if(this.panel.content.length > 0){
-			var graphDefinition = this.panel.content + '\n';
-		    mermaidAPI.render(this.panel.graphId, graphDefinition, function svgCallback(svgCode, bindFunctions){
-			    //console.log(svgCode);
-			    var svg = this.updateStyle(svgCode, data);
-			    this.svg = this.$sce.trustAsHtml(svg);
-			}.bind(this));
+		this.clearDiagram();
+		var _this = this;
+		var graphDefinition = this.panel.content;
+		var renderCallback = function (svgCode, bindFunctions){
+		    var svg = _this.updateStyle(svgCode, data);
+		    _this.svg = _this.$sce.trustAsHtml(svg);
+		};
+	    mermaidAPI.render(this.panel.graphId, graphDefinition, renderCallback);
 		}
 	} // End updateDiagram()
 	
 	updateStyle(svgCode, data){
 		console.info('updating svg style');
 		var svg = $('<div>' + svgCode + '</div>');
-		console.debug($(svg));
-		console.debug(data);
 		for(var key in data){
 			var seriesItem = data[key];
-			console.debug(seriesItem);
-			//var targetElement = $(svg).find('#A').first();
 			var targetElement = $(svg).find('#'+key).first();
 			console.info('setting node:' + key + ' to color:' + seriesItem.color);
 			targetElement.children().css('fill', seriesItem.color);
 		}
-		console.debug($(svg).html());
 		return $(svg).html();
 	} // End updateStyle()
 	
@@ -194,6 +195,12 @@ class DiagramCtrl extends MetricsPanelCtrl {
 	    result.scaledDecimals = result.decimals - Math.floor(Math.log(size) / Math.LN10) + 2;
 	
 	    return result;
+	}
+	
+	link(scope, elem, attrs, ctrl) {
+	    var diagramElement = elem.find('.diagram');
+    	console.debug('found diagram panel');
+    	console.debug(diagramElement);
 	}
   
 // End Class

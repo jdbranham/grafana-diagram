@@ -10,8 +10,8 @@
       "url": "https://github.com/jdbranham"
     },
     "keywords": ["diagram", "panel"],
-    "version": "1.0.0",
-    "updated": "2016-09-22"
+    "version": "1.0.2",
+    "updated": "2016-09-29"
   },
 
   "dependencies": {

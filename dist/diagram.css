@@ -1,5 +1,14 @@
 .diagram > svg div{
 	color: #333;
+	margin: auto;
+	text-align: center;
+	display: block;
+}
+
+.diagram > svg {
+	margin: auto;
+	display: block;
+	max-width: 100%;
 }
 
 g.node > * {
