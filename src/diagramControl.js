@@ -91,14 +91,14 @@ class DiagramCtrl extends MetricsPanelCtrl {
 
 	updateDiagram(data){
 		if(this.panel.content.length > 0){
-		this.clearDiagram();
-		var _this = this;
-		var graphDefinition = this.panel.content;
-		var renderCallback = function (svgCode, bindFunctions){
-		    var svg = _this.updateStyle(svgCode, data);
-		    _this.svg = _this.$sce.trustAsHtml(svg);
-		};
-	    mermaidAPI.render(this.panel.graphId, graphDefinition, renderCallback);
+			this.clearDiagram();
+			var _this = this;
+			var graphDefinition = this.panel.content;
+			var renderCallback = function (svgCode, bindFunctions){
+			    var svg = _this.updateStyle(svgCode, data);
+			    _this.svg = _this.$sce.trustAsHtml(svg);
+			};
+		    mermaidAPI.render(this.panel.graphId, graphDefinition, renderCallback);
 		}
 	} // End updateDiagram()
 	
@@ -110,6 +110,7 @@ class DiagramCtrl extends MetricsPanelCtrl {
 			var targetElement = $(svg).find('#'+key).first();
 			console.info('setting node:' + key + ' to color:' + seriesItem.color);
 			targetElement.children().css('fill', seriesItem.color);
+			targetElement.find('div').first().append('<p class="diagram-value" style="background-color:'+seriesItem.color+'">'+seriesItem.valueFormatted+'</p>');
 		}
 		return $(svg).html();
 	} // End updateStyle()
@@ -144,7 +145,7 @@ class DiagramCtrl extends MetricsPanelCtrl {
 			
 			        var decimalInfo = this.getDecimalsForValue(data[seriesItem.alias].value);
 			        var formatFunc = kbn.valueFormats[this.panel.format];
-			        data[seriesItem.alias].valueFormated = formatFunc(data[seriesItem.alias].value, decimalInfo.decimals, decimalInfo.scaledDecimals);
+			        data[seriesItem.alias].valueFormatted = formatFunc(data[seriesItem.alias].value, decimalInfo.decimals, decimalInfo.scaledDecimals);
 			        data[seriesItem.alias].valueRounded = kbn.roundValue(data[seriesItem.alias].value, decimalInfo.decimals);
 				}
 				data[seriesItem.alias].color = getColorForValue(colorData, data[seriesItem.alias].value);

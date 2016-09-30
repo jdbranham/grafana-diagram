@@ -191,6 +191,7 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 							var targetElement = $(svg).find('#' + key).first();
 							console.info('setting node:' + key + ' to color:' + seriesItem.color);
 							targetElement.children().css('fill', seriesItem.color);
+							targetElement.find('div').first().append('<p class="diagram-value" style="background-color:' + seriesItem.color + '">' + seriesItem.valueFormatted + '</p>');
 						}
 						return $(svg).html();
 					}
@@ -226,7 +227,7 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 
 									var decimalInfo = this.getDecimalsForValue(data[seriesItem.alias].value);
 									var formatFunc = kbn.valueFormats[this.panel.format];
-									data[seriesItem.alias].valueFormated = formatFunc(data[seriesItem.alias].value, decimalInfo.decimals, decimalInfo.scaledDecimals);
+									data[seriesItem.alias].valueFormatted = formatFunc(data[seriesItem.alias].value, decimalInfo.decimals, decimalInfo.scaledDecimals);
 									data[seriesItem.alias].valueRounded = kbn.roundValue(data[seriesItem.alias].value, decimalInfo.decimals);
 								}
 								data[seriesItem.alias].color = getColorForValue(colorData, data[seriesItem.alias].value);
