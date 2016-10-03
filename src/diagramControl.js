@@ -4,7 +4,7 @@ import kbn from 'app/core/utils/kbn';
 import {MetricsPanelCtrl} from 'app/plugins/sdk';
 import {diagramEditor, displayEditor} from './properties';
 import _ from 'lodash';
-import './libs/mermaid/dist/mermaid.forest.css!'
+//import './libs/mermaid/dist/mermaid.forest.css!'
 import './diagram.css!'
 
 const panelDefaults = {
@@ -20,11 +20,71 @@ const panelDefaults = {
     valueMaps: [
       { value: 'null', op: '=', text: 'N/A' }
     ],
-	content: 'graph LR\n' +
+    content: 'graph LR\n' +
 		'A[Square Rect] -- Link text --> B((Circle))\n' +
 		'A --> C(Round Rect)\n' +
 		'B --> D{Rhombus}\n' +
-		'C --> D\n'
+		'C --> D\n',
+	init: {
+		startOnLoad: false,
+		logLevel: 2, //1:debug, 2:info, 3:warn, 4:error, 5:fatal
+    	cloneCssStyles: false, // - This options controls whether or not the css rules should be copied into the generated svg
+		startOnLoad: false, // - This options controls whether or mermaid starts when the page loads
+		arrowMarkerAbsolute: true, // - This options controls whether or arrow markers in html code will be absolute paths or an anchor, #. This matters if you are using base tag settings.
+		flowchart: {
+			htmlLabels: true,
+			useMaxWidth: true
+		},
+		sequenceDiagram: {
+			diagramMarginX: 50, // - margin to the right and left of the sequence diagram
+			diagramMarginY: 10, // - margin to the over and under the sequence diagram
+			actorMargin: 50, // - Margin between actors
+			width: 150, // - Width of actor boxes
+			height: 65, // - Height of actor boxes00000000001111
+			boxMargin: 10, // - Margin around l01oop boxes
+			boxTextMargin: 5, // - margin around the text in loop/alt/opt boxes
+			noteMargin: 10, // - margin around notes
+			messageMargin: 35, // - Space between messages
+			mirrorActors: true, // - mirror actors under diagram
+			bottomMarginAdj: 1, // - Depending on css styling this might need adjustment. Prolongs the edge of the diagram downwards
+			useMaxWidth: true, // - when this flag is set the height and width is set to 100% and is then scaling with the available space if not the absolute space required is used
+		},
+		gantt: {
+			titleTopMargin: 25, // - margin top for the text over the gantt diagram
+			barHeight: 20, // - the height of the bars in the graph
+			barGap: 4, // - the margin between the different activities in the gantt diagram
+			topPadding: 50, // - margin between title and gantt diagram and between axis and gantt diagram.
+			leftPadding: 75, // - the space allocated for the section name to the left of the activities.
+			gridLineStartPadding: 35, // - Vertical starting position of the grid lines
+			fontSize: 11, // - font size ...
+			fontFamily: '"Open-Sans", "sans-serif"', // - font family ...
+			numberSectionStyles: 3, // - the number of alternating section styles
+			/** axisFormatter: // - formatting of the axis, this might need adjustment to match your locale and preferences
+				[
+		        // Within a day
+		        ['%I:%M', function (d) {
+		            return d.getHours();
+		        }],
+		        // Monday a week
+		        ['w. %U', function (d) {
+		            return d.getDay() == 1;
+		        }],
+		        // Day within a week (not monday)
+		        ['%a %d', function (d) {
+		            return d.getDay() && d.getDate() != 1;
+		        }],
+		        // within a month
+		        ['%b %d', function (d) {
+		            return d.getDate() != 1;
+		        }],
+		        // Month
+		        ['%m-%y', function (d) {
+		            return d.getMonth();
+		        }]] **/
+		},
+		classDiagram: {},
+    	info: {}
+	}
 };
 
 class DiagramCtrl extends MetricsPanelCtrl {
@@ -43,14 +103,7 @@ class DiagramCtrl extends MetricsPanelCtrl {
 	}
 	
 	initializeMermaid(){
-		mermaidAPI.initialize({
-		    startOnLoad:false,
-		    cloneCssStyles: false,
-		    logLevel: 1,
-		    flowchart:{
-				useMaxWidth: true
-			}
-		});
+		mermaidAPI.initialize(this.panel.init);
 		mermaidAPI.parseError = this.handleParseError.bind(this);
 	}
 	
@@ -73,6 +126,7 @@ class DiagramCtrl extends MetricsPanelCtrl {
 		var data = {};
 		this.setValues(data);
 		this.updateDiagram(data);
+		this.render();
 	}
 
 	seriesHandler(seriesData) {
@@ -117,6 +171,9 @@ class DiagramCtrl extends MetricsPanelCtrl {
 	
 	setValues(data) {
 		var colorData = {};
+		console.info('using thresholds');
+		console.debug(this.panel.thresholds);
+		console.debug(this.panel.thresholds.split(','));
 		colorData.thresholds = this.panel.thresholds.split(',').map(function(strVale) {
 			return Number(strVale.trim());
 		});
@@ -202,8 +259,21 @@ class DiagramCtrl extends MetricsPanelCtrl {
 	    var diagramElement = elem.find('.diagram');
     	console.debug('found diagram panel');
     	console.debug(diagramElement);
+    	elem.css('height', ctrl.height + 'px');
+    	
+    	function render(){
+    		setElementHeight();
+    	}
+    	
+    	function setElementHeight() {
+	      diagramElement.css('height', ctrl.height + 'px');
+	    }
+    	
+    	this.events.on('render', function() {
+			render();
+			ctrl.renderingCompleted();
+	    });
 	}
-  
 // End Class
 }
 

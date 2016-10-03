@@ -1,9 +1,9 @@
 'use strict';
 
-System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app/core/utils/kbn', 'app/plugins/sdk', './properties', 'lodash', './libs/mermaid/dist/mermaid.forest.css!', './diagram.css!'], function (_export, _context) {
+System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app/core/utils/kbn', 'app/plugins/sdk', './properties', 'lodash', './diagram.css!'], function (_export, _context) {
 	"use strict";
 
-	var TimeSeries, kbn, MetricsPanelCtrl, diagramEditor, displayEditor, _, _createClass, panelDefaults, DiagramCtrl;
+	var TimeSeries, kbn, MetricsPanelCtrl, diagramEditor, displayEditor, _, _createClass, _init, panelDefaults, DiagramCtrl;
 
 	function _classCallCheck(instance, Constructor) {
 		if (!(instance instanceof Constructor)) {
@@ -35,6 +35,21 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 		if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
 	}
 
+	function _defineProperty(obj, key, value) {
+		if (key in obj) {
+			Object.defineProperty(obj, key, {
+				value: value,
+				enumerable: true,
+				configurable: true,
+				writable: true
+			});
+		} else {
+			obj[key] = value;
+		}
+
+		return obj;
+	}
+
 	function getColorForValue(data, value) {
 		console.info('Getting color for value');
 		console.debug(data);
@@ -59,7 +74,7 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 			displayEditor = _properties.displayEditor;
 		}, function (_lodash) {
 			_ = _lodash.default;
-		}, function (_libsMermaidDistMermaidForestCss) {}, function (_diagramCss) {}],
+		}, function (_diagramCss) {}],
 		execute: function () {
 			_createClass = function () {
 				function defineProperties(target, props) {
@@ -90,7 +105,35 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 				format: 'none',
 				valueName: 'avg',
 				valueMaps: [{ value: 'null', op: '=', text: 'N/A' }],
-				content: 'graph LR\n' + 'A[Square Rect] -- Link text --> B((Circle))\n' + 'A --> C(Round Rect)\n' + 'B --> D{Rhombus}\n' + 'C --> D\n'
+				content: 'graph LR\n' + 'A[Square Rect] -- Link text --> B((Circle))\n' + 'A --> C(Round Rect)\n' + 'B --> D{Rhombus}\n' + 'C --> D\n',
+				init: (_init = {
+					startOnLoad: false,
+					logLevel: 2, //1:debug, 2:info, 3:warn, 4:error, 5:fatal
+					cloneCssStyles: false }, _defineProperty(_init, 'startOnLoad', false), _defineProperty(_init, 'arrowMarkerAbsolute', true), _defineProperty(_init, 'flowchart', {
+					htmlLabels: true,
+					useMaxWidth: true
+				}), _defineProperty(_init, 'sequenceDiagram', {
+					diagramMarginX: 50, // - margin to the right and left of the sequence diagram
+					diagramMarginY: 10, // - margin to the over and under the sequence diagram
+					actorMargin: 50, // - Margin between actors
+					width: 150, // - Width of actor boxes
+					height: 65, // - Height of actor boxes00000000001111
+					boxMargin: 10, // - Margin around l01oop boxes
+					boxTextMargin: 5, // - margin around the text in loop/alt/opt boxes
+					noteMargin: 10, // - margin around notes
+					messageMargin: 35, // - Space between messages
+					mirrorActors: true, // - mirror actors under diagram
+					bottomMarginAdj: 1, // - Depending on css styling this might need adjustment. Prolongs the edge of the diagram downwards
+					useMaxWidth: true }), _defineProperty(_init, 'gantt', {
+					titleTopMargin: 25, // - margin top for the text over the gantt diagram
+					barHeight: 20, // - the height of the bars in the graph
+					barGap: 4, // - the margin between the different activities in the gantt diagram
+					topPadding: 50, // - margin between title and gantt diagram and between axis and gantt diagram.
+					leftPadding: 75, // - the space allocated for the section name to the left of the activities.
+					gridLineStartPadding: 35, // - Vertical starting position of the grid lines
+					fontSize: 11, // - font size ...
+					fontFamily: '"Open-Sans", "sans-serif"', // - font family ...
+					numberSectionStyles: 3 }), _defineProperty(_init, 'classDiagram', {}), _defineProperty(_init, 'info', {}), _init)
 			};
 
 			_export('MetricsPanelCtrl', _export('DiagramCtrl', DiagramCtrl = function (_MetricsPanelCtrl) {
@@ -117,14 +160,7 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 				_createClass(DiagramCtrl, [{
 					key: 'initializeMermaid',
 					value: function initializeMermaid() {
-						mermaidAPI.initialize({
-							startOnLoad: false,
-							cloneCssStyles: false,
-							logLevel: 1,
-							flowchart: {
-								useMaxWidth: true
-							}
-						});
+						mermaidAPI.initialize(this.panel.init);
 						mermaidAPI.parseError = this.handleParseError.bind(this);
 					}
 				}, {
@@ -150,6 +186,7 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 						var data = {};
 						this.setValues(data);
 						this.updateDiagram(data);
+						this.render();
 					}
 				}, {
 					key: 'seriesHandler',
@@ -199,6 +236,9 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 					key: 'setValues',
 					value: function setValues(data) {
 						var colorData = {};
+						console.info('using thresholds');
+						console.debug(this.panel.thresholds);
+						console.debug(this.panel.thresholds.split(','));
 						colorData.thresholds = this.panel.thresholds.split(',').map(function (strVale) {
 							return Number(strVale.trim());
 						});
@@ -290,6 +330,20 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 						var diagramElement = elem.find('.diagram');
 						console.debug('found diagram panel');
 						console.debug(diagramElement);
+						elem.css('height', ctrl.height + 'px');
+
+						function render() {
+							setElementHeight();
+						}
+
+						function setElementHeight() {
+							diagramElement.css('height', ctrl.height + 'px');
+						}
+
+						this.events.on('render', function () {
+							render();
+							ctrl.renderingCompleted();
+						});
 					}
 				}]);
 

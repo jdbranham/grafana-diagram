@@ -18,7 +18,7 @@ module.exports = (grunt) => {
       libs_to_dist: {
 		  cwd: 'bower_components',
 		  expand: true,
-		  src: ['mermaid/dist/*'],
+		  src: ['mermaid/dist/mermaidAPI*'],
 		  dest: 'dist/libs'
 		},
       pluginDef: {
