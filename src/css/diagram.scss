@@ -1,5 +1,17 @@
+$fill-default: #cde498;
+$path-default: green;
+$stroke-default: #13540c;
+$text-color: #333;
+$text-fill: #333;
+$label-bg-color: #e8e8e8;
+$cluster-fill: #cdffb2;
+$cluster-stroke: #6eaa49;
+$message-stroke: #777;
+$task-fill: #487e3a;
+
+
 .diagram > svg div{
-	color: #333;
+	color: $text-color;
 	text-align: center;
 }
 
@@ -27,14 +39,14 @@ svg > g {
 /* Gantt chart variables */
 .mermaid .label {
   font-family: 'trebuchet ms', verdana, arial;
-  color: #333;
+  color: $text-color;
 }
 .node rect,
 .node circle,
 .node ellipse,
 .node polygon {
-  fill: #cde498;
-  stroke: #13540c;
+  fill: $fill-default;
+  stroke: $stroke-default;
   stroke-width: 1px;
 }
 .edgePath .path {
@@ -42,20 +54,20 @@ svg > g {
   stroke-width: 1.5px;
 }
 .edgeLabel {
-  background-color: #e8e8e8;
+  background-color: $label-bg-color;
 }
 .cluster rect {
-  fill: #cdffb2 !important;
+  fill: $cluster-fill !important;
   rx: 4  !important;
-  stroke: #6eaa49 !important;
+  stroke: $cluster-stroke !important;
   stroke-width: 1px !important;
 }
 .cluster text {
-  fill: #333;
+  fill: $text-color;
 }
 .actor {
-  stroke: #13540c;
-  fill: #cde498;
+  stroke: $stroke-default;
+  fill: $fill-default;
 }
 text.actor {
   fill: black;
@@ -68,27 +80,27 @@ text.actor {
   stroke-width: 1.5;
   stroke-dasharray: "2 2";
   marker-end: "url(#arrowhead)";
-  stroke: #333;
+  stroke: $path-default;
 }
 .messageLine1 {
   stroke-width: 1.5;
   stroke-dasharray: "2 2";
-  stroke: #333;
+  stroke: $path-default;
 }
 #arrowhead {
-  fill: #333;
+  fill: $path-default;
 }
 #crosshead path {
-  fill: #333 !important;
-  stroke: #333 !important;
+  fill: $path-default !important;
+  stroke: $path-default !important;
 }
 .messageText {
-  fill: #333;
+  fill: $text-color;
   stroke: none;
 }
 .labelBox {
   stroke: #326932;
-  fill: #cde498;
+  fill: $fill-default;
 }
 .labelText {
   fill: black;
@@ -105,7 +117,7 @@ text.actor {
   stroke: #326932;
 }
 .note {
-  stroke: #6eaa49;
+  stroke: $cluster-stroke;
   fill: #fff5ad;
 }
 .noteText {
@@ -120,10 +132,10 @@ text.actor {
   opacity: 0.2;
 }
 .section0 {
-  fill: #6eaa49;
+  fill: $cluster-stroke;
 }
 .section2 {
-  fill: #6eaa49;
+  fill: $cluster-stroke;
 }
 .section1,
 .section3 {
@@ -131,16 +143,16 @@ text.actor {
   opacity: 0.2;
 }
 .sectionTitle0 {
-  fill: #333;
+  fill: $text-color;
 }
 .sectionTitle1 {
-  fill: #333;
+  fill: $text-color;
 }
 .sectionTitle2 {
-  fill: #333;
+  fill: $text-color;
 }
 .sectionTitle3 {
-  fill: #333;
+  fill: $text-color;
 }
 .sectionTitle {
   text-anchor: start;
@@ -192,8 +204,8 @@ text.actor {
 .task1,
 .task2,
 .task3 {
-  fill: #487e3a;
-  stroke: #13540c;
+  fill: $task-fill;
+  stroke: $stroke-default;
 }
 .taskTextOutside0,
 .taskTextOutside2 {
@@ -208,8 +220,8 @@ text.actor {
 .active1,
 .active2,
 .active3 {
-  fill: #cde498;
-  stroke: #13540c;
+  fill: $fill-default;
+  stroke: $stroke-default;
 }
 .activeText0,
 .activeText1,
@@ -246,7 +258,7 @@ text.actor {
 .activeCrit2,
 .activeCrit3 {
   stroke: #ff8888;
-  fill: #cde498;
+  fill: $fill-default;
   stroke-width: 2;
 }
 .doneCrit0,
@@ -281,81 +293,81 @@ text.actor {
 
 */
 g.classGroup text {
-  fill: #13540c;
+  fill: $stroke-default;
   stroke: none;
   font-family: 'trebuchet ms', verdana, arial;
   font-size: 14px;
 }
 g.classGroup rect {
-  fill: #cde498;
-  stroke: #13540c;
+  fill: $fill-default;
+  stroke: $stroke-default;
 }
 g.classGroup line {
-  stroke: #13540c;
+  stroke: $stroke-default;
   stroke-width: 1;
 }
 svg .classLabel .box {
   stroke: none;
   stroke-width: 0;
-  fill: #cde498;
+  fill: $fill-default;
   opacity: 0.5;
 }
 svg .classLabel .label {
-  fill: #13540c;
+  fill: $stroke-default;
 }
 .relation {
-  stroke: #13540c;
+  stroke: $stroke-default;
   stroke-width: 1;
   fill: none;
 }
 .composition {
-  fill: #13540c;
-  stroke: #13540c;
+  fill: $stroke-default;
+  stroke: $stroke-default;
   stroke-width: 1;
 }
 #compositionStart {
-  fill: #13540c;
-  stroke: #13540c;
+  fill: $stroke-default;
+  stroke: $stroke-default;
   stroke-width: 1;
 }
 #compositionEnd {
-  fill: #13540c;
-  stroke: #13540c;
+  fill: $stroke-default;
+  stroke: $stroke-default;
   stroke-width: 1;
 }
 .aggregation {
-  fill: #cde498;
-  stroke: #13540c;
+  fill: $fill-default;
+  stroke: $stroke-default;
   stroke-width: 1;
 }
 #aggregationStart {
-  fill: #cde498;
-  stroke: #13540c;
+  fill: $fill-default;
+  stroke: $stroke-default;
   stroke-width: 1;
 }
 #aggregationEnd {
-  fill: #cde498;
-  stroke: #13540c;
+  fill: $fill-default;
+  stroke: $stroke-default;
   stroke-width: 1;
 }
 #dependencyStart {
-  fill: #13540c;
-  stroke: #13540c;
+  fill: $stroke-default;
+  stroke: $stroke-default;
   stroke-width: 1;
 }
 #dependencyEnd {
-  fill: #13540c;
-  stroke: #13540c;
+  fill: $stroke-default;
+  stroke: $stroke-default;
   stroke-width: 1;
 }
 #extensionStart {
-  fill: #13540c;
-  stroke: #13540c;
+  fill: $stroke-default;
+  stroke: $stroke-default;
   stroke-width: 1;
 }
 #extensionEnd {
-  fill: #13540c;
-  stroke: #13540c;
+  fill: $stroke-default;
+  stroke: $stroke-default;
   stroke-width: 1;
 }
 .node text {
@@ -369,8 +381,8 @@ div.mermaidTooltip {
   padding: 2px;
   font-family: 'trebuchet ms', verdana, arial;
   font-size: 12px;
-  background: #cdffb2;
-  border: 1px solid #6eaa49;
+  background: $cluster-fill;
+  border: 1px solid $cluster-stroke;
   border-radius: 2px;
   pointer-events: none;
   z-index: 100;

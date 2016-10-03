@@ -5,12 +5,12 @@ import {MetricsPanelCtrl} from 'app/plugins/sdk';
 import {diagramEditor, displayEditor} from './properties';
 import _ from 'lodash';
 //import './libs/mermaid/dist/mermaid.forest.css!'
-import './diagram.css!'
+import './css/diagram.css!'
 
 const panelDefaults = {
 	initialZoom: 1,
 	thresholds: '0,10',
-	colors: ['rgba(245, 54, 54, 0.9)', 'rgba(237, 129, 40, 0.89)', 'rgba(50, 172, 45, 0.97)'],
+	colors: ['rgba(50, 172, 45, 0.97)', 'rgba(237, 129, 40, 0.89)', 'rgba(245, 54, 54, 0.9)'],
 	showLegend: true,
 	maxDataPoints: 100,
 	mappingType: 1,
@@ -82,8 +82,8 @@ const panelDefaults = {
 		            return d.getMonth();
 		        }]] **/
 		},
-		classDiagram: {},
-    	info: {}
+		//classDiagram: {},
+    	//info: {}
 	}
 };
 
@@ -161,10 +161,23 @@ class DiagramCtrl extends MetricsPanelCtrl {
 		var svg = $('<div>' + svgCode + '</div>');
 		for(var key in data){
 			var seriesItem = data[key];
-			var targetElement = $(svg).find('#'+key).first();
-			console.info('setting node:' + key + ' to color:' + seriesItem.color);
-			targetElement.children().css('fill', seriesItem.color);
-			targetElement.find('div').first().append('<p class="diagram-value" style="background-color:'+seriesItem.color+'">'+seriesItem.valueFormatted+'</p>');
+			
+			// Find nodes by ID if we can
+			console.info('finding targetElement');
+			var targetElement = $(svg).find('#'+key).first(); 
+			
+			if(targetElement.length > 0){ // must be a flowchart
+				targetElement.children().css('fill', seriesItem.color);
+				// Add value text
+				targetElement.find('div').first().append('<p class="diagram-value" style="background-color:'+seriesItem.color+'">'+seriesItem.valueFormatted+'</p>');
+			} else {
+				targetElement = $(svg).find('text:contains("'+key+'")'); // sequence diagram, gantt ?
+				targetElement.parent().find('rect, circle, poly').css('fill', seriesItem.color);
+				targetElement.append('\n' + seriesItem.valueFormatted);
+			}
+			
+			console.debug(targetElement);
+			console.info('set nodes:' + key + ' to color:' + seriesItem.color);
 		}
 		return $(svg).html();
 	} // End updateStyle()

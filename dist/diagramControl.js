@@ -1,6 +1,6 @@
 'use strict';
 
-System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app/core/utils/kbn', 'app/plugins/sdk', './properties', 'lodash', './diagram.css!'], function (_export, _context) {
+System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app/core/utils/kbn', 'app/plugins/sdk', './properties', 'lodash', './css/diagram.css!'], function (_export, _context) {
 	"use strict";
 
 	var TimeSeries, kbn, MetricsPanelCtrl, diagramEditor, displayEditor, _, _createClass, _init, panelDefaults, DiagramCtrl;
@@ -74,7 +74,7 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 			displayEditor = _properties.displayEditor;
 		}, function (_lodash) {
 			_ = _lodash.default;
-		}, function (_diagramCss) {}],
+		}, function (_cssDiagramCss) {}],
 		execute: function () {
 			_createClass = function () {
 				function defineProperties(target, props) {
@@ -97,7 +97,7 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 			panelDefaults = {
 				initialZoom: 1,
 				thresholds: '0,10',
-				colors: ['rgba(245, 54, 54, 0.9)', 'rgba(237, 129, 40, 0.89)', 'rgba(50, 172, 45, 0.97)'],
+				colors: ['rgba(50, 172, 45, 0.97)', 'rgba(237, 129, 40, 0.89)', 'rgba(245, 54, 54, 0.9)'],
 				showLegend: true,
 				maxDataPoints: 100,
 				mappingType: 1,
@@ -133,7 +133,7 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 					gridLineStartPadding: 35, // - Vertical starting position of the grid lines
 					fontSize: 11, // - font size ...
 					fontFamily: '"Open-Sans", "sans-serif"', // - font family ...
-					numberSectionStyles: 3 }), _defineProperty(_init, 'classDiagram', {}), _defineProperty(_init, 'info', {}), _init)
+					numberSectionStyles: 3 }), _init)
 			};
 
 			_export('MetricsPanelCtrl', _export('DiagramCtrl', DiagramCtrl = function (_MetricsPanelCtrl) {
@@ -225,10 +225,24 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 						var svg = $('<div>' + svgCode + '</div>');
 						for (var key in data) {
 							var seriesItem = data[key];
+
+							// Find nodes by ID if we can
+							console.info('finding targetElement');
 							var targetElement = $(svg).find('#' + key).first();
-							console.info('setting node:' + key + ' to color:' + seriesItem.color);
-							targetElement.children().css('fill', seriesItem.color);
-							targetElement.find('div').first().append('<p class="diagram-value" style="background-color:' + seriesItem.color + '">' + seriesItem.valueFormatted + '</p>');
+
+							if (targetElement.length > 0) {
+								// must be a flowchart
+								targetElement.children().css('fill', seriesItem.color);
+								// Add value text
+								targetElement.find('div').first().append('<p class="diagram-value" style="background-color:' + seriesItem.color + '">' + seriesItem.valueFormatted + '</p>');
+							} else {
+								targetElement = $(svg).find('text:contains("' + key + '")'); // sequence diagram, gantt ?
+								targetElement.parent().find('rect, circle, poly').css('fill', seriesItem.color);
+								targetElement.append('\n' + seriesItem.valueFormatted);
+							}
+
+							console.debug(targetElement);
+							console.info('set nodes:' + key + ' to color:' + seriesItem.color);
 						}
 						return $(svg).html();
 					}

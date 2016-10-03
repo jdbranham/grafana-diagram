@@ -3,6 +3,7 @@ module.exports = (grunt) => {
 
   grunt.loadNpmTasks('grunt-execute');
   grunt.loadNpmTasks('grunt-contrib-clean');
+  //grunt.loadNpmTasks('grunt-sass');
 
   grunt.initConfig({
 
@@ -30,7 +31,7 @@ module.exports = (grunt) => {
         cwd: 'src',
         expand: true,
         src: ['img/**/*'],
-        dest: 'dist/src/'
+        dest: 'dist/'
       },
     },
 
@@ -41,6 +42,17 @@ module.exports = (grunt) => {
         options: {spawn: false}
       },
     },
+    
+    sass: {
+		options: {
+			sourceMap: true
+		},
+		dist: {
+			files: {
+				'dist/css/diagram.css': 'src/css/diagram.scss'
+			}
+		}
+	},
 
     babel: {
       options: {
@@ -61,5 +73,5 @@ module.exports = (grunt) => {
 
   });
 
-  grunt.registerTask('default', ['clean', 'copy:src_to_dist', 'copy:libs_to_dist', 'copy:pluginDef', 'copy:img_to_dist', 'babel']);
+  grunt.registerTask('default', ['clean', 'copy:src_to_dist', 'copy:libs_to_dist', 'copy:pluginDef', 'copy:img_to_dist', 'sass', 'babel']);
 };
