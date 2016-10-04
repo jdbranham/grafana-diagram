@@ -1,6 +1,6 @@
 'use strict';
 
-System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app/core/utils/kbn', 'app/plugins/sdk', './properties', 'lodash', './css/diagram.css!'], function (_export, _context) {
+System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app/core/utils/kbn', 'app/plugins/sdk', './properties', 'lodash', './series_overrides_diagram_ctrl', './css/diagram.css!'], function (_export, _context) {
 	"use strict";
 
 	var TimeSeries, kbn, MetricsPanelCtrl, diagramEditor, displayEditor, _, _createClass, _init, panelDefaults, DiagramCtrl;
@@ -74,7 +74,7 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 			displayEditor = _properties.displayEditor;
 		}, function (_lodash) {
 			_ = _lodash.default;
-		}, function (_cssDiagramCss) {}],
+		}, function (_series_overrides_diagram_ctrl) {}, function (_cssDiagramCss) {}],
 		execute: function () {
 			_createClass = function () {
 				function defineProperties(target, props) {
@@ -95,7 +95,8 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 			}();
 
 			panelDefaults = {
-				initialZoom: 1,
+				// other style overrides
+				seriesOverrides: [],
 				thresholds: '0,10',
 				colors: ['rgba(50, 172, 45, 0.97)', 'rgba(237, 129, 40, 0.89)', 'rgba(245, 54, 54, 0.9)'],
 				showLegend: true,
@@ -104,6 +105,7 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 				nullPointMode: 'connected',
 				format: 'none',
 				valueName: 'avg',
+				valueOptions: ['avg', 'min', 'max', 'total', 'current'],
 				valueMaps: [{ value: 'null', op: '=', text: 'N/A' }],
 				content: 'graph LR\n' + 'A[Square Rect] -- Link text --> B((Circle))\n' + 'A --> C(Round Rect)\n' + 'B --> D{Rhombus}\n' + 'C --> D\n',
 				init: (_init = {
@@ -199,6 +201,17 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 						return series;
 					}
 				}, {
+					key: 'addSeriesOverride',
+					value: function addSeriesOverride(override) {
+						this.panel.seriesOverrides.push(override || {});
+					}
+				}, {
+					key: 'removeSeriesOverride',
+					value: function removeSeriesOverride(override) {
+						this.panel.seriesOverrides = _.without(this.panel.seriesOverrides, override);
+						this.render();
+					}
+				}, {
 					key: 'clearDiagram',
 					value: function clearDiagram() {
 						$('#' + this.panel.graphId).remove();
@@ -249,21 +262,12 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 				}, {
 					key: 'setValues',
 					value: function setValues(data) {
-						var colorData = {};
-						console.info('using thresholds');
-						console.debug(this.panel.thresholds);
-						console.debug(this.panel.thresholds.split(','));
-						colorData.thresholds = this.panel.thresholds.split(',').map(function (strVale) {
-							return Number(strVale.trim());
-						});
-						colorData.colorMap = this.panel.colors;
-
 						if (this.series && this.series.length > 0) {
 							for (var i = 0; i < this.series.length; i++) {
 								var seriesItem = this.series[i];
 								console.debug('setting values for series');
 								console.debug(seriesItem);
-								data[seriesItem.alias] = {};
+								data[seriesItem.alias] = this.applyOverrides(seriesItem.alias);
 								var lastPoint = _.last(seriesItem.datapoints);
 								var lastValue = _.isArray(lastPoint) ? lastPoint[0] : null;
 
@@ -276,7 +280,7 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 									data[seriesItem.alias].valueFormated = _.escape(lastValue);
 									data[seriesItem.alias].valueRounded = 0;
 								} else {
-									data[seriesItem.alias].value = seriesItem.stats[this.panel.valueName];
+									data[seriesItem.alias].value = seriesItem.stats[data[seriesItem.alias].valueName];
 									//data[seriesItem.alias].flotpairs = seriesItem.flotpairs;
 
 									var decimalInfo = this.getDecimalsForValue(data[seriesItem.alias].value);
@@ -284,9 +288,35 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 									data[seriesItem.alias].valueFormatted = formatFunc(data[seriesItem.alias].value, decimalInfo.decimals, decimalInfo.scaledDecimals);
 									data[seriesItem.alias].valueRounded = kbn.roundValue(data[seriesItem.alias].value, decimalInfo.decimals);
 								}
-								data[seriesItem.alias].color = getColorForValue(colorData, data[seriesItem.alias].value);
+								data[seriesItem.alias].color = getColorForValue(data[seriesItem.alias].colorData, data[seriesItem.alias].value);
 							}
 						}
+					}
+				}, {
+					key: 'applyOverrides',
+					value: function applyOverrides(seriesItemAlias) {
+						var seriesItem = {},
+						    colorData = {},
+						    overrides = {};
+						console.info('applying overrides for seriesItem');
+						console.debug(seriesItemAlias);
+						console.debug(this.panel.seriesOverrides);
+						for (var i = 0; i <= this.panel.seriesOverrides.length; i++) {
+							console.debug('comparing:');
+							console.debug(this.panel.seriesOverrides[i]);
+							if (this.panel.seriesOverrides[i] && this.panel.seriesOverrides[i].alias == seriesItemAlias) {
+								overrides = this.panel.seriesOverrides[i];
+							}
+						}
+						colorData.thresholds = (overrides.thresholds || this.panel.thresholds).split(',').map(function (strVale) {
+							return Number(strVale.trim());
+						});
+						colorData.colorMap = this.panel.colors;
+						seriesItem.colorData = colorData;
+
+						seriesItem.valueName = overrides.valueName || this.panel.valueName;
+
+						return seriesItem;
 					}
 				}, {
 					key: 'invertColorOrder',

@@ -4,11 +4,12 @@ import kbn from 'app/core/utils/kbn';
 import {MetricsPanelCtrl} from 'app/plugins/sdk';
 import {diagramEditor, displayEditor} from './properties';
 import _ from 'lodash';
-//import './libs/mermaid/dist/mermaid.forest.css!'
+import './series_overrides_diagram_ctrl';
 import './css/diagram.css!'
 
 const panelDefaults = {
-	initialZoom: 1,
+	// other style overrides
+    seriesOverrides: [],
 	thresholds: '0,10',
 	colors: ['rgba(50, 172, 45, 0.97)', 'rgba(237, 129, 40, 0.89)', 'rgba(245, 54, 54, 0.9)'],
 	showLegend: true,
@@ -17,6 +18,7 @@ const panelDefaults = {
 	nullPointMode: 'connected',
 	format: 'none',
 	valueName: 'avg',
+	valueOptions: ['avg', 'min', 'max', 'total', 'current'],
     valueMaps: [
       { value: 'null', op: '=', text: 'N/A' }
     ],
@@ -138,6 +140,15 @@ class DiagramCtrl extends MetricsPanelCtrl {
 	    return series;
 	} // End seriesHandler()
 	
+	addSeriesOverride(override) {
+		this.panel.seriesOverrides.push(override || {});
+	}
+
+	removeSeriesOverride(override) {
+		this.panel.seriesOverrides = _.without(this.panel.seriesOverrides, override);
+	    this.render();
+	}
+	
 	clearDiagram(){
 		$('#'+this.panel.graphId).remove();
 		this.svg = {};
@@ -183,21 +194,12 @@ class DiagramCtrl extends MetricsPanelCtrl {
 	} // End updateStyle()
 	
 	setValues(data) {
-		var colorData = {};
-		console.info('using thresholds');
-		console.debug(this.panel.thresholds);
-		console.debug(this.panel.thresholds.split(','));
-		colorData.thresholds = this.panel.thresholds.split(',').map(function(strVale) {
-			return Number(strVale.trim());
-		});
-		colorData.colorMap = this.panel.colors;
-		
 	    if (this.series && this.series.length > 0) {
 			for(var i = 0; i < this.series.length; i++){
 				var seriesItem = this.series[i];
 				console.debug('setting values for series');
 				console.debug(seriesItem);
-				data[seriesItem.alias] = {};
+				data[seriesItem.alias] = this.applyOverrides(seriesItem.alias);
 				var lastPoint = _.last(seriesItem.datapoints);
 			    var lastValue = _.isArray(lastPoint) ? lastPoint[0] : null;
 			
@@ -210,7 +212,7 @@ class DiagramCtrl extends MetricsPanelCtrl {
 			        data[seriesItem.alias].valueFormated = _.escape(lastValue);
 			        data[seriesItem.alias].valueRounded = 0;
 				} else {
-					data[seriesItem.alias].value = seriesItem.stats[this.panel.valueName];
+					data[seriesItem.alias].value = seriesItem.stats[data[seriesItem.alias].valueName];
 			        //data[seriesItem.alias].flotpairs = seriesItem.flotpairs;
 			
 			        var decimalInfo = this.getDecimalsForValue(data[seriesItem.alias].value);
@@ -218,10 +220,33 @@ class DiagramCtrl extends MetricsPanelCtrl {
 			        data[seriesItem.alias].valueFormatted = formatFunc(data[seriesItem.alias].value, decimalInfo.decimals, decimalInfo.scaledDecimals);
 			        data[seriesItem.alias].valueRounded = kbn.roundValue(data[seriesItem.alias].value, decimalInfo.decimals);
 				}
-				data[seriesItem.alias].color = getColorForValue(colorData, data[seriesItem.alias].value);
+				data[seriesItem.alias].color = getColorForValue(data[seriesItem.alias].colorData, data[seriesItem.alias].value);
 			}
 	    }
 	} // End setValues()
+	
+	applyOverrides(seriesItemAlias){
+		var seriesItem = {}, colorData = {}, overrides = {};
+		console.info('applying overrides for seriesItem');
+		console.debug(seriesItemAlias);
+		console.debug(this.panel.seriesOverrides);
+		for(var i=0; i<=this.panel.seriesOverrides.length; i++){
+			console.debug('comparing:');
+			console.debug(this.panel.seriesOverrides[i]);
+			if (this.panel.seriesOverrides[i] && this.panel.seriesOverrides[i].alias == seriesItemAlias){
+				overrides = this.panel.seriesOverrides[i];
+			}
+		}
+		colorData.thresholds = (overrides.thresholds || this.panel.thresholds).split(',').map(function(strVale) {
+			return Number(strVale.trim());
+		});
+		colorData.colorMap = this.panel.colors;
+		seriesItem.colorData = colorData;
+		
+		seriesItem.valueName = overrides.valueName || this.panel.valueName;
+		
+		return seriesItem;
+	}
 	
 	invertColorOrder() {
 	    var tmp = this.panel.colors[0];

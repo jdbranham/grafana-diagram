@@ -23,5 +23,58 @@
 	          Invert
 	        </a>
       </span>
+    </div>
+	<div class="gf-form">
+		<label class="gf-form-label width-10">Value</label>
+		<select ng-options="option for option in ctrl.panel.valueOptions" ng-model="ctrl.panel.valueName" ng-change="ctrl.refresh()"></select>
+	</div>
+</div>
+
+<div class="gf-form-group">
+	<div class="edit-tab-content">
+		<div class="gf-form-group">
+			<h5>Series specific overrides <tip>Regex match example: /server[0-3]/i </tip></h5>
+			<div class="gf-form-inline" ng-repeat="override in ctrl.panel.seriesOverrides" ng-controller="SeriesOverridesDiagramCtrl">
+				<div class="gf-form">
+					<label class="gf-form-label">alias or regex</label>
+				</div>
+				<div class="gf-form width-15">
+					<input type="text" ng-model="override.alias" bs-typeahead="getSeriesNames" ng-blur="ctrl.render()" data-min-length=0 data-items=100 class="gf-form-input width-15">
+				</div>
+				<div class="gf-form" ng-repeat="option in currentOverrides">
+					<label class="gf-form-label">
+						<i class="pointer fa fa-remove" ng-click="removeOverride(option)"></i>
+						<span ng-show="option.propertyName === 'color'">
+							Color: <i class="fa fa-circle" ng-style="{color:option.value}"></i>
+						</span>
+						<span ng-show="option.propertyName === 'thresholds'">
+							Thresholds: <input ng-model="option.value" ng-blur="thresholdsChanged(option)"></input>
+						</span>
+						<span ng-show="option.propertyName !== 'color' && option.propertyName !== 'thresholds'">
+							{{option.name}}: {{option.value}}
+						</span>
+					</label>
+				</div>
+
+				<div class="gf-form">
+					<span class="dropdown" dropdown-typeahead="overrideMenu" dropdown-typeahead-on-select="setOverride($item, $subItem)">
+					</span>
+				</div>
+
+				<div class="gf-form gf-form--grow">
+					<div class="gf-form-label gf-form-label--grow"></div>
+				</div>
+
+				<div class="gf-form">
+					<label class="gf-form-label">
+						<i class="fa fa-trash pointer" ng-click="ctrl.removeSeriesOverride(override)"></i>
+					</label>
+				</div>
+			</div>
+		</div>
+
+		<button class="btn btn-inverse" ng-click="ctrl.addSeriesOverride()">
+			<i class="fa fa-plus"></i>&nbsp;Add override
+		</button>
 	</div>
 </div>
