@@ -9,7 +9,9 @@ $cluster-stroke: #6eaa49;
 $message-stroke: #777;
 $task-fill: #487e3a;
 
-
+.diagram {
+	overflow: scroll;
+}
 .diagram > svg div{
 	color: $text-color;
 	text-align: center;

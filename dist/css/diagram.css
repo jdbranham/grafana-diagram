@@ -1,3 +1,6 @@
+.diagram {
+  overflow: scroll; }
+
 .diagram > svg div {
   color: #333;
   text-align: center; }
