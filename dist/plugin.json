@@ -21,7 +21,7 @@
   "logos": {
       "small": "img/icn-diagram-panel.svg",
       "large": "img/icn-diagram-panel.svg"
-  }
+  },
 
   "dependencies": {
     "grafanaVersion": "3.x.x",
