@@ -398,7 +398,7 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 									// probably a flowchart
 									targetElement.selectAll('rect,circle,poly').style('fill', seriesItem.color);
 									// Add value text
-									var p = targetElement.select('div').append('div').append('p');
+									var p = targetElement.select('div').append('p');
 									p.classed('diagram-value');
 									p.style('background-color', seriesItem.color);
 									p.html(seriesItem.valueFormatted);

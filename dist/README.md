@@ -12,6 +12,9 @@ The target or 'alias' of the series is compared to the ID of the diagram node to
 
 ##Examples  
 
+###Diagram  
+![Diagram](https://raw.githubusercontent.com/jdbranham/grafana-diagram/master/src/img/diagram.PNG?raw=true)  
+
 ###Diagram Definition  
 ![Diagram Definition](https://raw.githubusercontent.com/jdbranham/grafana-diagram/master/src/img/diagram_definition.PNG?raw=true)  
 
@@ -31,10 +34,10 @@ Example Diagram -
 ![Prometheus Diagram](https://raw.githubusercontent.com/jdbranham/grafana-diagram/master/src/img/diagram_prometheus.PNG?raw=true)  
  
 
-##Roadmap -  
-- [suggest something] 
+##Roadmap  
+- [suggest something]  
 
-
+##Thanks!  
 
 
 Special thanks to the Mermaid contributors -  
