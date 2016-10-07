@@ -392,7 +392,7 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 
 								// Find nodes by ID if we can
 								console.info('finding targetElement');
-								var targetElement = d3.select(document.getElementById(key)); // $(svg).find('#'+key).first(); // jquery doesnt work for some ID expressions [prometheus data]
+								var targetElement = d3.select(svg[0].getElementById(key)); // $(svg).find('#'+key).first(); // jquery doesnt work for some ID expressions [prometheus data]
 
 								if (targetElement[0][0] !== null) {
 									// probably a flowchart

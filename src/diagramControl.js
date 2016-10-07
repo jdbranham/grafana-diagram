@@ -316,7 +316,7 @@ class DiagramCtrl extends MetricsPanelCtrl {
 				
 				// Find nodes by ID if we can
 				console.info('finding targetElement');
-				var targetElement = d3.select(document.getElementById(key)); // $(svg).find('#'+key).first(); // jquery doesnt work for some ID expressions [prometheus data]
+				var targetElement = d3.select(svg[0].getElementById(key)); // $(svg).find('#'+key).first(); // jquery doesnt work for some ID expressions [prometheus data]
 				
 				if(targetElement[0][0] !== null){ // probably a flowchart
 					targetElement.selectAll('rect,circle,poly').style('fill', seriesItem.color);
