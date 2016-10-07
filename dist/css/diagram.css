@@ -1,9 +1,6 @@
 .diagram {
   overflow: auto; }
 
-.diagram div {
-  color: #333; }
-
 .diagram div p {
   text-align: center; }
 
@@ -84,7 +81,7 @@ text.actor {
   stroke: green !important; }
 
 .messageText {
-  fill: #333;
+  fill: #D8D9DA;
   stroke: none; }
 
 .labelBox {
@@ -96,7 +93,7 @@ text.actor {
   stroke: none; }
 
 .loopText {
-  fill: black;
+  fill: #D8D9DA;
   stroke: none; }
 
 .loopLine {

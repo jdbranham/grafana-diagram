@@ -15,8 +15,13 @@
       {"name": "Apache License", "url": "https://github.com/jdbranham/grafana-diagram/blob/master/LICENSE"}
     ],
     "version": "1.2.1",
-    "updated": "2016-09-29"
+    "updated": "2016-10-07"
   },
+  
+  "logos": {
+      "small": "img/icn-diagram-panel.svg",
+      "large": "img/icn-diagram-panel.svg"
+  }
 
   "dependencies": {
     "grafanaVersion": "3.x.x",
