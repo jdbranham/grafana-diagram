@@ -10,14 +10,18 @@ $message-stroke: #777;
 $task-fill: #487e3a;
 
 .diagram {
-	overflow: scroll;
+	overflow: auto;
 }
-.diagram > svg div{
+
+.diagram div{
 	color: $text-color;
+}
+
+.diagram div p {
 	text-align: center;
 }
 
-.diagram > svg {
+.diagram svg {
 	margin: auto;
 	display: block;
 }
@@ -28,6 +32,7 @@ g.node > * {
 
 svg > g {
 	overflow: visible;
+	display: block;
 }
 
 .diagram-value {

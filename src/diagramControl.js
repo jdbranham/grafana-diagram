@@ -12,7 +12,14 @@ const panelDefaults = {
     seriesOverrides: [],
 	thresholds: '0,10',
 	colors: ['rgba(50, 172, 45, 0.97)', 'rgba(237, 129, 40, 0.89)', 'rgba(245, 54, 54, 0.9)'],
-	showLegend: true,
+	legend: {
+		show: true,
+		min: true,
+		max: true,
+		avg: true,
+		current: true,
+		total: true
+	},
 	maxDataPoints: 100,
 	mappingType: 1,
 	nullPointMode: 'connected',
@@ -96,7 +103,6 @@ class DiagramCtrl extends MetricsPanelCtrl {
 		
 		this.panel.graphId = 'diagram_' + this.panel.id;
 		this.containerDivId = 'container_'+this.panel.graphId;
-		this.svg = {};		
 		this.$sce = $sce;
 		this.events.on('init-edit-mode', this.onInitEditMode.bind(this));
 		this.events.on('data-received', this.onDataReceived.bind(this));
@@ -110,12 +116,16 @@ class DiagramCtrl extends MetricsPanelCtrl {
 	}
 	
 	handleParseError(err, hash){
-		this.svg = '<p>Diagram Definition:</p><pre>' + err + '</pre>';
+		this.getDiagramContainer().html('<p>Diagram Definition:</p><pre>' + err + '</pre>');
 	}
 	
 	onInitEditMode() {
 		this.addEditorTab('Diagram', diagramEditor, 2);
 		this.addEditorTab('Display', displayEditor, 3);
+	}
+	
+	getDiagramContainer(){
+		return $(document.getElementById(_this.containerDivId));
 	}
 	
 	onDataReceived(dataList){
@@ -128,13 +138,14 @@ class DiagramCtrl extends MetricsPanelCtrl {
 		var data = {};
 		this.setValues(data);
 		this.updateDiagram(data);
+		this.svgData = data;
 		this.render();
 	}
 
 	seriesHandler(seriesData) {
 		var series = new TimeSeries({
 			datapoints: seriesData.datapoints,
-			alias: seriesData.target,
+			alias: seriesData.target.replace(/"|,|;|=|:|{|}/g, '_')
 		});
 	    series.flotpairs = series.getFlotPairs(this.panel.nullPointMode);
 	    return series;
@@ -159,39 +170,17 @@ class DiagramCtrl extends MetricsPanelCtrl {
 			this.clearDiagram();
 			var _this = this;
 			var graphDefinition = this.panel.content;
+			var diagramContainer = $(document.getElementById(_this.containerDivId));
 			var renderCallback = function (svgCode, bindFunctions){
-			    var svg = _this.updateStyle(svgCode, data);
-			    _this.svg = _this.$sce.trustAsHtml(svg);
+				if(svgCode == '') {
+					diagramContainer.html('There was a problem rendering the graph');
+				} else {
+			    	diagramContainer.html(svgCode);
+				}
 			};
-		    mermaidAPI.render(this.panel.graphId, graphDefinition, renderCallback);
+			mermaidAPI.render(this.panel.graphId, graphDefinition, renderCallback);
 		}
 	} // End updateDiagram()
-	
-	updateStyle(svgCode, data){
-		console.info('updating svg style');
-		var svg = $('<div>' + svgCode + '</div>');
-		for(var key in data){
-			var seriesItem = data[key];
-			
-			// Find nodes by ID if we can
-			console.info('finding targetElement');
-			var targetElement = $(svg).find('#'+key).first(); 
-			
-			if(targetElement.length > 0){ // must be a flowchart
-				targetElement.children().css('fill', seriesItem.color);
-				// Add value text
-				targetElement.find('div').first().append('<p class="diagram-value" style="background-color:'+seriesItem.color+'">'+seriesItem.valueFormatted+'</p>');
-			} else {
-				targetElement = $(svg).find('text:contains("'+key+'")'); // sequence diagram, gantt ?
-				targetElement.parent().find('rect, circle, poly').css('fill', seriesItem.color);
-				targetElement.append('\n' + seriesItem.valueFormatted);
-			}
-			
-			console.debug(targetElement);
-			console.info('set nodes:' + key + ' to color:' + seriesItem.color);
-		}
-		return $(svg).html();
-	} // End updateStyle()
 	
 	setValues(data) {
 	    if (this.series && this.series.length > 0) {
@@ -294,23 +283,75 @@ class DiagramCtrl extends MetricsPanelCtrl {
 	}
 	
 	link(scope, elem, attrs, ctrl) {
-	    var diagramElement = elem.find('.diagram');
-    	console.debug('found diagram panel');
-    	console.debug(diagramElement);
+		var diagramElement = elem.find('.diagram');
+		diagramElement.append('<div id="'+ctrl.containerDivId+'"></div>');
+	    var diagramContainer = $(document.getElementById(ctrl.containerDivId));
+    	console.debug('found diagramContainer');
+    	console.debug(diagramContainer);
     	elem.css('height', ctrl.height + 'px');
     	
     	function render(){
     		setElementHeight();
+    		updateStyle();
     	}
     	
     	function setElementHeight() {
-	      diagramElement.css('height', ctrl.height + 'px');
+	      //diagramContainer.css('height', ctrl.height + 'px');
 	    }
     	
     	this.events.on('render', function() {
 			render();
 			ctrl.renderingCompleted();
 	    });
+	    
+	    function updateStyle(){
+	    	var data = ctrl.svgData;
+	    	ctrl.svgData = {}; // get rid of the data after consuming it. This prevents adding duplicate DOM elements
+			console.info('updating svg style');
+			var svg = $(document.getElementById(ctrl.panel.graphId));
+			$(svg).css('min-width', $(svg).css('max-width')); 
+			
+			for(var key in data){
+				var seriesItem = data[key];
+				
+				// Find nodes by ID if we can
+				console.info('finding targetElement');
+				var targetElement = d3.select(document.getElementById(key)); // $(svg).find('#'+key).first(); // jquery doesnt work for some ID expressions [prometheus data]
+				
+				if(targetElement[0][0] !== null){ // probably a flowchart
+					targetElement.selectAll('rect,circle,poly').style('fill', seriesItem.color);
+					// Add value text
+					var p = targetElement.select('div').append('div').append('p');
+					p.classed('diagram-value');
+					p.style('background-color', seriesItem.color);
+					p.html(seriesItem.valueFormatted);
+				} else {
+					console.debug('finding element that contains text node: ' + key);
+					targetElement = $(svg).find('div:contains("'+key+'")'); // maybe a flowchart with an alias text node
+					if(targetElement.length > 0){
+						targetElement.parents('.node').find('rect, circle, poly').css('fill', seriesItem.color);
+						var dElement = d3.select(targetElement[0]);
+						 // Add value text
+						var p = dElement.append('p');
+						p.classed('diagram-value');
+						p.style('background-color', seriesItem.color);
+						p.html(seriesItem.valueFormatted);
+					} else {
+						targetElement = $(svg).find('text:contains("'+key+'")'); // sequence diagram, gantt ?
+						if(targetElement.length == 0){
+							console.warn('couldnt not find a diagram node with id/text: ' + key);
+							continue;
+						}
+						targetElement.parent().find('rect, circle, poly').css('fill', seriesItem.color);
+						targetElement.append('\n' + seriesItem.valueFormatted);
+					}
+				}
+				
+				console.debug(targetElement);
+				console.info('set nodes:' + key + ' to color:' + seriesItem.color);
+			}
+			//return $(svg).html();
+		} // End updateStyle()
 	}
 // End Class
 }

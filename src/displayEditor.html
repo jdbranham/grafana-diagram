@@ -1,3 +1,16 @@
+<div class="gf-form-group">
+	<h5>Legend</h5>
+	<div class="gf-form">
+		<editor-checkbox text="Show Legend" model="ctrl.panel.legend.show" class="gf-form-checkbox" ></editor-checkbox>
+		<div ng-show="ctrl.panel.legend.show">
+			<editor-checkbox text="Min" model="ctrl.panel.legend.min" class="gf-form-checkbox" ></editor-checkbox>
+			<editor-checkbox text="Max" model="ctrl.panel.legend.max" class="gf-form-checkbox" ></editor-checkbox>
+			<editor-checkbox text="Avg" model="ctrl.panel.legend.avg" class="gf-form-checkbox" ></editor-checkbox>
+			<editor-checkbox text="Total" model="ctrl.panel.legend.total" class="gf-form-checkbox" ></editor-checkbox>
+			<editor-checkbox text="Current" model="ctrl.panel.legend.current" class="gf-form-checkbox" ></editor-checkbox>
+		</div>
+	</div>
+</div>
 
 <div class="gf-form-group">
 	<h5>Threshold Options</h5>

@@ -1,11 +1,13 @@
 .diagram {
-  overflow: scroll; }
+  overflow: auto; }
 
-.diagram > svg div {
-  color: #333;
+.diagram div {
+  color: #333; }
+
+.diagram div p {
   text-align: center; }
 
-.diagram > svg {
+.diagram svg {
   margin: auto;
   display: block; }
 
@@ -13,7 +15,8 @@ g.node > * {
   fill: white; }
 
 svg > g {
-  overflow: visible; }
+  overflow: visible;
+  display: block; }
 
 .diagram-value {
   background-color: white;
