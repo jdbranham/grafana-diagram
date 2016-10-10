@@ -14,6 +14,10 @@ $task-fill: #487e3a;
 	overflow: auto;
 }
 
+.diagram g.label div {
+	color: $text-color;
+}
+
 .diagram div p {
 	text-align: center;
 }

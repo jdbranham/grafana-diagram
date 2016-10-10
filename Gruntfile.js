@@ -22,9 +22,9 @@ module.exports = (grunt) => {
 		  src: ['mermaid/dist/mermaidAPI*'],
 		  dest: 'dist/libs'
 		},
-      pluginDef: {
+      readme: {
         expand: true,
-        src: ['plugin.json', 'README.md'],
+        src: ['README.md'],
         dest: 'dist',
       },
       img_to_dist: {
@@ -37,7 +37,7 @@ module.exports = (grunt) => {
 
     watch: {
       rebuild_all: {
-        files: ['src/**/*', 'plugin.json'],
+        files: ['src/**/*', 'README.md'],
         tasks: ['default'],
         options: {spawn: false}
       },
@@ -73,5 +73,5 @@ module.exports = (grunt) => {
 
   });
 
-  grunt.registerTask('default', ['clean', 'copy:src_to_dist', 'copy:libs_to_dist', 'copy:pluginDef', 'copy:img_to_dist', 'sass', 'babel']);
+  grunt.registerTask('default', ['clean', 'copy:src_to_dist', 'copy:libs_to_dist', 'copy:readme', 'copy:img_to_dist', 'sass', 'babel']);
 };

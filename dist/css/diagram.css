@@ -1,6 +1,9 @@
 .diagram {
   overflow: auto; }
 
+.diagram g.label div {
+  color: #333; }
+
 .diagram div p {
   text-align: center; }
 
