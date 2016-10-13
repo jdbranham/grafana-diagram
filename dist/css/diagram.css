@@ -1,6 +1,9 @@
 .diagram {
   overflow: auto; }
 
+.gradient-values-container .gradient-value-max {
+  float: right; }
+
 .diagram g.label div {
   color: #333; }
 
@@ -116,7 +119,7 @@ text.actor {
   font-size: 14px; }
 
 /** Section styling */
-.section {
+.diagram .section {
   stroke: none;
   opacity: 0.2; }
 

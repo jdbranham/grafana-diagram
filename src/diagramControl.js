@@ -18,7 +18,11 @@ const panelDefaults = {
 		max: true,
 		avg: true,
 		current: true,
-		total: true
+		total: true,
+		gradient: {
+			enabled: true,
+			show: true
+		}
 	},
 	maxDataPoints: 100,
 	mappingType: 1,
@@ -160,6 +164,24 @@ class DiagramCtrl extends MetricsPanelCtrl {
 	    this.render();
 	}
 	
+	updateThresholds(){
+		var thresholdCount = this.panel.thresholds.length;
+		var colorCount = this.panel.colors.length;
+		this.refresh();
+	}
+	
+	changeColor(colorIndex, color){
+		this.panel.colors[colorIndex] = color;
+	}
+	
+	removeColor(colorIndex){
+		this.panel.colors.splice(colorIndex,1);
+	}
+	
+	addColor(){
+		this.panel.colors.push('rgba(255, 255, 255, 1)');
+	}
+	
 	clearDiagram(){
 		$('#'+this.panel.graphId).remove();
 		this.svg = {};
@@ -209,10 +231,31 @@ class DiagramCtrl extends MetricsPanelCtrl {
 			        data[seriesItem.alias].valueFormatted = formatFunc(data[seriesItem.alias].value, decimalInfo.decimals, decimalInfo.scaledDecimals);
 			        data[seriesItem.alias].valueRounded = kbn.roundValue(data[seriesItem.alias].value, decimalInfo.decimals);
 				}
-				data[seriesItem.alias].color = getColorForValue(data[seriesItem.alias].colorData, data[seriesItem.alias].value);
+				if (this.panel.legend.gradient.enabled){
+					data[seriesItem.alias].color = this.getGradientForValue(data[seriesItem.alias].colorData, data[seriesItem.alias].value);
+				} else {
+					data[seriesItem.alias].color = getColorForValue(data[seriesItem.alias].colorData, data[seriesItem.alias].value);
+				}
 			}
 	    }
 	} // End setValues()
+	
+	getGradientForValue(data, value){
+		console.info('Getting gradient for value');
+		console.debug(data);
+		console.debug(value);
+		var min = Math.min.apply(Math, data.thresholds);
+		var max = Math.max.apply(Math, data.thresholds);
+		var absoluteDistance = max - min;
+		var valueDistanceFromMin = value - min;
+		var xPercent = valueDistanceFromMin/absoluteDistance;
+		// Get the smaller number to clamp at 0.99 max
+		xPercent = Math.min(0.99, xPercent);
+		// Get the larger number to clamp at 0.01 min
+		xPercent = Math.max(0.01, xPercent);
+		
+		return getColorByXPercentage(this.canvas, xPercent);
+	}
 	
 	applyOverrides(seriesItemAlias){
 		var seriesItem = {}, colorData = {}, overrides = {};
@@ -238,9 +281,8 @@ class DiagramCtrl extends MetricsPanelCtrl {
 	}
 	
 	invertColorOrder() {
-	    var tmp = this.panel.colors[0];
-	    this.panel.colors[0] = this.panel.colors[2];
-	    this.panel.colors[2] = tmp;
+	    this.panel.colors.reverse();
+	    this.refresh();
 	}
 
 	getDecimalsForValue(value) {
@@ -290,10 +332,37 @@ class DiagramCtrl extends MetricsPanelCtrl {
     	console.debug(diagramContainer);
     	elem.css('height', ctrl.height + 'px');
     	
+	    var canvas = elem.find('.canvas')[0];
+	    ctrl.canvas = canvas;
+	    var gradientValueMax = elem.find('.gradient-value-max')[0];
+	    var gradientValueMin = elem.find('.gradient-value-min')[0];
+    	
     	function render(){
     		setElementHeight();
+    		updateCanvasStyle();
     		updateStyle();
     	}
+    	
+    	function updateCanvasStyle(){
+	    	canvas.width = Math.max(diagramElement[0].clientWidth, 100);
+			var canvasContext = canvas.getContext("2d");
+			canvasContext.clearRect(0, 0, canvas.width, canvas.height);
+			
+			var grd = canvasContext.createLinearGradient(0, 0, canvas.width, 0);
+			var colorWidth = 1 / Math.max(ctrl.panel.colors.length, 1);
+			for(var i=0; i<ctrl.panel.colors.length; i++){
+				var currentColor = ctrl.panel.colors[i];
+				grd.addColorStop(Math.min(colorWidth*i,1), currentColor);
+			}
+			canvasContext.fillStyle = grd;
+			canvasContext.fillRect(0, 0, canvas.width, 3);
+    		ctrl.canvasContext = canvasContext;
+    		
+			gradientValueMax.innerText = Math.max.apply(Math, ctrl.panel.thresholds.split(','));
+			gradientValueMin.innerText = Math.min.apply(Math, ctrl.panel.thresholds.split(','));
+    	}
+    	
+
     	
     	function setElementHeight() {
 	      //diagramContainer.css('height', ctrl.height + 'px');
@@ -366,6 +435,14 @@ function getColorForValue(data, value) {
 	}
   }
   return _.first(data.colorMap);
+}
+
+function getColorByXPercentage(canvas, xPercent){
+	var x = canvas.width * xPercent;
+	var context = canvas.getContext("2d");
+    var p = context.getImageData(x, 1, 1, 1).data; 
+    var color = 'rgba('+[p[0] +','+ p[1] +','+ p[2] +','+ p[3]]+')';
+    return color;
 }
 
 DiagramCtrl.templateUrl = 'module.html';

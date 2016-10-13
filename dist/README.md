@@ -28,9 +28,16 @@ The target or 'alias' of the series is compared to the ID of the diagram node to
   
 ### Display Options  
   
+* Thresholds
+* Aggregation Options
+* Unbound Color Levels
+* Gradient Option for Heatmap style coloring
+  
 ![Diagram Display Options](https://raw.githubusercontent.com/jdbranham/grafana-diagram/master/src/img/diagram_display.PNG?raw=true)  
 
+### With Gradient Coloring  
 
+![Diagram Heatmap](https://raw.githubusercontent.com/jdbranham/grafana-diagram/master/src/img/diagram_gradient.PNG?raw=true) 
   
 ### Metrics  
   

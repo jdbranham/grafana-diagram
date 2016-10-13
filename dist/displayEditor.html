@@ -16,26 +16,37 @@
 	<h5>Threshold Options</h5>
 	<div class="gf-form">
 		<label class="gf-form-label width-10">Thresholds
-			<tip>Define two threshold values&lt;br /&gt; 50,80 will produce: &lt;50 = Green, 50:80 = Yellow, &gt;80 = Red</tip>
+			<tip>Define threshold values to map the colors</tip>
 		</label>
 		<input
 			type="text" class="input-small gf-form-input width-10"
-			ng-model="ctrl.panel.thresholds" ng-change="ctrl.refresh()"
+			ng-model="ctrl.panel.thresholds" ng-change="ctrl.updateThresholds()"
 			placeholder="0,10" ng-model-onblur />
 	</div>
 	<div class="gf-form">
 		<label class="gf-form-label width-10">Colors</label>
-		<spectrum-picker class="gf-form-input width-3"
-			ng-model="ctrl.panel.colors[0]" ng-change="ctrl.refresh()"></spectrum-picker>
-		<spectrum-picker class="gf-form-input width-3"
-			ng-model="ctrl.panel.colors[1]" ng-change="ctrl.refresh()"></spectrum-picker>
-		<spectrum-picker class="gf-form-input width-3"
-			ng-model="ctrl.panel.colors[2]" ng-change="ctrl.refresh()"></spectrum-picker>
+		<div class="gf-form-inline" ng-repeat="color in ctrl.panel.colors track by $index">
+			<label class="gf-form-label">
+				<a ng-click="ctrl.removeColor($index)"><i class="pointer fa fa-remove">&nbsp;</i></a>
+				<spectrum-picker ng-model="color" ng-change="ctrl.changeColor($index, color)" ng-model-onblur></spectrum-picker>
+			</label>
+		</div>
+		<span class="gf-form-label">
+	        <a  ng-click="ctrl.addColor()">
+	          <i class="fa fa-plus"></i>&nbsp;
+	        </a>
+    	</span>
 		<span class="gf-form-label">
 	        <a  ng-click="ctrl.invertColorOrder()">
 	          Invert
 	        </a>
-      </span>
+    	</span>
+    	<span>
+   			<label class="gf-form-label">
+				<editor-checkbox text="Gradient" model="ctrl.panel.legend.gradient.enabled" class="gf-form-checkbox" ></editor-checkbox>
+				<tip>Only the Max and Min threshold values are considered when using Gradient mode</tip>
+			</label>
+    	</span>
     </div>
 	<div class="gf-form">
 		<label class="gf-form-label width-10">Value</label>
