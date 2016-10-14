@@ -26,6 +26,7 @@ const panelDefaults = {
 	},
 	maxDataPoints: 100,
 	mappingType: 1,
+	maxWidth: false,
 	nullPointMode: 'connected',
 	format: 'none',
 	valueName: 'avg',
@@ -39,8 +40,7 @@ const panelDefaults = {
 		'B --> D{Rhombus}\n' +
 		'C --> D\n',
 	init: {
-		startOnLoad: false,
-		logLevel: 2, //1:debug, 2:info, 3:warn, 4:error, 5:fatal
+		logLevel: 3, //1:debug, 2:info, 3:warn, 4:error, 5:fatal
     	cloneCssStyles: false, // - This options controls whether or not the css rules should be copied into the generated svg
 		startOnLoad: false, // - This options controls whether or mermaid starts when the page loads
 		arrowMarkerAbsolute: true, // - This options controls whether or arrow markers in html code will be absolute paths or an anchor, #. This matters if you are using base tag settings.
@@ -120,7 +120,8 @@ class DiagramCtrl extends MetricsPanelCtrl {
 	}
 	
 	handleParseError(err, hash){
-		this.getDiagramContainer().html('<p>Diagram Definition:</p><pre>' + err + '</pre>');
+		this.error = 'Failed to parse diagram definition';
+		this.errorText = this.$sce.trustAsHtml('<p>Diagram Definition:</p><pre>' + err + '</pre>');
 	}
 	
 	onInitEditMode() {
@@ -129,7 +130,7 @@ class DiagramCtrl extends MetricsPanelCtrl {
 	}
 	
 	getDiagramContainer(){
-		return $(document.getElementById(_this.containerDivId));
+		return $(document.getElementById(this.containerDivId));
 	}
 	
 	onDataReceived(dataList){
@@ -190,9 +191,10 @@ class DiagramCtrl extends MetricsPanelCtrl {
 	updateDiagram(data){
 		if(this.panel.content.length > 0){
 			this.clearDiagram();
-			var _this = this;
 			var graphDefinition = this.panel.content;
-			var diagramContainer = $(document.getElementById(_this.containerDivId));
+			this.diagramType = mermaidAPI.detectType(graphDefinition);
+			var diagramContainer = $(document.getElementById(this.containerDivId));
+		    
 			var renderCallback = function (svgCode, bindFunctions){
 				if(svgCode == '') {
 					diagramContainer.html('There was a problem rendering the graph');
@@ -200,6 +202,7 @@ class DiagramCtrl extends MetricsPanelCtrl {
 			    	diagramContainer.html(svgCode);
 				}
 			};
+			// if parsing the graph definition fails, the error handler will be called but the renderCallback() may also still be called.
 			mermaidAPI.render(this.panel.graphId, graphDefinition, renderCallback);
 		}
 	} // End updateDiagram()
@@ -379,6 +382,13 @@ class DiagramCtrl extends MetricsPanelCtrl {
 			console.info('updating svg style');
 			var svg = $(document.getElementById(ctrl.panel.graphId));
 			$(svg).css('min-width', $(svg).css('max-width')); 
+			if (ctrl.panel.maxWidth){
+				$(svg).css('max-width', '100%');
+			}
+			
+			if(svg[0] === undefined){
+				return;
+			}
 			
 			for(var key in data){
 				var seriesItem = data[key];

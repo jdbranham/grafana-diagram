@@ -59,6 +59,24 @@ Example Diagram -
 ## Roadmap  
   
 - [suggest something]  
+
+## Upgrading  
+
+### v1.2 to >1.3.x  
+
+#### Cannot read property 'enabled' of undefined
+
+Add an empty 'gradient' object to the panel json 'legend' object  
+
+  "legend": {
+    "avg": true,
+    "current": true,
+    "max": true,
+    "min": false,
+    "show": true,
+    "total": false,
+    "gradient": {}
+  },
   
 ## Thanks!  
   

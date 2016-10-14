@@ -3,7 +3,7 @@
 System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app/core/utils/kbn', 'app/plugins/sdk', './properties', 'lodash', './series_overrides_diagram_ctrl', './css/diagram.css!'], function (_export, _context) {
 	"use strict";
 
-	var TimeSeries, kbn, MetricsPanelCtrl, diagramEditor, displayEditor, _, _createClass, _init, panelDefaults, DiagramCtrl;
+	var TimeSeries, kbn, MetricsPanelCtrl, diagramEditor, displayEditor, _, _createClass, panelDefaults, DiagramCtrl;
 
 	function _classCallCheck(instance, Constructor) {
 		if (!(instance instanceof Constructor)) {
@@ -33,21 +33,6 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 			}
 		});
 		if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
-	}
-
-	function _defineProperty(obj, key, value) {
-		if (key in obj) {
-			Object.defineProperty(obj, key, {
-				value: value,
-				enumerable: true,
-				configurable: true,
-				writable: true
-			});
-		} else {
-			obj[key] = value;
-		}
-
-		return obj;
 	}
 
 	function getColorForValue(data, value) {
@@ -121,40 +106,46 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 				},
 				maxDataPoints: 100,
 				mappingType: 1,
+				maxWidth: false,
 				nullPointMode: 'connected',
 				format: 'none',
 				valueName: 'avg',
 				valueOptions: ['avg', 'min', 'max', 'total', 'current'],
 				valueMaps: [{ value: 'null', op: '=', text: 'N/A' }],
 				content: 'graph LR\n' + 'A[Square Rect] -- Link text --> B((Circle))\n' + 'A --> C(Round Rect)\n' + 'B --> D{Rhombus}\n' + 'C --> D\n',
-				init: (_init = {
-					startOnLoad: false,
-					logLevel: 2, //1:debug, 2:info, 3:warn, 4:error, 5:fatal
-					cloneCssStyles: false }, _defineProperty(_init, 'startOnLoad', false), _defineProperty(_init, 'arrowMarkerAbsolute', true), _defineProperty(_init, 'flowchart', {
-					htmlLabels: true,
-					useMaxWidth: true
-				}), _defineProperty(_init, 'sequenceDiagram', {
-					diagramMarginX: 50, // - margin to the right and left of the sequence diagram
-					diagramMarginY: 10, // - margin to the over and under the sequence diagram
-					actorMargin: 50, // - Margin between actors
-					width: 150, // - Width of actor boxes
-					height: 65, // - Height of actor boxes00000000001111
-					boxMargin: 10, // - Margin around l01oop boxes
-					boxTextMargin: 5, // - margin around the text in loop/alt/opt boxes
-					noteMargin: 10, // - margin around notes
-					messageMargin: 35, // - Space between messages
-					mirrorActors: true, // - mirror actors under diagram
-					bottomMarginAdj: 1, // - Depending on css styling this might need adjustment. Prolongs the edge of the diagram downwards
-					useMaxWidth: true }), _defineProperty(_init, 'gantt', {
-					titleTopMargin: 25, // - margin top for the text over the gantt diagram
-					barHeight: 20, // - the height of the bars in the graph
-					barGap: 4, // - the margin between the different activities in the gantt diagram
-					topPadding: 50, // - margin between title and gantt diagram and between axis and gantt diagram.
-					leftPadding: 75, // - the space allocated for the section name to the left of the activities.
-					gridLineStartPadding: 35, // - Vertical starting position of the grid lines
-					fontSize: 11, // - font size ...
-					fontFamily: '"Open-Sans", "sans-serif"', // - font family ...
-					numberSectionStyles: 3 }), _init)
+				init: {
+					logLevel: 3, //1:debug, 2:info, 3:warn, 4:error, 5:fatal
+					cloneCssStyles: false, // - This options controls whether or not the css rules should be copied into the generated svg
+					startOnLoad: false, // - This options controls whether or mermaid starts when the page loads
+					arrowMarkerAbsolute: true, // - This options controls whether or arrow markers in html code will be absolute paths or an anchor, #. This matters if you are using base tag settings.
+					flowchart: {
+						htmlLabels: true,
+						useMaxWidth: true
+					},
+					sequenceDiagram: {
+						diagramMarginX: 50, // - margin to the right and left of the sequence diagram
+						diagramMarginY: 10, // - margin to the over and under the sequence diagram
+						actorMargin: 50, // - Margin between actors
+						width: 150, // - Width of actor boxes
+						height: 65, // - Height of actor boxes00000000001111
+						boxMargin: 10, // - Margin around l01oop boxes
+						boxTextMargin: 5, // - margin around the text in loop/alt/opt boxes
+						noteMargin: 10, // - margin around notes
+						messageMargin: 35, // - Space between messages
+						mirrorActors: true, // - mirror actors under diagram
+						bottomMarginAdj: 1, // - Depending on css styling this might need adjustment. Prolongs the edge of the diagram downwards
+						useMaxWidth: true },
+					gantt: {
+						titleTopMargin: 25, // - margin top for the text over the gantt diagram
+						barHeight: 20, // - the height of the bars in the graph
+						barGap: 4, // - the margin between the different activities in the gantt diagram
+						topPadding: 50, // - margin between title and gantt diagram and between axis and gantt diagram.
+						leftPadding: 75, // - the space allocated for the section name to the left of the activities.
+						gridLineStartPadding: 35, // - Vertical starting position of the grid lines
+						fontSize: 11, // - font size ...
+						fontFamily: '"Open-Sans", "sans-serif"', // - font family ...
+						numberSectionStyles: 3 }
+				}
 			};
 
 			_export('MetricsPanelCtrl', _export('DiagramCtrl', DiagramCtrl = function (_MetricsPanelCtrl) {
@@ -163,18 +154,18 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 				function DiagramCtrl($scope, $injector, $sce) {
 					_classCallCheck(this, DiagramCtrl);
 
-					var _this2 = _possibleConstructorReturn(this, (DiagramCtrl.__proto__ || Object.getPrototypeOf(DiagramCtrl)).call(this, $scope, $injector));
+					var _this = _possibleConstructorReturn(this, (DiagramCtrl.__proto__ || Object.getPrototypeOf(DiagramCtrl)).call(this, $scope, $injector));
 
-					_.defaults(_this2.panel, panelDefaults);
+					_.defaults(_this.panel, panelDefaults);
 
-					_this2.panel.graphId = 'diagram_' + _this2.panel.id;
-					_this2.containerDivId = 'container_' + _this2.panel.graphId;
-					_this2.$sce = $sce;
-					_this2.events.on('init-edit-mode', _this2.onInitEditMode.bind(_this2));
-					_this2.events.on('data-received', _this2.onDataReceived.bind(_this2));
-					_this2.events.on('data-snapshot-load', _this2.onDataReceived.bind(_this2));
-					_this2.initializeMermaid();
-					return _this2;
+					_this.panel.graphId = 'diagram_' + _this.panel.id;
+					_this.containerDivId = 'container_' + _this.panel.graphId;
+					_this.$sce = $sce;
+					_this.events.on('init-edit-mode', _this.onInitEditMode.bind(_this));
+					_this.events.on('data-received', _this.onDataReceived.bind(_this));
+					_this.events.on('data-snapshot-load', _this.onDataReceived.bind(_this));
+					_this.initializeMermaid();
+					return _this;
 				}
 
 				_createClass(DiagramCtrl, [{
@@ -186,7 +177,8 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 				}, {
 					key: 'handleParseError',
 					value: function handleParseError(err, hash) {
-						this.getDiagramContainer().html('<p>Diagram Definition:</p><pre>' + err + '</pre>');
+						this.error = 'Failed to parse diagram definition';
+						this.errorText = this.$sce.trustAsHtml('<p>Diagram Definition:</p><pre>' + err + '</pre>');
 					}
 				}, {
 					key: 'onInitEditMode',
@@ -197,7 +189,7 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 				}, {
 					key: 'getDiagramContainer',
 					value: function getDiagramContainer() {
-						return $(document.getElementById(_this.containerDivId));
+						return $(document.getElementById(this.containerDivId));
 					}
 				}, {
 					key: 'onDataReceived',
@@ -268,9 +260,10 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 					value: function updateDiagram(data) {
 						if (this.panel.content.length > 0) {
 							this.clearDiagram();
-							var _this = this;
 							var graphDefinition = this.panel.content;
-							var diagramContainer = $(document.getElementById(_this.containerDivId));
+							this.diagramType = mermaidAPI.detectType(graphDefinition);
+							var diagramContainer = $(document.getElementById(this.containerDivId));
+
 							var renderCallback = function renderCallback(svgCode, bindFunctions) {
 								if (svgCode == '') {
 									diagramContainer.html('There was a problem rendering the graph');
@@ -278,6 +271,7 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 									diagramContainer.html(svgCode);
 								}
 							};
+							// if parsing the graph definition fails, the error handler will be called but the renderCallback() may also still be called.
 							mermaidAPI.render(this.panel.graphId, graphDefinition, renderCallback);
 						}
 					}
@@ -466,6 +460,13 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 							console.info('updating svg style');
 							var svg = $(document.getElementById(ctrl.panel.graphId));
 							$(svg).css('min-width', $(svg).css('max-width'));
+							if (ctrl.panel.maxWidth) {
+								$(svg).css('max-width', '100%');
+							}
+
+							if (svg[0] === undefined) {
+								return;
+							}
 
 							for (var key in data) {
 								var seriesItem = data[key];
