@@ -15,6 +15,6 @@
     "tests"
   ],
   "dependencies": {
-    "mermaid": "~0.5"
+    "mermaid": "https://github.com/knsv/mermaid.git#6.0.0"
   }
 }
