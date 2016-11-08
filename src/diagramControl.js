@@ -268,8 +268,13 @@ class DiagramCtrl extends MetricsPanelCtrl {
 		for(var i=0; i<=this.panel.seriesOverrides.length; i++){
 			console.debug('comparing:');
 			console.debug(this.panel.seriesOverrides[i]);
-			if (this.panel.seriesOverrides[i] && this.panel.seriesOverrides[i].alias == seriesItemAlias){
-				overrides = this.panel.seriesOverrides[i];
+			
+			if (this.panel.seriesOverrides[i]){
+				var regex = kbn.stringToJsRegex(this.panel.seriesOverrides[i].alias);
+				var matches = seriesItemAlias.match(regex);
+				if(matches && matches.length > 0){
+					overrides = this.panel.seriesOverrides[i];
+				}
 			}
 		}
 		colorData.thresholds = (overrides.thresholds || this.panel.thresholds).split(',').map(function(strVale) {
