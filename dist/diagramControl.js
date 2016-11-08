@@ -164,6 +164,7 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 					_this.events.on('init-edit-mode', _this.onInitEditMode.bind(_this));
 					_this.events.on('data-received', _this.onDataReceived.bind(_this));
 					_this.events.on('data-snapshot-load', _this.onDataReceived.bind(_this));
+					_this.unitFormats = kbn.getUnitFormats();
 					_this.initializeMermaid();
 					return _this;
 				}
@@ -211,7 +212,8 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 					value: function seriesHandler(seriesData) {
 						var series = new TimeSeries({
 							datapoints: seriesData.datapoints,
-							alias: seriesData.target.replace(/"|,|;|=|:|{|}/g, '_')
+							alias: seriesData.target.replace(/"|,|;|=|:|{|}/g, '_'),
+							unit: seriesData.unit
 						});
 						series.flotpairs = series.getFlotPairs(this.panel.nullPointMode);
 						return series;
@@ -248,6 +250,12 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 					key: 'addColor',
 					value: function addColor() {
 						this.panel.colors.push('rgba(255, 255, 255, 1)');
+					}
+				}, {
+					key: 'setUnitFormat',
+					value: function setUnitFormat(subItem) {
+						this.panel.format = subItem.value;
+						this.render();
 					}
 				}, {
 					key: 'clearDiagram',

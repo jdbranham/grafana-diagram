@@ -6,6 +6,14 @@
 </div>
 
 <div class="gf-form-group">
+	<h5>Format</h5>
+	<div class="gf-form">
+		<label class="gf-form-label width-10">Unit</label> 
+		<div class="gf-form-dropdown-typeahead max-width-15" ng-model="ctrl.panel.format" dropdown-typeahead2="ctrl.unitFormats" dropdown-typeahead-on-select="ctrl.setUnitFormat($subItem)"></div>
+	</div>
+</div>
+
+<div class="gf-form-group">
 	<h5>Legend</h5>
 	<div class="gf-form">
 		<editor-checkbox text="Show Legend" model="ctrl.panel.legend.show" class="gf-form-checkbox" ></editor-checkbox>

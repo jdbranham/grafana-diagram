@@ -111,6 +111,7 @@ class DiagramCtrl extends MetricsPanelCtrl {
 		this.events.on('init-edit-mode', this.onInitEditMode.bind(this));
 		this.events.on('data-received', this.onDataReceived.bind(this));
 		this.events.on('data-snapshot-load', this.onDataReceived.bind(this));
+		this.unitFormats = kbn.getUnitFormats();
 		this.initializeMermaid();
 	}
 	
@@ -150,7 +151,8 @@ class DiagramCtrl extends MetricsPanelCtrl {
 	seriesHandler(seriesData) {
 		var series = new TimeSeries({
 			datapoints: seriesData.datapoints,
-			alias: seriesData.target.replace(/"|,|;|=|:|{|}/g, '_')
+			alias: seriesData.target.replace(/"|,|;|=|:|{|}/g, '_'),
+      		unit: seriesData.unit
 		});
 	    series.flotpairs = series.getFlotPairs(this.panel.nullPointMode);
 	    return series;
@@ -181,6 +183,11 @@ class DiagramCtrl extends MetricsPanelCtrl {
 	
 	addColor(){
 		this.panel.colors.push('rgba(255, 255, 255, 1)');
+	}
+	
+	setUnitFormat(subItem) {
+		this.panel.format = subItem.value;
+		this.render();
 	}
 	
 	clearDiagram(){
