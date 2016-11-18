@@ -5,7 +5,7 @@
   "main": "src/module.js",
   "scripts": {
     "lint": "eslint --color .",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "grunt"
   },
   "repository": {
     "type": "git",
