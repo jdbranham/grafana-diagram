@@ -199,6 +199,7 @@ class DiagramCtrl extends MetricsPanelCtrl {
 		if(this.panel.content.length > 0){
 			this.clearDiagram();
 			var graphDefinition = this.panel.content;
+			graphDefinition = this.templateSrv.replace(graphDefinition);
 			this.diagramType = mermaidAPI.detectType(graphDefinition);
 			var diagramContainer = $(document.getElementById(this.containerDivId));
 		    
@@ -347,6 +348,7 @@ class DiagramCtrl extends MetricsPanelCtrl {
 	}
 	
 	link(scope, elem, attrs, ctrl) {
+		var templateSrv = this.templateSrv;
 		var diagramElement = elem.find('.diagram');
 		diagramElement.append('<div id="'+ctrl.containerDivId+'"></div>');
 	    var diagramContainer = $(document.getElementById(ctrl.containerDivId));
