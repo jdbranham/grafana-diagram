@@ -94,6 +94,7 @@ System.register([], function (_export, _context) {
 
         //$scope.addOverrideOption('Color', 'color', ['change']);
         $scope.addOverrideOption('Thresholds', 'thresholds', ['custom']);
+        $scope.addOverrideOption('Colors', 'invertColors', ['Invert Colors']);
         $scope.addOverrideOption('Value', 'valueName', ['avg', 'min', 'max', 'total', 'current']);
         $scope.updateCurrentOverrides();
       }]);

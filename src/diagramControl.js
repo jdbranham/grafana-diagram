@@ -259,10 +259,13 @@ class DiagramCtrl extends MetricsPanelCtrl {
 		var absoluteDistance = max - min;
 		var valueDistanceFromMin = value - min;
 		var xPercent = valueDistanceFromMin/absoluteDistance;
-		// Get the smaller number to clamp at 0.99 max
-		xPercent = Math.min(0.99, xPercent);
-		// Get the larger number to clamp at 0.01 min
-		xPercent = Math.max(0.01, xPercent);
+		// Get the smaller number to clamp at 0.999 max
+		xPercent = Math.min(0.999, xPercent);
+		// Get the larger number to clamp at 0.001 min
+		xPercent = Math.max(0.001, xPercent);
+		if(data.invertColors){
+			xPercent = 1-xPercent;
+		}
 		
 		return getColorByXPercentage(this.canvas, xPercent);
 	}
@@ -287,7 +290,11 @@ class DiagramCtrl extends MetricsPanelCtrl {
 		colorData.thresholds = (overrides.thresholds || this.panel.thresholds).split(',').map(function(strVale) {
 			return Number(strVale.trim());
 		});
-		colorData.colorMap = this.panel.colors;
+		colorData.colorMap = this.panel.colors.slice();
+		colorData.invertColors = overrides.invertColors || false;
+		if(colorData.invertColors){
+			colorData.colorMap.reverse();
+		}
 		seriesItem.colorData = colorData;
 		
 		seriesItem.valueName = overrides.valueName || this.panel.valueName;
