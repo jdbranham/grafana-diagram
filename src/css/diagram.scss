@@ -61,8 +61,8 @@ svg > g {
   stroke: $stroke-default;
   stroke-width: 1px;
 }
-.edgePath .path {
-  stroke: green;
+.edgePath .path, path.path {
+  stroke: $path-default !important;
   stroke-width: 1.5px;
 }
 .edgeLabel {

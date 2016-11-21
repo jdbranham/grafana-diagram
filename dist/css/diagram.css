@@ -41,8 +41,8 @@ svg > g {
   stroke: #13540c;
   stroke-width: 1px; }
 
-.edgePath .path {
-  stroke: green;
+.edgePath .path, path.path {
+  stroke: green !important;
   stroke-width: 1.5px; }
 
 .edgeLabel {
