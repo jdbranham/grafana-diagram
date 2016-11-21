@@ -498,8 +498,13 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 								if (targetElement[0][0] !== null) {
 									// probably a flowchart
 									targetElement.selectAll('rect,circle,poly').style('fill', seriesItem.color);
+
+									var div = targetElement.select('div');
+									var fo = targetElement.select('foreignObject');
+									// make foreign object element taller to accomdate value in FireFox/IE
+									fo.attr('height', 45);
 									// Add value text
-									var p = targetElement.select('div').append('p');
+									var p = div.append('p');
 									p.classed('diagram-value');
 									p.style('background-color', seriesItem.color);
 									p.html(seriesItem.valueFormatted);
@@ -508,6 +513,8 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 									targetElement = $(svg).find('div:contains("' + key + '")'); // maybe a flowchart with an alias text node
 									if (targetElement.length > 0) {
 										targetElement.parents('.node').find('rect, circle, poly').css('fill', seriesItem.color);
+										// make foreign object element taller to accomdate value in FireFox/IE
+										targetElement.parents('.node').find('foreignObject').attr('height', 45);
 										var dElement = d3.select(targetElement[0]);
 										// Add value text
 										var p = dElement.append('p');
