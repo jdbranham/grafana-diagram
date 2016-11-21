@@ -517,18 +517,27 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 										targetElement.parents('.node').find('rect, circle, poly').css('fill', seriesItem.color);
 										// make foreign object element taller to accomdate value in FireFox/IE
 										targetElement.parents('.node').find('foreignObject').attr('height', 45);
-										var dElement = d3.select(targetElement[0]);
-										// Add value text
-										var p = dElement.append('p');
-										p.classed('diagram-value');
-										p.style('background-color', seriesItem.color);
-										p.html(seriesItem.valueFormatted);
+										// for edge matches
+										var edgeElement = targetElement.parent().find('.edgeLabel');
+										if (edgeElement.length > 0) {
+											edgeElement.css('background-color', 'transparent');
+											edgeElement.append('<br/>' + seriesItem.valueFormatted).addClass('diagram-value');
+											edgeElement.parent('div').css('text-align', 'center').css('background-color', seriesItem.color);
+										} else {
+											var dElement = d3.select(targetElement[0]);
+											// Add value text
+											var p = dElement.append('p');
+											p.classed('diagram-value');
+											p.style('background-color', seriesItem.color);
+											p.html(seriesItem.valueFormatted);
+										}
 									} else {
 										targetElement = $(svg).find('text:contains("' + key + '")'); // sequence diagram, gantt ?
 										if (targetElement.length == 0) {
 											console.warn('couldnt not find a diagram node with id/text: ' + key);
 											continue;
 										}
+										// for node matches
 										targetElement.parent().find('rect, circle, poly').css('fill', seriesItem.color);
 										targetElement.append('\n' + seriesItem.valueFormatted);
 									}
