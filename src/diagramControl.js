@@ -207,7 +207,8 @@ class DiagramCtrl extends MetricsPanelCtrl {
 				if(svgCode == '') {
 					diagramContainer.html('There was a problem rendering the graph');
 				} else {
-			    	diagramContainer.html(svgCode);
+			    		diagramContainer.html(svgCode);
+					bindFunctions(diagramContainer[0]);
 				}
 			};
 			// if parsing the graph definition fails, the error handler will be called but the renderCallback() may also still be called.
