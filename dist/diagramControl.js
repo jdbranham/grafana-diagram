@@ -499,7 +499,7 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 
 								if (targetElement[0][0] !== null) {
 									// probably a flowchart
-									targetElement.selectAll('rect,circle,poly').style('fill', seriesItem.color);
+									targetElement.selectAll('rect,circle,polygon').style('fill', seriesItem.color);
 
 									var div = targetElement.select('div');
 									var fo = targetElement.select('foreignObject');
@@ -511,10 +511,14 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 									p.style('background-color', seriesItem.color);
 									p.html(seriesItem.valueFormatted);
 								} else {
-									console.debug('finding element that contains text node: ' + key);
-									targetElement = $(svg).find('div:contains("' + key + '")'); // maybe a flowchart with an alias text node
+									console.debug('finding element that contains id: ' + key);
+									// maybe a flowchart with an alias text node
+									targetElement = $(svg).find('div:contains("' + key + '")').filter(function () {
+										// Matches node name ( 'foo' in both 'foo' and 'foo[bar]')
+										return $(this).attr('id') === key;
+									});
 									if (targetElement.length > 0) {
-										targetElement.parents('.node').find('rect, circle, poly').css('fill', seriesItem.color);
+										targetElement.parents('.node').find('rect, circle, polygon').css('fill', seriesItem.color);
 										// make foreign object element taller to accomdate value in FireFox/IE
 										targetElement.parents('.node').find('foreignObject').attr('height', 45);
 										// for edge matches
@@ -538,7 +542,7 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 											continue;
 										}
 										// for node matches
-										targetElement.parent().find('rect, circle, poly').css('fill', seriesItem.color);
+										targetElement.parent().find('rect, circle, polygon').css('fill', seriesItem.color);
 										targetElement.append('\n' + seriesItem.valueFormatted);
 									}
 								}
