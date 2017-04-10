@@ -271,7 +271,7 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 						if (this.panel.content.length > 0) {
 							this.clearDiagram();
 							var mode = this.panel.mode;
-							var templatedURL = this.templateSrv.replace(this.panel.mermaidServiceUrl);
+							var templatedURL = this.templateSrv.replace(this.panel.mermaidServiceUrl, this.panel.scopedVars);
 							if (mode == 'url') {
 								var me = this;
 								this.$http({
