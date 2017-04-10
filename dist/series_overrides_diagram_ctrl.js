@@ -72,7 +72,7 @@ System.register([], function (_export, _context) {
         };
 
         $scope.getSeriesNames = function () {
-          return _.map($scope.ctrl.seriesList, function (series) {
+          return _.map($scope.ctrl.series, function (series) {
             return series.alias;
           });
         };

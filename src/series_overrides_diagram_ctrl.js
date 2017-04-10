@@ -34,7 +34,7 @@
       $scope.updateCurrentOverrides();
       $scope.ctrl.render();
     };
-    
+
     $scope.thresholdsChanged = function(thresholds){
     	$scope.override['thresholds'] = thresholds.value;
     	$scope.updateCurrentOverrides();
@@ -56,7 +56,7 @@
         }
       });
     };
-    
+
     $scope.removeOverride = function(option) {
       delete $scope.override[option.propertyName];
       $scope.updateCurrentOverrides();
@@ -64,7 +64,7 @@
     };
 
     $scope.getSeriesNames = function() {
-      return _.map($scope.ctrl.seriesList, function(series) {
+      return _.map($scope.ctrl.series, function(series) {
         return series.alias;
       });
     };

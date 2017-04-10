@@ -3,7 +3,7 @@
 System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app/core/utils/kbn', 'app/plugins/sdk', './properties', 'lodash', './series_overrides_diagram_ctrl', './css/diagram.css!'], function (_export, _context) {
 	"use strict";
 
-	var TimeSeries, kbn, MetricsPanelCtrl, diagramEditor, displayEditor, _, _createClass, panelDefaults, DiagramCtrl;
+	var TimeSeries, kbn, MetricsPanelCtrl, diagramEditor, displayEditor, compositeEditor, _, _createClass, panelDefaults, DiagramCtrl;
 
 	function _classCallCheck(instance, Constructor) {
 		if (!(instance instanceof Constructor)) {
@@ -65,6 +65,7 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 		}, function (_properties) {
 			diagramEditor = _properties.diagramEditor;
 			displayEditor = _properties.displayEditor;
+			compositeEditor = _properties.compositeEditor;
 		}, function (_lodash) {
 			_ = _lodash.default;
 		}, function (_series_overrides_diagram_ctrl) {}, function (_cssDiagramCss) {}],
@@ -88,6 +89,7 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 			}();
 
 			panelDefaults = {
+				composites: [],
 				// other style overrides
 				seriesOverrides: [],
 				thresholds: '0,10',
@@ -186,6 +188,7 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 					value: function onInitEditMode() {
 						this.addEditorTab('Diagram', diagramEditor, 2);
 						this.addEditorTab('Display', displayEditor, 3);
+						this.addEditorTab('Metric Composites', compositeEditor, 4);
 					}
 				}, {
 					key: 'getDiagramContainer',
@@ -228,6 +231,38 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 					value: function removeSeriesOverride(override) {
 						this.panel.seriesOverrides = _.without(this.panel.seriesOverrides, override);
 						this.render();
+					}
+				}, {
+					key: 'addComposite',
+					value: function addComposite(composite) {
+						this.panel.composites.push(composite || {});
+					}
+				}, {
+					key: 'removeComposite',
+					value: function removeComposite(composite) {
+						this.panel.composites = _.without(this.panel.composites, composite);
+						this.render();
+					}
+				}, {
+					key: 'getSeriesNamesForComposites',
+					value: function getSeriesNamesForComposites() {
+						return _.map(this.$scope.ctrl.series, function (series) {
+							return series.alias;
+						});
+					}
+				}, {
+					key: 'addMetricToComposite',
+					value: function addMetricToComposite(composite) {
+						if (composite.metrics === undefined) {
+							composite.metrics = [{}];
+						} else {
+							composite.metrics.push({});
+						}
+					}
+				}, {
+					key: 'removeMetricFromComposite',
+					value: function removeMetricFromComposite(composite, metric) {
+						composite.metrics = _.without(composite.metrics, metric);
 					}
 				}, {
 					key: 'updateThresholds',
@@ -278,6 +313,7 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 									diagramContainer.html('There was a problem rendering the graph');
 								} else {
 									diagramContainer.html(svgCode);
+									bindFunctions(diagramContainer[0]);
 								}
 							};
 							// if parsing the graph definition fails, the error handler will be called but the renderCallback() may also still be called.
@@ -320,6 +356,56 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 								}
 							}
 						}
+						// now add the composites to data
+						for (var i = 0; i < this.panel.composites.length; i++) {
+							var aComposite = this.panel.composites[i];
+							var currentWorstSeries = null;
+							for (var j = 0; j < aComposite.metrics.length; j++) {
+								//debugger;
+								var aMetric = aComposite.metrics[j];
+								var seriesName = aMetric.seriesName;
+								var seriesItem = data[seriesName];
+								// check colorData thresholds
+								if (currentWorstSeries === null) {
+									currentWorstSeries = seriesItem;
+								} else {
+									currentWorstSeries = this.getWorstSeries(currentWorstSeries, seriesItem);
+								}
+							}
+							// now push the composite into data
+							data[aComposite.name] = currentWorstSeries;
+						}
+					}
+				}, {
+					key: 'getWorstSeries',
+					value: function getWorstSeries(series1, series2) {
+						var worstSeries = series1;
+						var series1thresholdLevel = this.getThesholdLevel(series1);
+						var series2thresholdLevel = this.getThesholdLevel(series2);
+						console.log("Series1 threhold level: " + series1thresholdLevel);
+						console.log("Series2 threhold level: " + series2thresholdLevel);
+						if (series2thresholdLevel > series1thresholdLevel) {
+							// series2 has higher threshold violation
+							worstSeries = series2;
+						}
+						return worstSeries;
+					}
+				}, {
+					key: 'getThesholdLevel',
+					value: function getThesholdLevel(series) {
+						// default to ok
+						var thresholdLevel = 0;
+						var value = series.value;
+						var thresholds = series.colorData.thresholds;
+						if (value >= thresholds[0]) {
+							// value is equal or greater than first threshold
+							thresholdLevel = 1;
+						}
+						if (value >= thresholds[1]) {
+							// value is equal or greater than second threshold
+							thresholdLevel = 2;
+						}
+						return thresholdLevel;
 					}
 				}, {
 					key: 'getGradientForValue',
