@@ -146,8 +146,6 @@ class DiagramCtrl extends MetricsPanelCtrl {
 		var data = {};
 		this.setValues(data);
 		this.updateDiagram(data);
-		this.svgData = data;
-		this.render();
 	}
 
 	seriesHandler(seriesData) {
@@ -210,19 +208,21 @@ class DiagramCtrl extends MetricsPanelCtrl {
 				}).then(function successCallback(response) {
 					//the response must have text/plain content-type
 //					console.info(response.data);
-					me.renderDiagram(response.data);
+					me.renderDiagram(data, response.data);
 				}, function errorCallback(response) {
 					console.warn('error', response);
 				})
 			} else {
 				var graphDefinition = this.panel.content;
-				this.renderDiagram(graphDefinition);
+				this.renderDiagram(data, graphDefinition);
 			}
 		}
 	} // End updateDiagram()
 	
-	renderDiagram(graphDefinition) {
+	renderDiagram(data, graphDefinition) {
+		console.info(graphDefinition);
 		graphDefinition = this.templateSrv.replace(graphDefinition);
+		console.info(graphDefinition);
 		this.diagramType = mermaidAPI.detectType(graphDefinition);
 		var diagramContainer = $(document.getElementById(this.containerDivId));
 		
@@ -236,6 +236,8 @@ class DiagramCtrl extends MetricsPanelCtrl {
 		};
 		// if parsing the graph definition fails, the error handler will be called but the renderCallback() may also still be called.
 		mermaidAPI.render(this.panel.graphId, graphDefinition, renderCallback);
+		this.svgData = data;
+		this.render();
 	}
 	
 	setValues(data) {

@@ -1,15 +1,20 @@
 <h5 class="section-heading">Diagram Definition</h5>
 
 
-<label><input type="radio" ng-model="ctrl.panel.mode" value="url">URL</label>
+<label><input type="radio" ng-model="ctrl.panel.mode" value="url" ng-change="ctrl.refresh()">URL</label>
 <span> (This service should respond with a text/plain response containing mermaid syntax <a target="_blank"
 	href="http://knsv.github.io/mermaid/">Mermaid syntax</a>.)
 </span>
 <input type="text" 
 	style="width: 95%" 
 	ng-model="ctrl.panel.mermaidServiceUrl" 
-	ng-change="ctrl.refresh()"/>
-<label><input type="radio" ng-model="ctrl.panel.mode" value="content">Content</label>
+	ng-change="ctrl.refresh()"
+	ng-model-onblur/>
+<label>
+<input type="radio" 
+	ng-model="ctrl.panel.mode" 
+	ng-change="ctrl.refresh()"
+	value="content">Content</label>
 <span> (This area uses <a target="_blank"
 	href="http://knsv.github.io/mermaid/">Mermaid syntax</a>.)
 </span>
