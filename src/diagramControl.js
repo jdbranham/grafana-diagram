@@ -317,6 +317,14 @@ class DiagramCtrl extends MetricsPanelCtrl {
     var thresholdLevel = 0;
     var value = series.value;
     var thresholds = series.colorData.thresholds;
+    // if no thresholds are defined, return 0
+    if (thresholds === undefined) {
+      return thresholdLevel;
+    }
+    // make sure thresholds is an array of size 2
+    if (thresholds.length !== 2) {
+      return thresholdLevel;
+    }
     if (value >= thresholds[0]) {
       // value is equal or greater than first threshold
       thresholdLevel = 1;

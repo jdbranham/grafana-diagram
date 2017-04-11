@@ -6,60 +6,97 @@ This is a Grafana panel plugin that provides a way to create flow-charts, sequen
 
 
 
-A diagram can be defined using the Mermaid JS syntax.  
-Metric series are used to color the background of the shape/node.  
-The target or 'alias' of the series is compared to the ID of the diagram node to find a match, then applies a 'fill' style to the shape.  
-  
+* A diagram can be defined using the Mermaid JS syntax.  
+* Metric series are used to color the background of the shape/node.  
+* The target or 'alias' of the series is compared to the ID of the diagram node to find a match, then applies a 'fill' style to the shape.  
+* Composites can be used to aggregate multiple series for a single node, with custom thresholds for each series.
 
 **Note - Special characters in an alias are replace with an underscore.
-   
+
 ## Examples  
 
-   
+
 ### Diagram  
-  
+
 ![Diagram](https://raw.githubusercontent.com/jdbranham/grafana-diagram/master/src/img/diagram.PNG?raw=true)  
 
 
-  
+
 ### Diagram Definition  
-  
+
 ![Diagram Definition](https://raw.githubusercontent.com/jdbranham/grafana-diagram/master/src/img/diagram_definition.PNG?raw=true)  
 
 
-  
+
 ### Display Options  
-  
+
 * Thresholds
 * Aggregation Options
 * Unbound Color Levels
 * Gradient Option for Heatmap style coloring
-  
+
 ![Diagram Display Options](https://raw.githubusercontent.com/jdbranham/grafana-diagram/master/src/img/diagram_display.PNG?raw=true)  
 
 ### With Gradient Coloring  
 
-![Diagram Heatmap](https://raw.githubusercontent.com/jdbranham/grafana-diagram/master/src/img/diagram_gradient.PNG?raw=true) 
-  
+![Diagram Heatmap](https://raw.githubusercontent.com/jdbranham/grafana-diagram/master/src/img/diagram_gradient.PNG?raw=true)
+
 ### Metrics  
-  
+
 Graphite Datasource  
-![Metrics](https://raw.githubusercontent.com/jdbranham/grafana-diagram/master/src/img/diagram_metrics_graphite.PNG?raw=true) 
+![Metrics](https://raw.githubusercontent.com/jdbranham/grafana-diagram/master/src/img/diagram_metrics_graphite.PNG?raw=true)
 
 
-  
+
 ### Prometheus  
-  
+
 With prometheus, be sure to use the transformed alias [with underscores]  
 Metric  
 ![Metrics](https://raw.githubusercontent.com/jdbranham/grafana-diagram/master/src/img/diagram_metrics_prometheus.PNG?raw=true)  
 
 Example Diagram -  
 ![Prometheus Diagram](https://raw.githubusercontent.com/jdbranham/grafana-diagram/master/src/img/diagram_prometheus.PNG?raw=true)  
- 
-  
+
+### InfluxDB
+![InfluxDB Metrics](https://raw.githubusercontent.com/jdbranham/grafana-diagram/master/src/img/composite-metrics-influx.png?raw=true)
+
+### Metric Composites
+To reflect multiple metrics and their thresholds on a single node, use metric composites to specify a composite name, and the metrics to be evaluated for the composite.
+
+Series specific overrides will be evaluated for each metric, and the "worst" state of the composite is displayed.
+
+The composite name is evaluated in the Diagram definition.
+
+For example, combining two series "A-series" and "B-series" into a single composite named "xyz", the following can be used:
+
+![Composite Editor](https://raw.githubusercontent.com/jdbranham/grafana-diagram/master/src/img/composite-edit-tab.png?raw=true)
+
+With series specific overrides for these two series:
+
+![Composite Overrides](https://raw.githubusercontent.com/jdbranham/grafana-diagram/master/src/img/composite-overrides.png?raw=true)
+
+When data is received for each series, the thresholds will be evaluated to find the "worst" threshold level, and the metrics and color value will be reflected in the "xyz" composite in the diagram.
+
+Here are examples of the composite in action:
+
+This diagram has "xyz" node, with "all green" threholds for both series A and B:
+
+![threshold0](https://raw.githubusercontent.com/jdbranham/grafana-diagram/master/src/img/composite-threshold0.png?raw=true)
+
+This diagram has "xyz" node, where the A-series is green, but B-Series is yellow. The diagram node shows yellow, along with the value:
+
+![threshold1](https://raw.githubusercontent.com/jdbranham/grafana-diagram/master/src/img/composite-threshold1.png?raw=true)
+
+This diagram has "xyz" node, where the A-series is green, but B-Series is red. The diagram node shows red, along with the value:
+
+![threshold2](https://raw.githubusercontent.com/jdbranham/grafana-diagram/master/src/img/composite-threshold2.png?raw=true)
+
+This diagram has "xyz" node, where the A-series is yellow, and B-Series is green. The diagram node shows yellow, along with the value:
+
+![threshold3](https://raw.githubusercontent.com/jdbranham/grafana-diagram/master/src/img/composite-threshold3.png?raw=true)
+
 ## Roadmap  
-  
+
 - [suggest something]  
 
 ## Upgrading  
@@ -79,9 +116,9 @@ Add an empty 'gradient' object to the panel json 'legend' object
     "total": false,
     "gradient": {}
   },
-  
+
 ## Thanks!  
-  
+
 
 Special thanks to the Mermaid contributors -  
 https://github.com/knsv/mermaid/graphs/contributors  
@@ -93,4 +130,3 @@ https://github.com/d3/d3/graphs/contributors
 And especially the Grafana contributors -  
 https://github.com/grafana/grafana/graphs/contributors   
 http://grafana.org/  
-
