@@ -5,13 +5,14 @@ import {MetricsPanelCtrl} from 'app/plugins/sdk';
 import {diagramEditor, displayEditor, compositeEditor} from './properties';
 import _ from 'lodash';
 import './series_overrides_diagram_ctrl';
-import './css/diagram.css!'
+import './css/diagram.css!';
 
 const panelDefaults = {
   composites: [],
 	// other style overrides
   seriesOverrides: [],
 	thresholds: '0,10',
+  decimals: 2, // decimal precision
 	colors: ['rgba(50, 172, 45, 0.97)', 'rgba(237, 129, 40, 0.89)', 'rgba(245, 54, 54, 0.9)'],
 	legend: {
 		show: true,
@@ -180,14 +181,14 @@ class DiagramCtrl extends MetricsPanelCtrl {
     return _.map(this.$scope.ctrl.series, function(series) {
       return series.alias;
     });
-  };
+  }
 
   addMetricToComposite(composite) {
     if (composite.metrics === undefined) {
       composite.metrics = [{}];
     }
     else {
-      composite.metrics.push({})
+      composite.metrics.push({});
     }
   }
   removeMetricFromComposite(composite, metric) {
@@ -226,12 +227,17 @@ class DiagramCtrl extends MetricsPanelCtrl {
 		if(this.panel.content.length > 0){
 			this.clearDiagram();
 			var graphDefinition = this.panel.content;
-			graphDefinition = this.templateSrv.replace(graphDefinition);
+      // substitute values inside "link text"
+      // this will look for any composite prefixed with a # and substitute the value of the composite
+      // if a series alias is found, in the form #alias, the value will be substituted
+      // this allows link values to be displayed based on the metric
+      graphDefinition = this.substituteHashPrefixedNotation(graphDefinition, data);
+			graphDefinition = this.templateSrv.replaceWithText(graphDefinition);
 			this.diagramType = mermaidAPI.detectType(graphDefinition);
 			var diagramContainer = $(document.getElementById(this.containerDivId));
 
 			var renderCallback = function (svgCode, bindFunctions){
-				if(svgCode == '') {
+				if(svgCode === '') {
 					diagramContainer.html('There was a problem rendering the graph');
 				} else {
 			    		diagramContainer.html(svgCode);
@@ -243,6 +249,83 @@ class DiagramCtrl extends MetricsPanelCtrl {
 		}
 	} // End updateDiagram()
 
+  /**
+   * substitute values inside "link text"
+   * this will look for any composite prefixed with a #|!|@|& and substitute the value of the composite
+   * if a series alias is found, in the form #alias, the value will be substituted
+   * this allows link values to be displayed based on the metric
+   *
+   * Prefix Modifier For Composites
+   *   # Raw Value of Series
+   *   ! Raw Value plus Metric Name
+   *   @ Formatted (Decimal Limited and Unit Format)
+   *   & Formatted (Decimal Limited, Unit Format, and Metric Name)
+   *
+   * Prefix Modifier For Series
+   *   # Raw Value of Series
+   *   @ Formatted (Decimal Limited and Unit Format)
+   *
+   * @param  {[String]} graphDefinition [Content of Graph Definition Markdown]
+   * @param  {[Array]} data [Series Data]
+   * @return {[String]} [Modified Graph Definition]
+   */
+  substituteHashPrefixedNotation(graphDefinition, data) {
+    // inspect the string, locate all # prefixed items, and replace them with the value
+    // of the series. If no matching series is found, leave it alone
+    var matches = graphDefinition.match(/(?:#|!|@|&)(\w+)/g);
+    if (matches === null) return graphDefinition;
+    // check if there is a composite with a matching name
+    for (var i = 0; i < matches.length; i++) {
+      var aMatch = matches[i];
+      var valueType = aMatch[0];
+      aMatch = aMatch.substring(1);
+      // check composites first
+      for (var j = 0; j < this.panel.composites.length; j++) {
+        var aComposite = this.panel.composites[j];
+        if (aComposite.name === aMatch) {
+          // found matching composite, get the valueFormatted
+          //var displayedValue = data[aComposite.name].value;
+          var displayedValue = null;
+          switch (valueType) {
+            case '#':
+              displayedValue = data[aComposite.name].value;
+              graphDefinition = graphDefinition.replace('#'+aMatch, displayedValue);
+              break;
+            case '!':
+              displayedValue = data[aComposite.name].valueRawFormattedWithPrefix;
+              graphDefinition = graphDefinition.replace('!'+aMatch, displayedValue);
+              break;
+            case '@':
+              displayedValue = data[aComposite.name].valueFormatted;
+              graphDefinition = graphDefinition.replace('@'+aMatch, displayedValue);
+              break;
+            case '&':
+              displayedValue = data[aComposite.name].valueFormattedWithPrefix;
+              graphDefinition = graphDefinition.replace('&'+aMatch, displayedValue);
+              break;
+          }
+        }
+      }
+      // next check series
+      for(var k = 0; k < this.series.length; k++){
+				var seriesItem = this.series[k];
+        if (seriesItem.alias === aMatch) {
+          var displayedValue = null;
+          switch (valueType) {
+            case '#':
+              displayedValue = data[seriesItem.alias].value;
+              graphDefinition = graphDefinition.replace('#'+aMatch, displayedValue);
+              break;
+            case '@':
+              displayedValue = data[seriesItem.alias].valueFormatted;
+              graphDefinition = graphDefinition.replace('@'+aMatch, displayedValue);
+              break;
+          }
+        }
+      }
+    }
+    return graphDefinition;
+  }
 	setValues(data) {
 	    if (this.series && this.series.length > 0) {
 			for(var i = 0; i < this.series.length; i++){
@@ -266,7 +349,8 @@ class DiagramCtrl extends MetricsPanelCtrl {
 			        //data[seriesItem.alias].flotpairs = seriesItem.flotpairs;
 
 			        var decimalInfo = this.getDecimalsForValue(data[seriesItem.alias].value);
-			        var formatFunc = kbn.valueFormats[this.panel.format];
+			        var formatFunc = kbn.valueFormats[data[seriesItem.alias].format];
+              // put the value in quotes to escape "most" special characters
 			        data[seriesItem.alias].valueFormatted = formatFunc(data[seriesItem.alias].value, decimalInfo.decimals, decimalInfo.scaledDecimals);
 			        data[seriesItem.alias].valueRounded = kbn.roundValue(data[seriesItem.alias].value, decimalInfo.decimals);
 				}
@@ -281,10 +365,12 @@ class DiagramCtrl extends MetricsPanelCtrl {
       for (var i = 0; i < this.panel.composites.length; i++) {
         var aComposite = this.panel.composites[i];
         var currentWorstSeries = null;
+        var currentWorstSeriesName = null;
         for (var j = 0; j < aComposite.metrics.length; j++) {
           //debugger;
           var aMetric = aComposite.metrics[j];
           var seriesName = aMetric.seriesName;
+          currentWorstSeriesName = aMetric.seriesName;
           var seriesItem = data[seriesName];
           // check colorData thresholds
           if (currentWorstSeries === null) {
@@ -293,6 +379,10 @@ class DiagramCtrl extends MetricsPanelCtrl {
             currentWorstSeries = this.getWorstSeries(currentWorstSeries, seriesItem);
           }
         }
+        // Prefix the valueFormatted with the actual metric name
+        currentWorstSeries.valueFormattedWithPrefix = currentWorstSeriesName + ': ' + currentWorstSeries.valueFormatted;
+        currentWorstSeries.valueRawFormattedWithPrefix = currentWorstSeriesName + ': ' + currentWorstSeries.value;
+        currentWorstSeries.valueFormatted = currentWorstSeriesName + ': ' + currentWorstSeries.valueFormatted;
         // now push the composite into data
         data[aComposite.name] = currentWorstSeries;
       }
@@ -358,6 +448,7 @@ class DiagramCtrl extends MetricsPanelCtrl {
 
 	applyOverrides(seriesItemAlias){
 		var seriesItem = {}, colorData = {}, overrides = {};
+
 		console.info('applying overrides for seriesItem');
 		console.debug(seriesItemAlias);
 		console.debug(this.panel.seriesOverrides);
@@ -385,6 +476,7 @@ class DiagramCtrl extends MetricsPanelCtrl {
 
 		seriesItem.valueName = overrides.valueName || this.panel.valueName;
 
+    seriesItem.format = overrides.unitFormat || this.panel.format;
 		return seriesItem;
 	}
 
@@ -394,6 +486,7 @@ class DiagramCtrl extends MetricsPanelCtrl {
 	}
 
 	getDecimalsForValue(value) {
+    //debugger;
 	    if (_.isNumber(this.panel.decimals)) {
 	      return {decimals: this.panel.decimals, scaledDecimals: null};
 	    }
@@ -542,7 +635,7 @@ class DiagramCtrl extends MetricsPanelCtrl {
 						}
 					} else {
 						targetElement = $(svg).find('text:contains("'+key+'")'); // sequence diagram, gantt ?
-						if(targetElement.length == 0){
+						if(targetElement.length === 0){
 							console.warn('couldnt not find a diagram node with id/text: ' + key);
 							continue;
 						}
