@@ -34,6 +34,12 @@ This is a Grafana panel plugin that provides a way to create flow-charts, sequen
 * Aggregation Options
 * Unbound Color Levels
 * Gradient Option for Heatmap style coloring
+* Series Specific Overrides are used to specify:
+  1. Threshold to apply to metric
+  2. Color Inversion
+  3. Value of metric to display (average/current/etc)
+  4. Value decimal precision
+  5. Unit Format
 
 ![Diagram Display Options](https://raw.githubusercontent.com/jdbranham/grafana-diagram/master/src/img/diagram_display.PNG?raw=true)  
 
@@ -59,6 +65,27 @@ Example Diagram -
 
 ### InfluxDB
 ![InfluxDB Metrics](https://raw.githubusercontent.com/jdbranham/grafana-diagram/master/src/img/composite-metrics-influx.png?raw=true)
+
+### Link Metrics
+Mermaid Notation is the same, but now supports supplying a metric name in the "text".
+
+Specify the metric name in double quotes (for escaping purposes), and optionally use a metric modifier.
+
+#### Prefix Modifier For Composites
+
+| Modifier | Description | Example | Output |
+|----------|-------------|---------|--------|
+|   #      | Raw Value of Series (no decimal limit)| "#metric" | 8.123456789
+|   !      | Raw Value plus Metric Name | "!metric" | metric: 8.123456789
+|   @      | Formatted (Decimal Limited and Unit Format)| "@metric" | 8.12 Mbps
+|   &      | Formatted (Decimal Limited, Unit Format, and Metric Name) | "&metric" | metric: 8.12 Mbps
+
+#### Prefix Modifier For Series
+
+| Modifier | Description | Example | Output |
+|----------|-------------|---------|--------|
+|   #      | Raw Value of Series (no decimal limit)| "#metric" | 8.123456789
+|   @      | Formatted (Decimal Limited and Unit Format)| "@metric" | 8.12 Mbps
 
 ### Metric Composites
 To reflect multiple metrics and their thresholds on a single node, use metric composites to specify a composite name, and the metrics to be evaluated for the composite.
