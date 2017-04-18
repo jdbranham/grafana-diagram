@@ -2,15 +2,17 @@ import './libs/mermaid/dist/mermaidAPI';
 import TimeSeries from 'app/core/time_series2';
 import kbn from 'app/core/utils/kbn';
 import {MetricsPanelCtrl} from 'app/plugins/sdk';
-import {diagramEditor, displayEditor} from './properties';
+import {diagramEditor, displayEditor, compositeEditor} from './properties';
 import _ from 'lodash';
 import './series_overrides_diagram_ctrl';
-import './css/diagram.css!'
+import './css/diagram.css!';
 
 const panelDefaults = {
+  composites: [],
 	// other style overrides
-    seriesOverrides: [],
+  seriesOverrides: [],
 	thresholds: '0,10',
+  decimals: 2, // decimal precision
 	colors: ['rgba(50, 172, 45, 0.97)', 'rgba(237, 129, 40, 0.89)', 'rgba(245, 54, 54, 0.9)'],
 	legend: {
 		show: true,
@@ -104,7 +106,7 @@ class DiagramCtrl extends MetricsPanelCtrl {
 	constructor($scope, $injector, $sce) {
 		super($scope, $injector);
 		_.defaults(this.panel, panelDefaults);
-		
+
 		this.panel.graphId = 'diagram_' + this.panel.id;
 		this.containerDivId = 'container_'+this.panel.graphId;
 		this.$sce = $sce;
@@ -114,26 +116,27 @@ class DiagramCtrl extends MetricsPanelCtrl {
 		this.unitFormats = kbn.getUnitFormats();
 		this.initializeMermaid();
 	}
-	
+
 	initializeMermaid(){
 		mermaidAPI.initialize(this.panel.init);
 		mermaidAPI.parseError = this.handleParseError.bind(this);
 	}
-	
+
 	handleParseError(err, hash){
 		this.error = 'Failed to parse diagram definition';
 		this.errorText = this.$sce.trustAsHtml('<p>Diagram Definition:</p><pre>' + err + '</pre>');
 	}
-	
+
 	onInitEditMode() {
 		this.addEditorTab('Diagram', diagramEditor, 2);
 		this.addEditorTab('Display', displayEditor, 3);
+    this.addEditorTab('Metric Composites', compositeEditor, 4);
 	}
-	
+
 	getDiagramContainer(){
 		return $(document.getElementById(this.containerDivId));
 	}
-	
+
 	onDataReceived(dataList){
 		console.info('received data');
 		console.debug(dataList);
@@ -157,7 +160,7 @@ class DiagramCtrl extends MetricsPanelCtrl {
 	    series.flotpairs = series.getFlotPairs(this.panel.nullPointMode);
 	    return series;
 	} // End seriesHandler()
-	
+
 	addSeriesOverride(override) {
 		this.panel.seriesOverrides.push(override || {});
 	}
@@ -166,30 +169,55 @@ class DiagramCtrl extends MetricsPanelCtrl {
 		this.panel.seriesOverrides = _.without(this.panel.seriesOverrides, override);
 	    this.render();
 	}
-	
+
+  addComposite(composite) {
+		this.panel.composites.push(composite || {});
+	}
+  removeComposite(composite) {
+		this.panel.composites = _.without(this.panel.composites, composite);
+	  this.render();
+	}
+  getSeriesNamesForComposites() {
+    return _.map(this.$scope.ctrl.series, function(series) {
+      return series.alias;
+    });
+  }
+
+  addMetricToComposite(composite) {
+    if (composite.metrics === undefined) {
+      composite.metrics = [{}];
+    }
+    else {
+      composite.metrics.push({});
+    }
+  }
+  removeMetricFromComposite(composite, metric) {
+    composite.metrics = _.without(composite.metrics, metric);
+  }
+
 	updateThresholds(){
 		var thresholdCount = this.panel.thresholds.length;
 		var colorCount = this.panel.colors.length;
 		this.refresh();
 	}
-	
+
 	changeColor(colorIndex, color){
 		this.panel.colors[colorIndex] = color;
 	}
-	
+
 	removeColor(colorIndex){
 		this.panel.colors.splice(colorIndex,1);
 	}
-	
+
 	addColor(){
 		this.panel.colors.push('rgba(255, 255, 255, 1)');
 	}
-	
+
 	setUnitFormat(subItem) {
 		this.panel.format = subItem.value;
 		this.render();
 	}
-	
+
 	clearDiagram(){
 		$('#'+this.panel.graphId).remove();
 		this.svg = {};
@@ -199,12 +227,17 @@ class DiagramCtrl extends MetricsPanelCtrl {
 		if(this.panel.content.length > 0){
 			this.clearDiagram();
 			var graphDefinition = this.panel.content;
-			graphDefinition = this.templateSrv.replace(graphDefinition);
+      // substitute values inside "link text"
+      // this will look for any composite prefixed with a # and substitute the value of the composite
+      // if a series alias is found, in the form #alias, the value will be substituted
+      // this allows link values to be displayed based on the metric
+      graphDefinition = this.substituteHashPrefixedNotation(graphDefinition, data);
+			graphDefinition = this.templateSrv.replaceWithText(graphDefinition);
 			this.diagramType = mermaidAPI.detectType(graphDefinition);
 			var diagramContainer = $(document.getElementById(this.containerDivId));
-		    
+
 			var renderCallback = function (svgCode, bindFunctions){
-				if(svgCode == '') {
+				if(svgCode === '') {
 					diagramContainer.html('There was a problem rendering the graph');
 				} else {
 			    		diagramContainer.html(svgCode);
@@ -215,7 +248,84 @@ class DiagramCtrl extends MetricsPanelCtrl {
 			mermaidAPI.render(this.panel.graphId, graphDefinition, renderCallback);
 		}
 	} // End updateDiagram()
-	
+
+  /**
+   * substitute values inside "link text"
+   * this will look for any composite prefixed with a #|!|@|& and substitute the value of the composite
+   * if a series alias is found, in the form #alias, the value will be substituted
+   * this allows link values to be displayed based on the metric
+   *
+   * Prefix Modifier For Composites
+   *   # Raw Value of Series
+   *   ! Raw Value plus Metric Name
+   *   @ Formatted (Decimal Limited and Unit Format)
+   *   & Formatted (Decimal Limited, Unit Format, and Metric Name)
+   *
+   * Prefix Modifier For Series
+   *   # Raw Value of Series
+   *   @ Formatted (Decimal Limited and Unit Format)
+   *
+   * @param  {[String]} graphDefinition [Content of Graph Definition Markdown]
+   * @param  {[Array]} data [Series Data]
+   * @return {[String]} [Modified Graph Definition]
+   */
+  substituteHashPrefixedNotation(graphDefinition, data) {
+    // inspect the string, locate all # prefixed items, and replace them with the value
+    // of the series. If no matching series is found, leave it alone
+    var matches = graphDefinition.match(/(?:#|!|@|&)(\w+)/g);
+    if (matches === null) return graphDefinition;
+    // check if there is a composite with a matching name
+    for (var i = 0; i < matches.length; i++) {
+      var aMatch = matches[i];
+      var valueType = aMatch[0];
+      aMatch = aMatch.substring(1);
+      // check composites first
+      for (var j = 0; j < this.panel.composites.length; j++) {
+        var aComposite = this.panel.composites[j];
+        if (aComposite.name === aMatch) {
+          // found matching composite, get the valueFormatted
+          //var displayedValue = data[aComposite.name].value;
+          var displayedValue = null;
+          switch (valueType) {
+            case '#':
+              displayedValue = data[aComposite.name].value;
+              graphDefinition = graphDefinition.replace('#'+aMatch, displayedValue);
+              break;
+            case '!':
+              displayedValue = data[aComposite.name].valueRawFormattedWithPrefix;
+              graphDefinition = graphDefinition.replace('!'+aMatch, displayedValue);
+              break;
+            case '@':
+              displayedValue = data[aComposite.name].valueFormatted;
+              graphDefinition = graphDefinition.replace('@'+aMatch, displayedValue);
+              break;
+            case '&':
+              displayedValue = data[aComposite.name].valueFormattedWithPrefix;
+              graphDefinition = graphDefinition.replace('&'+aMatch, displayedValue);
+              break;
+          }
+        }
+      }
+      // next check series
+      for(var k = 0; k < this.series.length; k++){
+				var seriesItem = this.series[k];
+        if (seriesItem.alias === aMatch) {
+          var displayedValue = null;
+          switch (valueType) {
+            case '#':
+              displayedValue = data[seriesItem.alias].value;
+              graphDefinition = graphDefinition.replace('#'+aMatch, displayedValue);
+              break;
+            case '@':
+              displayedValue = data[seriesItem.alias].valueFormatted;
+              graphDefinition = graphDefinition.replace('@'+aMatch, displayedValue);
+              break;
+          }
+        }
+      }
+    }
+    return graphDefinition;
+  }
 	setValues(data) {
 	    if (this.series && this.series.length > 0) {
 			for(var i = 0; i < this.series.length; i++){
@@ -225,7 +335,7 @@ class DiagramCtrl extends MetricsPanelCtrl {
 				data[seriesItem.alias] = this.applyOverrides(seriesItem.alias);
 				var lastPoint = _.last(seriesItem.datapoints);
 			    var lastValue = _.isArray(lastPoint) ? lastPoint[0] : null;
-			
+
 				if (this.panel.valueName === 'name') {
 					data[seriesItem.alias].value = 0;
 			        data[seriesItem.alias].valueRounded = 0;
@@ -237,9 +347,10 @@ class DiagramCtrl extends MetricsPanelCtrl {
 				} else {
 					data[seriesItem.alias].value = seriesItem.stats[data[seriesItem.alias].valueName];
 			        //data[seriesItem.alias].flotpairs = seriesItem.flotpairs;
-			
+
 			        var decimalInfo = this.getDecimalsForValue(data[seriesItem.alias].value);
-			        var formatFunc = kbn.valueFormats[this.panel.format];
+			        var formatFunc = kbn.valueFormats[data[seriesItem.alias].format];
+              // put the value in quotes to escape "most" special characters
 			        data[seriesItem.alias].valueFormatted = formatFunc(data[seriesItem.alias].value, decimalInfo.decimals, decimalInfo.scaledDecimals);
 			        data[seriesItem.alias].valueRounded = kbn.roundValue(data[seriesItem.alias].value, decimalInfo.decimals);
 				}
@@ -250,8 +361,71 @@ class DiagramCtrl extends MetricsPanelCtrl {
 				}
 			}
 	    }
+      // now add the composites to data
+      for (var i = 0; i < this.panel.composites.length; i++) {
+        var aComposite = this.panel.composites[i];
+        var currentWorstSeries = null;
+        var currentWorstSeriesName = null;
+        for (var j = 0; j < aComposite.metrics.length; j++) {
+          //debugger;
+          var aMetric = aComposite.metrics[j];
+          var seriesName = aMetric.seriesName;
+          currentWorstSeriesName = aMetric.seriesName;
+          var seriesItem = data[seriesName];
+          // check colorData thresholds
+          if (currentWorstSeries === null) {
+            currentWorstSeries = seriesItem;
+          } else {
+            currentWorstSeries = this.getWorstSeries(currentWorstSeries, seriesItem);
+          }
+        }
+        // Prefix the valueFormatted with the actual metric name
+        currentWorstSeries.valueFormattedWithPrefix = currentWorstSeriesName + ': ' + currentWorstSeries.valueFormatted;
+        currentWorstSeries.valueRawFormattedWithPrefix = currentWorstSeriesName + ': ' + currentWorstSeries.value;
+        currentWorstSeries.valueFormatted = currentWorstSeriesName + ': ' + currentWorstSeries.valueFormatted;
+        // now push the composite into data
+        data[aComposite.name] = currentWorstSeries;
+      }
 	} // End setValues()
-	
+
+  getWorstSeries(series1, series2) {
+    var worstSeries = series1;
+    var series1thresholdLevel = this.getThesholdLevel(series1);
+    var series2thresholdLevel = this.getThesholdLevel(series2);
+    console.log("Series1 threhold level: " + series1thresholdLevel);
+    console.log("Series2 threhold level: " + series2thresholdLevel);
+    if (series2thresholdLevel > series1thresholdLevel) {
+      // series2 has higher threshold violation
+      worstSeries = series2;
+    }
+    return worstSeries;
+  }
+
+  // returns level of threshold, 0 = ok, 1 = warnimg, 2 = critical
+  getThesholdLevel(series) {
+    // default to ok
+    var thresholdLevel = 0;
+    var value = series.value;
+    var thresholds = series.colorData.thresholds;
+    // if no thresholds are defined, return 0
+    if (thresholds === undefined) {
+      return thresholdLevel;
+    }
+    // make sure thresholds is an array of size 2
+    if (thresholds.length !== 2) {
+      return thresholdLevel;
+    }
+    if (value >= thresholds[0]) {
+      // value is equal or greater than first threshold
+      thresholdLevel = 1;
+    }
+    if (value >= thresholds[1]) {
+      // value is equal or greater than second threshold
+      thresholdLevel = 2;
+    }
+    return thresholdLevel;
+  }
+
 	getGradientForValue(data, value){
 		console.info('Getting gradient for value');
 		console.debug(data);
@@ -268,19 +442,20 @@ class DiagramCtrl extends MetricsPanelCtrl {
 		if(data.invertColors){
 			xPercent = 1-xPercent;
 		}
-		
+
 		return getColorByXPercentage(this.canvas, xPercent);
 	}
-	
+
 	applyOverrides(seriesItemAlias){
 		var seriesItem = {}, colorData = {}, overrides = {};
+
 		console.info('applying overrides for seriesItem');
 		console.debug(seriesItemAlias);
 		console.debug(this.panel.seriesOverrides);
 		for(var i=0; i<=this.panel.seriesOverrides.length; i++){
 			console.debug('comparing:');
 			console.debug(this.panel.seriesOverrides[i]);
-			
+
 			if (this.panel.seriesOverrides[i]){
 				var regex = kbn.stringToJsRegex(this.panel.seriesOverrides[i].alias);
 				var matches = seriesItemAlias.match(regex);
@@ -298,29 +473,31 @@ class DiagramCtrl extends MetricsPanelCtrl {
 			colorData.colorMap.reverse();
 		}
 		seriesItem.colorData = colorData;
-		
+
 		seriesItem.valueName = overrides.valueName || this.panel.valueName;
-		
+
+    seriesItem.format = overrides.unitFormat || this.panel.format;
 		return seriesItem;
 	}
-	
+
 	invertColorOrder() {
 	    this.panel.colors.reverse();
 	    this.refresh();
 	}
 
 	getDecimalsForValue(value) {
+    //debugger;
 	    if (_.isNumber(this.panel.decimals)) {
 	      return {decimals: this.panel.decimals, scaledDecimals: null};
 	    }
 
 	    var delta = value / 2;
 	    var dec = -Math.floor(Math.log(delta) / Math.LN10);
-	
+
 	    var magn = Math.pow(10, -dec),
 	      norm = delta / magn, // norm is between 1.0 and 10.0
 	      size;
-	
+
 	    if (norm < 1.5) {
 	      size = 1;
 	    } else if (norm < 3) {
@@ -335,19 +512,19 @@ class DiagramCtrl extends MetricsPanelCtrl {
 	    } else {
 	      size = 10;
 	    }
-	
+
 	    size *= magn;
-	
+
 	    // reduce starting decimals if not needed
 	    if (Math.floor(value) === value) { dec = 0; }
-	
+
 	    var result = {};
 	    result.decimals = Math.max(0, dec);
 	    result.scaledDecimals = result.decimals - Math.floor(Math.log(size) / Math.LN10) + 2;
-	
+
 	    return result;
 	}
-	
+
 	link(scope, elem, attrs, ctrl) {
 		var templateSrv = this.templateSrv;
 		var diagramElement = elem.find('.diagram');
@@ -356,23 +533,23 @@ class DiagramCtrl extends MetricsPanelCtrl {
     	console.debug('found diagramContainer');
     	console.debug(diagramContainer);
     	elem.css('height', ctrl.height + 'px');
-    	
+
 	    var canvas = elem.find('.canvas')[0];
 	    ctrl.canvas = canvas;
 	    var gradientValueMax = elem.find('.gradient-value-max')[0];
 	    var gradientValueMin = elem.find('.gradient-value-min')[0];
-    	
+
     	function render(){
     		setElementHeight();
     		updateCanvasStyle();
     		updateStyle();
     	}
-    	
+
     	function updateCanvasStyle(){
 	    	canvas.width = Math.max(diagramElement[0].clientWidth, 100);
 			var canvasContext = canvas.getContext("2d");
 			canvasContext.clearRect(0, 0, canvas.width, canvas.height);
-			
+
 			var grd = canvasContext.createLinearGradient(0, 0, canvas.width, 0);
 			var colorWidth = 1 / Math.max(ctrl.panel.colors.length, 1);
 			for(var i=0; i<ctrl.panel.colors.length; i++){
@@ -382,46 +559,46 @@ class DiagramCtrl extends MetricsPanelCtrl {
 			canvasContext.fillStyle = grd;
 			canvasContext.fillRect(0, 0, canvas.width, 3);
     		ctrl.canvasContext = canvasContext;
-    		
+
 			gradientValueMax.innerText = Math.max.apply(Math, ctrl.panel.thresholds.split(','));
 			gradientValueMin.innerText = Math.min.apply(Math, ctrl.panel.thresholds.split(','));
     	}
-    	
 
-    	
+
+
     	function setElementHeight() {
 	      //diagramContainer.css('height', ctrl.height + 'px');
 	    }
-    	
+
     	this.events.on('render', function() {
 			render();
 			ctrl.renderingCompleted();
 	    });
-	    
+
 	    function updateStyle(){
 	    	var data = ctrl.svgData;
 	    	ctrl.svgData = {}; // get rid of the data after consuming it. This prevents adding duplicate DOM elements
 			console.info('updating svg style');
 			var svg = $(document.getElementById(ctrl.panel.graphId));
-			$(svg).css('min-width', $(svg).css('max-width')); 
+			$(svg).css('min-width', $(svg).css('max-width'));
 			if (ctrl.panel.maxWidth){
 				$(svg).css('max-width', '100%');
 			}
-			
+
 			if(svg[0] === undefined){
 				return;
 			}
-			
+
 			for(var key in data){
 				var seriesItem = data[key];
-				
+
 				// Find nodes by ID if we can
 				console.info('finding targetElement');
 				var targetElement = d3.select(svg[0].getElementById(key)); // $(svg).find('#'+key).first(); // jquery doesnt work for some ID expressions [prometheus data]
-				
+
 				if(targetElement[0][0] !== null){ // probably a flowchart
 					targetElement.selectAll('rect,circle,polygon').style('fill', seriesItem.color);
-					
+
 					var div = targetElement.select('div');
 					var fo = targetElement.select('foreignObject');
 					// make foreign object element taller to accomdate value in FireFox/IE
@@ -458,7 +635,7 @@ class DiagramCtrl extends MetricsPanelCtrl {
 						}
 					} else {
 						targetElement = $(svg).find('text:contains("'+key+'")'); // sequence diagram, gantt ?
-						if(targetElement.length == 0){
+						if(targetElement.length === 0){
 							console.warn('couldnt not find a diagram node with id/text: ' + key);
 							continue;
 						}
@@ -467,7 +644,7 @@ class DiagramCtrl extends MetricsPanelCtrl {
 						targetElement.append('\n' + seriesItem.valueFormatted);
 					}
 				}
-				
+
 				console.debug(targetElement);
 				console.info('set nodes:' + key + ' to color:' + seriesItem.color);
 			}
@@ -492,7 +669,7 @@ function getColorForValue(data, value) {
 function getColorByXPercentage(canvas, xPercent){
 	var x = canvas.width * xPercent;
 	var context = canvas.getContext("2d");
-    var p = context.getImageData(x, 1, 1, 1).data; 
+    var p = context.getImageData(x, 1, 1, 1).data;
     var color = 'rgba('+[p[0] +','+ p[1] +','+ p[2] +','+ p[3]]+')';
     return color;
 }

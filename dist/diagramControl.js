@@ -3,7 +3,7 @@
 System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app/core/utils/kbn', 'app/plugins/sdk', './properties', 'lodash', './series_overrides_diagram_ctrl', './css/diagram.css!'], function (_export, _context) {
 	"use strict";
 
-	var TimeSeries, kbn, MetricsPanelCtrl, diagramEditor, displayEditor, _, _createClass, panelDefaults, DiagramCtrl;
+	var TimeSeries, kbn, MetricsPanelCtrl, diagramEditor, displayEditor, compositeEditor, _, _createClass, panelDefaults, DiagramCtrl;
 
 	function _classCallCheck(instance, Constructor) {
 		if (!(instance instanceof Constructor)) {
@@ -65,6 +65,7 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 		}, function (_properties) {
 			diagramEditor = _properties.diagramEditor;
 			displayEditor = _properties.displayEditor;
+			compositeEditor = _properties.compositeEditor;
 		}, function (_lodash) {
 			_ = _lodash.default;
 		}, function (_series_overrides_diagram_ctrl) {}, function (_cssDiagramCss) {}],
@@ -88,9 +89,11 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 			}();
 
 			panelDefaults = {
+				composites: [],
 				// other style overrides
 				seriesOverrides: [],
 				thresholds: '0,10',
+				decimals: 2, // decimal precision
 				colors: ['rgba(50, 172, 45, 0.97)', 'rgba(237, 129, 40, 0.89)', 'rgba(245, 54, 54, 0.9)'],
 				legend: {
 					show: true,
@@ -186,6 +189,7 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 					value: function onInitEditMode() {
 						this.addEditorTab('Diagram', diagramEditor, 2);
 						this.addEditorTab('Display', displayEditor, 3);
+						this.addEditorTab('Metric Composites', compositeEditor, 4);
 					}
 				}, {
 					key: 'getDiagramContainer',
@@ -230,6 +234,38 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 						this.render();
 					}
 				}, {
+					key: 'addComposite',
+					value: function addComposite(composite) {
+						this.panel.composites.push(composite || {});
+					}
+				}, {
+					key: 'removeComposite',
+					value: function removeComposite(composite) {
+						this.panel.composites = _.without(this.panel.composites, composite);
+						this.render();
+					}
+				}, {
+					key: 'getSeriesNamesForComposites',
+					value: function getSeriesNamesForComposites() {
+						return _.map(this.$scope.ctrl.series, function (series) {
+							return series.alias;
+						});
+					}
+				}, {
+					key: 'addMetricToComposite',
+					value: function addMetricToComposite(composite) {
+						if (composite.metrics === undefined) {
+							composite.metrics = [{}];
+						} else {
+							composite.metrics.push({});
+						}
+					}
+				}, {
+					key: 'removeMetricFromComposite',
+					value: function removeMetricFromComposite(composite, metric) {
+						composite.metrics = _.without(composite.metrics, metric);
+					}
+				}, {
 					key: 'updateThresholds',
 					value: function updateThresholds() {
 						var thresholdCount = this.panel.thresholds.length;
@@ -269,20 +305,85 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 						if (this.panel.content.length > 0) {
 							this.clearDiagram();
 							var graphDefinition = this.panel.content;
-							graphDefinition = this.templateSrv.replace(graphDefinition);
+							// substitute values inside "link text"
+							// this will look for any composite prefixed with a # and substitute the value of the composite
+							// if a series alias is found, in the form #alias, the value will be substituted
+							// this allows link values to be displayed based on the metric
+							graphDefinition = this.substituteHashPrefixedNotation(graphDefinition, data);
+							graphDefinition = this.templateSrv.replaceWithText(graphDefinition);
 							this.diagramType = mermaidAPI.detectType(graphDefinition);
 							var diagramContainer = $(document.getElementById(this.containerDivId));
 
 							var renderCallback = function renderCallback(svgCode, bindFunctions) {
-								if (svgCode == '') {
+								if (svgCode === '') {
 									diagramContainer.html('There was a problem rendering the graph');
 								} else {
 									diagramContainer.html(svgCode);
+									bindFunctions(diagramContainer[0]);
 								}
 							};
 							// if parsing the graph definition fails, the error handler will be called but the renderCallback() may also still be called.
 							mermaidAPI.render(this.panel.graphId, graphDefinition, renderCallback);
 						}
+					}
+				}, {
+					key: 'substituteHashPrefixedNotation',
+					value: function substituteHashPrefixedNotation(graphDefinition, data) {
+						// inspect the string, locate all # prefixed items, and replace them with the value
+						// of the series. If no matching series is found, leave it alone
+						var matches = graphDefinition.match(/(?:#|!|@|&)(\w+)/g);
+						if (matches === null) return graphDefinition;
+						// check if there is a composite with a matching name
+						for (var i = 0; i < matches.length; i++) {
+							var aMatch = matches[i];
+							var valueType = aMatch[0];
+							aMatch = aMatch.substring(1);
+							// check composites first
+							for (var j = 0; j < this.panel.composites.length; j++) {
+								var aComposite = this.panel.composites[j];
+								if (aComposite.name === aMatch) {
+									// found matching composite, get the valueFormatted
+									//var displayedValue = data[aComposite.name].value;
+									var displayedValue = null;
+									switch (valueType) {
+										case '#':
+											displayedValue = data[aComposite.name].value;
+											graphDefinition = graphDefinition.replace('#' + aMatch, displayedValue);
+											break;
+										case '!':
+											displayedValue = data[aComposite.name].valueRawFormattedWithPrefix;
+											graphDefinition = graphDefinition.replace('!' + aMatch, displayedValue);
+											break;
+										case '@':
+											displayedValue = data[aComposite.name].valueFormatted;
+											graphDefinition = graphDefinition.replace('@' + aMatch, displayedValue);
+											break;
+										case '&':
+											displayedValue = data[aComposite.name].valueFormattedWithPrefix;
+											graphDefinition = graphDefinition.replace('&' + aMatch, displayedValue);
+											break;
+									}
+								}
+							}
+							// next check series
+							for (var k = 0; k < this.series.length; k++) {
+								var seriesItem = this.series[k];
+								if (seriesItem.alias === aMatch) {
+									var displayedValue = null;
+									switch (valueType) {
+										case '#':
+											displayedValue = data[seriesItem.alias].value;
+											graphDefinition = graphDefinition.replace('#' + aMatch, displayedValue);
+											break;
+										case '@':
+											displayedValue = data[seriesItem.alias].valueFormatted;
+											graphDefinition = graphDefinition.replace('@' + aMatch, displayedValue);
+											break;
+									}
+								}
+							}
+						}
+						return graphDefinition;
 					}
 				}, {
 					key: 'setValues',
@@ -309,7 +410,8 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 									//data[seriesItem.alias].flotpairs = seriesItem.flotpairs;
 
 									var decimalInfo = this.getDecimalsForValue(data[seriesItem.alias].value);
-									var formatFunc = kbn.valueFormats[this.panel.format];
+									var formatFunc = kbn.valueFormats[data[seriesItem.alias].format];
+									// put the value in quotes to escape "most" special characters
 									data[seriesItem.alias].valueFormatted = formatFunc(data[seriesItem.alias].value, decimalInfo.decimals, decimalInfo.scaledDecimals);
 									data[seriesItem.alias].valueRounded = kbn.roundValue(data[seriesItem.alias].value, decimalInfo.decimals);
 								}
@@ -320,6 +422,70 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 								}
 							}
 						}
+						// now add the composites to data
+						for (var i = 0; i < this.panel.composites.length; i++) {
+							var aComposite = this.panel.composites[i];
+							var currentWorstSeries = null;
+							var currentWorstSeriesName = null;
+							for (var j = 0; j < aComposite.metrics.length; j++) {
+								//debugger;
+								var aMetric = aComposite.metrics[j];
+								var seriesName = aMetric.seriesName;
+								currentWorstSeriesName = aMetric.seriesName;
+								var seriesItem = data[seriesName];
+								// check colorData thresholds
+								if (currentWorstSeries === null) {
+									currentWorstSeries = seriesItem;
+								} else {
+									currentWorstSeries = this.getWorstSeries(currentWorstSeries, seriesItem);
+								}
+							}
+							// Prefix the valueFormatted with the actual metric name
+							currentWorstSeries.valueFormattedWithPrefix = currentWorstSeriesName + ': ' + currentWorstSeries.valueFormatted;
+							currentWorstSeries.valueRawFormattedWithPrefix = currentWorstSeriesName + ': ' + currentWorstSeries.value;
+							currentWorstSeries.valueFormatted = currentWorstSeriesName + ': ' + currentWorstSeries.valueFormatted;
+							// now push the composite into data
+							data[aComposite.name] = currentWorstSeries;
+						}
+					}
+				}, {
+					key: 'getWorstSeries',
+					value: function getWorstSeries(series1, series2) {
+						var worstSeries = series1;
+						var series1thresholdLevel = this.getThesholdLevel(series1);
+						var series2thresholdLevel = this.getThesholdLevel(series2);
+						console.log("Series1 threhold level: " + series1thresholdLevel);
+						console.log("Series2 threhold level: " + series2thresholdLevel);
+						if (series2thresholdLevel > series1thresholdLevel) {
+							// series2 has higher threshold violation
+							worstSeries = series2;
+						}
+						return worstSeries;
+					}
+				}, {
+					key: 'getThesholdLevel',
+					value: function getThesholdLevel(series) {
+						// default to ok
+						var thresholdLevel = 0;
+						var value = series.value;
+						var thresholds = series.colorData.thresholds;
+						// if no thresholds are defined, return 0
+						if (thresholds === undefined) {
+							return thresholdLevel;
+						}
+						// make sure thresholds is an array of size 2
+						if (thresholds.length !== 2) {
+							return thresholdLevel;
+						}
+						if (value >= thresholds[0]) {
+							// value is equal or greater than first threshold
+							thresholdLevel = 1;
+						}
+						if (value >= thresholds[1]) {
+							// value is equal or greater than second threshold
+							thresholdLevel = 2;
+						}
+						return thresholdLevel;
 					}
 				}, {
 					key: 'getGradientForValue',
@@ -348,6 +514,7 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 						var seriesItem = {},
 						    colorData = {},
 						    overrides = {};
+
 						console.info('applying overrides for seriesItem');
 						console.debug(seriesItemAlias);
 						console.debug(this.panel.seriesOverrides);
@@ -375,6 +542,7 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 
 						seriesItem.valueName = overrides.valueName || this.panel.valueName;
 
+						seriesItem.format = overrides.unitFormat || this.panel.format;
 						return seriesItem;
 					}
 				}, {
@@ -386,6 +554,7 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 				}, {
 					key: 'getDecimalsForValue',
 					value: function getDecimalsForValue(value) {
+						//debugger;
 						if (_.isNumber(this.panel.decimals)) {
 							return { decimals: this.panel.decimals, scaledDecimals: null };
 						}
@@ -537,7 +706,7 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 										}
 									} else {
 										targetElement = $(svg).find('text:contains("' + key + '")'); // sequence diagram, gantt ?
-										if (targetElement.length == 0) {
+										if (targetElement.length === 0) {
 											console.warn('couldnt not find a diagram node with id/text: ' + key);
 											continue;
 										}

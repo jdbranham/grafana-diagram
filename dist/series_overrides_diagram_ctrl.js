@@ -17,7 +17,6 @@ System.register([], function (_export, _context) {
           option.propertyName = propertyName;
           option.index = $scope.overrideMenu.length;
           option.values = values;
-
           option.submenu = _.map(values, function (value) {
             return { text: String(value), value: value };
           });
@@ -49,6 +48,18 @@ System.register([], function (_export, _context) {
           $scope.ctrl.render();
         };
 
+        $scope.unitFormatChanged = function (option) {
+          $scope.override['unitFormat'] = option.value;
+          $scope.updateCurrentOverrides();
+          $scope.ctrl.refresh();
+        };
+
+        $scope.decimalsChanged = function (option) {
+          $scope.override['decimals'] = option.value;
+          $scope.updateCurrentOverrides();
+          $scope.ctrl.refresh();
+        };
+
         $scope.openColorSelector = function () {
           popoverSrv.show({
             element: $element.find(".dropdown")[0],
@@ -72,7 +83,7 @@ System.register([], function (_export, _context) {
         };
 
         $scope.getSeriesNames = function () {
-          return _.map($scope.ctrl.seriesList, function (series) {
+          return _.map($scope.ctrl.series, function (series) {
             return series.alias;
           });
         };
@@ -96,6 +107,8 @@ System.register([], function (_export, _context) {
         $scope.addOverrideOption('Thresholds', 'thresholds', ['custom']);
         $scope.addOverrideOption('Colors', 'invertColors', ['Invert Colors']);
         $scope.addOverrideOption('Value', 'valueName', ['avg', 'min', 'max', 'total', 'current']);
+        $scope.addOverrideOption('Decimals', 'decimals', [2]);
+        $scope.addOverrideOption('Unit Format', 'unitFormat', ['select']);
         $scope.updateCurrentOverrides();
       }]);
     }
