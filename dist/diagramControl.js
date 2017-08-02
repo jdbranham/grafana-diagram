@@ -144,7 +144,8 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
             messageMargin: 35, // - Space between messages
             mirrorActors: true, // - mirror actors under diagram
             bottomMarginAdj: 1, // - Depending on css styling this might need adjustment. Prolongs the edge of the diagram downwards
-            useMaxWidth: true },
+            useMaxWidth: true // - when this flag is set the height and width is set to 100% and is then scaling with the available space if not the absolute space required is used
+          },
           gantt: {
             titleTopMargin: 25, // - margin top for the text over the gantt diagram
             barHeight: 20, // - the height of the bars in the graph
@@ -154,7 +155,32 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
             gridLineStartPadding: 35, // - Vertical starting position of the grid lines
             fontSize: 11, // - font size ...
             fontFamily: '"Open-Sans", "sans-serif"', // - font family ...
-            numberSectionStyles: 3 }
+            numberSectionStyles: 3 // - the number of alternating section styles
+            /** axisFormatter: // - formatting of the axis, this might need adjustment to match your locale and preferences
+            [
+                // Within a day
+                ['%I:%M', function (d) {
+                    return d.getHours();
+                }],
+                // Monday a week
+                ['w. %U', function (d) {
+                    return d.getDay() == 1;
+                }],
+                // Day within a week (not monday)
+                ['%a %d', function (d) {
+                    return d.getDay() && d.getDate() != 1;
+                }],
+                // within a month
+                ['%b %d', function (d) {
+                    return d.getDate() != 1;
+                }],
+                // Month
+                ['%m-%y', function (d) {
+                    return d.getMonth();
+                }]] **/
+          }
+          //classDiagram: {},
+          //info: {}
         }
       };
 
@@ -354,60 +380,50 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
         }, {
           key: 'updateDiagram',
           value: function updateDiagram(data) {
-            var _this3 = this;
-
             if (this.panel.content.length > 0) {
-              var mode;
-              var templatedURL;
+              var updateDiagram_cont = function updateDiagram_cont(_this, graphDefinition) {
+                // substitute values inside "link text"
+                // this will look for any composite prefixed with a # and substitute the value of the composite
+                // if a series alias is found, in the form #alias, the value will be substituted
+                // this allows link values to be displayed based on the metric
+                graphDefinition = _this.substituteHashPrefixedNotation(graphDefinition, data);
+                graphDefinition = _this.templateSrv.replaceWithText(graphDefinition);
+                _this.diagramType = mermaidAPI.detectType(graphDefinition);
+                var diagramContainer = $(document.getElementById(_this.containerDivId));
 
-              var _this;
-
-              (function () {
-                var updateDiagram_cont = function updateDiagram_cont(_this, graphDefinition) {
-                  // substitute values inside "link text"
-                  // this will look for any composite prefixed with a # and substitute the value of the composite
-                  // if a series alias is found, in the form #alias, the value will be substituted
-                  // this allows link values to be displayed based on the metric
-                  graphDefinition = _this.substituteHashPrefixedNotation(graphDefinition, data);
-                  graphDefinition = _this.templateSrv.replaceWithText(graphDefinition);
-                  _this.diagramType = mermaidAPI.detectType(graphDefinition);
-                  var diagramContainer = $(document.getElementById(_this.containerDivId));
-
-                  var renderCallback = function renderCallback(svgCode, bindFunctions) {
-                    if (svgCode === '') {
-                      diagramContainer.html('There was a problem rendering the graph');
-                    } else {
-                      diagramContainer.html(svgCode);
-                      bindFunctions(diagramContainer[0]);
-                    }
-                  };
-                  // if parsing the graph definition fails, the error handler will be called but the renderCallback() may also still be called.
-                  mermaidAPI.render(_this.panel.graphId, graphDefinition, renderCallback);
+                var renderCallback = function renderCallback(svgCode, bindFunctions) {
+                  if (svgCode === '') {
+                    diagramContainer.html('There was a problem rendering the graph');
+                  } else {
+                    diagramContainer.html(svgCode);
+                    bindFunctions(diagramContainer[0]);
+                  }
                 };
+                // if parsing the graph definition fails, the error handler will be called but the renderCallback() may also still be called.
+                mermaidAPI.render(_this.panel.graphId, graphDefinition, renderCallback);
+              };
 
-                _this3.clearDiagram();
+              this.clearDiagram();
 
-                mode = _this3.panel.mode;
-                templatedURL = _this3.templateSrv.replace(_this3.panel.mermaidServiceUrl, _this3.panel.scopedVars);
+              var mode = this.panel.mode;
+              var templatedURL = this.templateSrv.replace(this.panel.mermaidServiceUrl, this.panel.scopedVars);
 
-
-                if (mode == 'url') {
-                  _this = _this3;
-
-                  _this3.$http({
-                    method: 'GET',
-                    url: templatedURL
-                  }).then(function successCallback(response) {
-                    //the response must have text/plain content-type
-                    // console.info(response.data);
-                    updateDiagram_cont.call(_this, response.data);
-                  }, function errorCallback(response) {
-                    console.warn('error', response);
-                  });
-                } else {
-                  updateDiagram_cont(_this3, _this3.panel.content);
-                }
-              })();
+              if (mode == 'url') {
+                var _this = this;
+                this.$http({
+                  method: 'GET',
+                  url: templatedURL,
+                  headers: { 'Accept': 'text/x-mermaid,text/plain;q=0.9,*/*;q=0.8' }
+                }).then(function successCallback(response) {
+                  //the response must have text/plain content-type
+                  // console.info(response.data);
+                  updateDiagram_cont.call(_this, response.data);
+                }, function errorCallback(response) {
+                  console.warn('error', response);
+                });
+              } else {
+                updateDiagram_cont(this, this.panel.content);
+              }
             }
           }
         }, {

@@ -310,7 +310,8 @@ class DiagramCtrl extends MetricsPanelCtrl {
         var _this = this;
         this.$http({
           method: 'GET',
-          url: templatedURL
+          url: templatedURL,
+          headers: { 'Accept': 'text/x-mermaid,text/plain;q=0.9,*/*;q=0.8' }
         }).then(function successCallback(response) {
           //the response must have text/plain content-type
           // console.info(response.data);
