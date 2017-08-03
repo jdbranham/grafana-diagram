@@ -41,6 +41,8 @@ const panelDefaults = {
 		'A --> C(Round Rect)\n' +
 		'B --> D{Rhombus}\n' +
 		'C --> D\n',
+	mode: 'content', //allowed values: 'content' and 'url'
+	mermaidServiceUrl : '',
 	init: {
 		logLevel: 3, //1:debug, 2:info, 3:warn, 4:error, 5:fatal
     	cloneCssStyles: false, // - This options controls whether or not the css rules should be copied into the generated svg
@@ -103,10 +105,10 @@ const panelDefaults = {
 };
 
 class DiagramCtrl extends MetricsPanelCtrl {
-	constructor($scope, $injector, $sce) {
+	constructor($scope, $injector, $sce, $http) {
 		super($scope, $injector);
 		_.defaults(this.panel, panelDefaults);
-
+		this.$http = $http;
 		this.panel.graphId = 'diagram_' + this.panel.id;
 		this.containerDivId = 'container_'+this.panel.graphId;
 		this.$sce = $sce;
@@ -147,8 +149,6 @@ class DiagramCtrl extends MetricsPanelCtrl {
 		var data = {};
 		this.setValues(data);
 		this.updateDiagram(data);
-		this.svgData = data;
-		this.render();
 	}
 
 	seriesHandler(seriesData) {
@@ -226,28 +226,51 @@ class DiagramCtrl extends MetricsPanelCtrl {
 	updateDiagram(data){
 		if(this.panel.content.length > 0){
 			this.clearDiagram();
-			var graphDefinition = this.panel.content;
-      // substitute values inside "link text"
-      // this will look for any composite prefixed with a # and substitute the value of the composite
-      // if a series alias is found, in the form #alias, the value will be substituted
-      // this allows link values to be displayed based on the metric
-      graphDefinition = this.substituteHashPrefixedNotation(graphDefinition, data);
-			graphDefinition = this.templateSrv.replaceWithText(graphDefinition);
-			this.diagramType = mermaidAPI.detectType(graphDefinition);
-			var diagramContainer = $(document.getElementById(this.containerDivId));
 
-			var renderCallback = function (svgCode, bindFunctions){
-				if(svgCode === '') {
-					diagramContainer.html('There was a problem rendering the graph');
-				} else {
-			    		diagramContainer.html(svgCode);
-					bindFunctions(diagramContainer[0]);
-				}
-			};
-			// if parsing the graph definition fails, the error handler will be called but the renderCallback() may also still be called.
-			mermaidAPI.render(this.panel.graphId, graphDefinition, renderCallback);
+			var mode = this.panel.mode;
+			var templatedURL = this.templateSrv.replace(this.panel.mermaidServiceUrl, this.panel.scopedVars);
+
+      function updateDiagram_cont(graphDefinition) {
+        // substitute values inside "link text"
+        // this will look for any composite prefixed with a # and substitute the value of the composite
+        // if a series alias is found, in the form #alias, the value will be substituted
+        // this allows link values to be displayed based on the metric
+        graphDefinition = this.substituteHashPrefixedNotation(graphDefinition, data);
+        graphDefinition = this.templateSrv.replaceWithText(graphDefinition);
+        this.diagramType = mermaidAPI.detectType(graphDefinition);
+        var diagramContainer = $(document.getElementById(this.containerDivId));
+  
+        var renderCallback = function (svgCode, bindFunctions){
+          if(svgCode === '') {
+            diagramContainer.html('There was a problem rendering the graph');
+          } else {
+                diagramContainer.html(svgCode);
+            bindFunctions(diagramContainer[0]);
+          }
+        };
+        // if parsing the graph definition fails, the error handler will be called but the renderCallback() may also still be called.
+        mermaidAPI.render(this.panel.graphId, graphDefinition, renderCallback);
+      }
+
+			if(mode == 'url') {
+				var me = this;
+				this.$http({
+					method: 'GET',
+					url: templatedURL
+				}).then(function successCallback(response) {
+					//the response must have text/plain content-type
+//					console.info(response.data);
+          updateDiagram_cont.call(me, response.data);
+				}, function errorCallback(response) {
+					console.warn('error', response);
+				})
+			} else {
+        updateDiagram_cont.call(this, this.panel.content);
+			}
 		}
 	} // End updateDiagram()
+
+
 
   /**
    * substitute values inside "link text"
@@ -326,6 +349,29 @@ class DiagramCtrl extends MetricsPanelCtrl {
     }
     return graphDefinition;
   }
+	
+	renderDiagram(data, graphDefinition) {
+		console.info(graphDefinition);
+		graphDefinition = this.templateSrv.replace(graphDefinition);
+		console.info(graphDefinition);
+		this.diagramType = mermaidAPI.detectType(graphDefinition);
+		var diagramContainer = $(document.getElementById(this.containerDivId));
+		
+		var renderCallback = function (svgCode, bindFunctions){
+			if(svgCode == '') {
+				diagramContainer.html('There was a problem rendering the graph');
+			} else {
+				diagramContainer.html(svgCode);
+				bindFunctions(diagramContainer[0]);
+			}
+		};
+		// if parsing the graph definition fails, the error handler will be called but the renderCallback() may also still be called.
+		mermaidAPI.render(this.panel.graphId, graphDefinition, renderCallback);
+		this.svgData = data;
+		this.render();
+	}
+	
+
 	setValues(data) {
 	    if (this.series && this.series.length > 0) {
 			for(var i = 0; i < this.series.length; i++){
