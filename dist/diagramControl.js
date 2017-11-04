@@ -116,6 +116,8 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 				valueOptions: ['avg', 'min', 'max', 'total', 'current'],
 				valueMaps: [{ value: 'null', op: '=', text: 'N/A' }],
 				content: 'graph LR\n' + 'A[Square Rect] -- Link text --> B((Circle))\n' + 'A --> C(Round Rect)\n' + 'B --> D{Rhombus}\n' + 'C --> D\n',
+				mode: 'content', //allowed values: 'content' and 'url'
+				mermaidServiceUrl: '',
 				init: {
 					logLevel: 3, //1:debug, 2:info, 3:warn, 4:error, 5:fatal
 					cloneCssStyles: false, // - This options controls whether or not the css rules should be copied into the generated svg
@@ -137,7 +139,8 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 						messageMargin: 35, // - Space between messages
 						mirrorActors: true, // - mirror actors under diagram
 						bottomMarginAdj: 1, // - Depending on css styling this might need adjustment. Prolongs the edge of the diagram downwards
-						useMaxWidth: true },
+						useMaxWidth: true // - when this flag is set the height and width is set to 100% and is then scaling with the available space if not the absolute space required is used
+					},
 					gantt: {
 						titleTopMargin: 25, // - margin top for the text over the gantt diagram
 						barHeight: 20, // - the height of the bars in the graph
@@ -147,20 +150,45 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 						gridLineStartPadding: 35, // - Vertical starting position of the grid lines
 						fontSize: 11, // - font size ...
 						fontFamily: '"Open-Sans", "sans-serif"', // - font family ...
-						numberSectionStyles: 3 }
+						numberSectionStyles: 3 // - the number of alternating section styles
+						/** axisFormatter: // - formatting of the axis, this might need adjustment to match your locale and preferences
+      	[
+             // Within a day
+             ['%I:%M', function (d) {
+                 return d.getHours();
+             }],
+             // Monday a week
+             ['w. %U', function (d) {
+                 return d.getDay() == 1;
+             }],
+             // Day within a week (not monday)
+             ['%a %d', function (d) {
+                 return d.getDay() && d.getDate() != 1;
+             }],
+             // within a month
+             ['%b %d', function (d) {
+                 return d.getDate() != 1;
+             }],
+             // Month
+             ['%m-%y', function (d) {
+                 return d.getMonth();
+             }]] **/
+					}
+					//classDiagram: {},
+					//info: {}
 				}
 			};
 
 			_export('MetricsPanelCtrl', _export('DiagramCtrl', DiagramCtrl = function (_MetricsPanelCtrl) {
 				_inherits(DiagramCtrl, _MetricsPanelCtrl);
 
-				function DiagramCtrl($scope, $injector, $sce) {
+				function DiagramCtrl($scope, $injector, $sce, $http) {
 					_classCallCheck(this, DiagramCtrl);
 
 					var _this = _possibleConstructorReturn(this, (DiagramCtrl.__proto__ || Object.getPrototypeOf(DiagramCtrl)).call(this, $scope, $injector));
 
 					_.defaults(_this.panel, panelDefaults);
-
+					_this.$http = $http;
 					_this.panel.graphId = 'diagram_' + _this.panel.id;
 					_this.containerDivId = 'container_' + _this.panel.graphId;
 					_this.$sce = $sce;
@@ -208,8 +236,6 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 						var data = {};
 						this.setValues(data);
 						this.updateDiagram(data);
-						this.svgData = data;
-						this.render();
 					}
 				}, {
 					key: 'seriesHandler',
@@ -303,27 +329,48 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 					key: 'updateDiagram',
 					value: function updateDiagram(data) {
 						if (this.panel.content.length > 0) {
-							this.clearDiagram();
-							var graphDefinition = this.panel.content;
-							// substitute values inside "link text"
-							// this will look for any composite prefixed with a # and substitute the value of the composite
-							// if a series alias is found, in the form #alias, the value will be substituted
-							// this allows link values to be displayed based on the metric
-							graphDefinition = this.substituteHashPrefixedNotation(graphDefinition, data);
-							graphDefinition = this.templateSrv.replaceWithText(graphDefinition);
-							this.diagramType = mermaidAPI.detectType(graphDefinition);
-							var diagramContainer = $(document.getElementById(this.containerDivId));
+							var updateDiagram_cont = function updateDiagram_cont(graphDefinition) {
+								// substitute values inside "link text"
+								// this will look for any composite prefixed with a # and substitute the value of the composite
+								// if a series alias is found, in the form #alias, the value will be substituted
+								// this allows link values to be displayed based on the metric
+								graphDefinition = this.substituteHashPrefixedNotation(graphDefinition, data);
+								graphDefinition = this.templateSrv.replaceWithText(graphDefinition);
+								this.diagramType = mermaidAPI.detectType(graphDefinition);
+								var diagramContainer = $(document.getElementById(this.containerDivId));
 
-							var renderCallback = function renderCallback(svgCode, bindFunctions) {
-								if (svgCode === '') {
-									diagramContainer.html('There was a problem rendering the graph');
-								} else {
-									diagramContainer.html(svgCode);
-									bindFunctions(diagramContainer[0]);
-								}
+								var renderCallback = function renderCallback(svgCode, bindFunctions) {
+									if (svgCode === '') {
+										diagramContainer.html('There was a problem rendering the graph');
+									} else {
+										diagramContainer.html(svgCode);
+										bindFunctions(diagramContainer[0]);
+									}
+								};
+								// if parsing the graph definition fails, the error handler will be called but the renderCallback() may also still be called.
+								mermaidAPI.render(this.panel.graphId, graphDefinition, renderCallback);
 							};
-							// if parsing the graph definition fails, the error handler will be called but the renderCallback() may also still be called.
-							mermaidAPI.render(this.panel.graphId, graphDefinition, renderCallback);
+
+							this.clearDiagram();
+
+							var mode = this.panel.mode;
+							var templatedURL = this.templateSrv.replace(this.panel.mermaidServiceUrl, this.panel.scopedVars);
+
+							if (mode == 'url') {
+								var me = this;
+								this.$http({
+									method: 'GET',
+									url: templatedURL
+								}).then(function successCallback(response) {
+									//the response must have text/plain content-type
+									//					console.info(response.data);
+									updateDiagram_cont.call(me, response.data);
+								}, function errorCallback(response) {
+									console.warn('error', response);
+								});
+							} else {
+								updateDiagram_cont.call(this, this.panel.content);
+							}
 						}
 					}
 				}, {
@@ -384,6 +431,28 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 							}
 						}
 						return graphDefinition;
+					}
+				}, {
+					key: 'renderDiagram',
+					value: function renderDiagram(data, graphDefinition) {
+						console.info(graphDefinition);
+						graphDefinition = this.templateSrv.replace(graphDefinition);
+						console.info(graphDefinition);
+						this.diagramType = mermaidAPI.detectType(graphDefinition);
+						var diagramContainer = $(document.getElementById(this.containerDivId));
+
+						var renderCallback = function renderCallback(svgCode, bindFunctions) {
+							if (svgCode == '') {
+								diagramContainer.html('There was a problem rendering the graph');
+							} else {
+								diagramContainer.html(svgCode);
+								bindFunctions(diagramContainer[0]);
+							}
+						};
+						// if parsing the graph definition fails, the error handler will be called but the renderCallback() may also still be called.
+						mermaidAPI.render(this.panel.graphId, graphDefinition, renderCallback);
+						this.svgData = data;
+						this.render();
 					}
 				}, {
 					key: 'setValues',
