@@ -36,7 +36,7 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 	}
 
 	function getColorForValue(data, value) {
-		console.info('Getting color for value');
+		console.debug('Getting color for value');
 		console.debug(data);
 		console.debug(value);
 		for (var i = data.thresholds.length; i > 0; i--) {
@@ -139,8 +139,7 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 						messageMargin: 35, // - Space between messages
 						mirrorActors: true, // - mirror actors under diagram
 						bottomMarginAdj: 1, // - Depending on css styling this might need adjustment. Prolongs the edge of the diagram downwards
-						useMaxWidth: true // - when this flag is set the height and width is set to 100% and is then scaling with the available space if not the absolute space required is used
-					},
+						useMaxWidth: true },
 					gantt: {
 						titleTopMargin: 25, // - margin top for the text over the gantt diagram
 						barHeight: 20, // - the height of the bars in the graph
@@ -150,32 +149,7 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 						gridLineStartPadding: 35, // - Vertical starting position of the grid lines
 						fontSize: 11, // - font size ...
 						fontFamily: '"Open-Sans", "sans-serif"', // - font family ...
-						numberSectionStyles: 3 // - the number of alternating section styles
-						/** axisFormatter: // - formatting of the axis, this might need adjustment to match your locale and preferences
-      	[
-             // Within a day
-             ['%I:%M', function (d) {
-                 return d.getHours();
-             }],
-             // Monday a week
-             ['w. %U', function (d) {
-                 return d.getDay() == 1;
-             }],
-             // Day within a week (not monday)
-             ['%a %d', function (d) {
-                 return d.getDay() && d.getDate() != 1;
-             }],
-             // within a month
-             ['%b %d', function (d) {
-                 return d.getDate() != 1;
-             }],
-             // Month
-             ['%m-%y', function (d) {
-                 return d.getMonth();
-             }]] **/
-					}
-					//classDiagram: {},
-					//info: {}
+						numberSectionStyles: 3 }
 				}
 			};
 
@@ -185,19 +159,19 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 				function DiagramCtrl($scope, $injector, $sce, $http) {
 					_classCallCheck(this, DiagramCtrl);
 
-					var _this = _possibleConstructorReturn(this, (DiagramCtrl.__proto__ || Object.getPrototypeOf(DiagramCtrl)).call(this, $scope, $injector));
+					var _this2 = _possibleConstructorReturn(this, (DiagramCtrl.__proto__ || Object.getPrototypeOf(DiagramCtrl)).call(this, $scope, $injector));
 
-					_.defaults(_this.panel, panelDefaults);
-					_this.$http = $http;
-					_this.panel.graphId = 'diagram_' + _this.panel.id;
-					_this.containerDivId = 'container_' + _this.panel.graphId;
-					_this.$sce = $sce;
-					_this.events.on('init-edit-mode', _this.onInitEditMode.bind(_this));
-					_this.events.on('data-received', _this.onDataReceived.bind(_this));
-					_this.events.on('data-snapshot-load', _this.onDataReceived.bind(_this));
-					_this.unitFormats = kbn.getUnitFormats();
-					_this.initializeMermaid();
-					return _this;
+					_.defaults(_this2.panel, panelDefaults);
+					_this2.$http = $http;
+					_this2.panel.graphId = 'diagram_' + _this2.panel.id;
+					_this2.containerDivId = 'container_' + _this2.panel.graphId;
+					_this2.$sce = $sce;
+					_this2.events.on('init-edit-mode', _this2.onInitEditMode.bind(_this2));
+					_this2.events.on('data-received', _this2.onDataReceived.bind(_this2));
+					_this2.events.on('data-snapshot-load', _this2.onDataReceived.bind(_this2));
+					_this2.unitFormats = kbn.getUnitFormats();
+					_this2.initializeMermaid();
+					return _this2;
 				}
 
 				_createClass(DiagramCtrl, [{
@@ -227,15 +201,17 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 				}, {
 					key: 'onDataReceived',
 					value: function onDataReceived(dataList) {
-						console.info('received data');
+						console.debug('received data');
 						console.debug(dataList);
 						this.series = dataList.map(this.seriesHandler.bind(this));
-						console.info('mapped dataList to series');
+						console.debug('mapped dataList to series');
 						console.debug(this.series);
 
 						var data = {};
 						this.setValues(data);
 						this.updateDiagram(data);
+						this.svgData = data;
+						this.render();
 					}
 				}, {
 					key: 'seriesHandler',
@@ -329,15 +305,15 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 					key: 'updateDiagram',
 					value: function updateDiagram(data) {
 						if (this.panel.content.length > 0) {
-							var updateDiagram_cont = function updateDiagram_cont(graphDefinition) {
+							var updateDiagram_cont = function updateDiagram_cont(_this, graphDefinition) {
 								// substitute values inside "link text"
 								// this will look for any composite prefixed with a # and substitute the value of the composite
 								// if a series alias is found, in the form #alias, the value will be substituted
 								// this allows link values to be displayed based on the metric
-								graphDefinition = this.substituteHashPrefixedNotation(graphDefinition, data);
-								graphDefinition = this.templateSrv.replaceWithText(graphDefinition);
-								this.diagramType = mermaidAPI.detectType(graphDefinition);
-								var diagramContainer = $(document.getElementById(this.containerDivId));
+								graphDefinition = _this.substituteHashPrefixedNotation(graphDefinition, data);
+								graphDefinition = _this.templateSrv.replaceWithText(graphDefinition);
+								_this.diagramType = mermaidAPI.detectType(graphDefinition);
+								var diagramContainer = $(document.getElementById(_this.containerDivId));
 
 								var renderCallback = function renderCallback(svgCode, bindFunctions) {
 									if (svgCode === '') {
@@ -348,7 +324,7 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 									}
 								};
 								// if parsing the graph definition fails, the error handler will be called but the renderCallback() may also still be called.
-								mermaidAPI.render(this.panel.graphId, graphDefinition, renderCallback);
+								mermaidAPI.render(_this.panel.graphId, graphDefinition, renderCallback);
 							};
 
 							this.clearDiagram();
@@ -357,19 +333,19 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 							var templatedURL = this.templateSrv.replace(this.panel.mermaidServiceUrl, this.panel.scopedVars);
 
 							if (mode == 'url') {
-								var me = this;
+								var _this = this;
 								this.$http({
 									method: 'GET',
 									url: templatedURL
 								}).then(function successCallback(response) {
 									//the response must have text/plain content-type
 									//					console.info(response.data);
-									updateDiagram_cont.call(me, response.data);
+									updateDiagram_cont.call(_this, response.data);
 								}, function errorCallback(response) {
 									console.warn('error', response);
 								});
 							} else {
-								updateDiagram_cont.call(this, this.panel.content);
+								updateDiagram_cont(this, this.panel.content);
 							}
 						}
 					}
@@ -435,9 +411,9 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 				}, {
 					key: 'renderDiagram',
 					value: function renderDiagram(data, graphDefinition) {
-						console.info(graphDefinition);
+						console.debug(graphDefinition);
 						graphDefinition = this.templateSrv.replace(graphDefinition);
-						console.info(graphDefinition);
+						console.debug(graphDefinition);
 						this.diagramType = mermaidAPI.detectType(graphDefinition);
 						var diagramContainer = $(document.getElementById(this.containerDivId));
 
@@ -559,7 +535,7 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 				}, {
 					key: 'getGradientForValue',
 					value: function getGradientForValue(data, value) {
-						console.info('Getting gradient for value');
+						console.debug('Getting gradient for value');
 						console.debug(data);
 						console.debug(value);
 						var min = Math.min.apply(Math, data.thresholds);
@@ -584,7 +560,7 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 						    colorData = {},
 						    overrides = {};
 
-						console.info('applying overrides for seriesItem');
+						console.debug('applying overrides for seriesItem');
 						console.debug(seriesItemAlias);
 						console.debug(this.panel.seriesOverrides);
 						for (var i = 0; i <= this.panel.seriesOverrides.length; i++) {
@@ -717,7 +693,7 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 						function updateStyle() {
 							var data = ctrl.svgData;
 							ctrl.svgData = {}; // get rid of the data after consuming it. This prevents adding duplicate DOM elements
-							console.info('updating svg style');
+							console.debug('updating svg style');
 							var svg = $(document.getElementById(ctrl.panel.graphId));
 							$(svg).css('min-width', $(svg).css('max-width'));
 							if (ctrl.panel.maxWidth) {
@@ -732,7 +708,7 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 								var seriesItem = data[key];
 
 								// Find nodes by ID if we can
-								console.info('finding targetElement');
+								//console.info('finding targetElement');
 								var targetElement = d3.select(svg[0].getElementById(key)); // $(svg).find('#'+key).first(); // jquery doesnt work for some ID expressions [prometheus data]
 
 								if (targetElement[0][0] !== null) {
@@ -776,7 +752,7 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 									} else {
 										targetElement = $(svg).find('text:contains("' + key + '")'); // sequence diagram, gantt ?
 										if (targetElement.length === 0) {
-											console.warn('couldnt not find a diagram node with id/text: ' + key);
+											console.debug('couldnt not find a diagram node with id/text: ' + key);
 											continue;
 										}
 										// for node matches
@@ -786,7 +762,7 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 								}
 
 								console.debug(targetElement);
-								console.info('set nodes:' + key + ' to color:' + seriesItem.color);
+								console.debug('set nodes:' + key + ' to color:' + seriesItem.color);
 							}
 							//return $(svg).html();
 						} // End updateStyle()

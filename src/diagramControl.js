@@ -140,15 +140,17 @@ class DiagramCtrl extends MetricsPanelCtrl {
 	}
 
 	onDataReceived(dataList){
-		console.info('received data');
+		console.debug('received data');
 		console.debug(dataList);
 		this.series = dataList.map(this.seriesHandler.bind(this));
-		console.info('mapped dataList to series');
+		console.debug('mapped dataList to series');
 		console.debug(this.series);
 
 		var data = {};
 		this.setValues(data);
 		this.updateDiagram(data);
+    this.svgData = data;
+    this.render();
 	}
 
 	seriesHandler(seriesData) {
@@ -224,22 +226,22 @@ class DiagramCtrl extends MetricsPanelCtrl {
 	}
 
 	updateDiagram(data){
-		if(this.panel.content.length > 0){
+		if(this.panel.content.length > 0) {
 			this.clearDiagram();
 
 			var mode = this.panel.mode;
 			var templatedURL = this.templateSrv.replace(this.panel.mermaidServiceUrl, this.panel.scopedVars);
 
-      function updateDiagram_cont(graphDefinition) {
+      function updateDiagram_cont(_this, graphDefinition) {
         // substitute values inside "link text"
         // this will look for any composite prefixed with a # and substitute the value of the composite
         // if a series alias is found, in the form #alias, the value will be substituted
         // this allows link values to be displayed based on the metric
-        graphDefinition = this.substituteHashPrefixedNotation(graphDefinition, data);
-        graphDefinition = this.templateSrv.replaceWithText(graphDefinition);
-        this.diagramType = mermaidAPI.detectType(graphDefinition);
-        var diagramContainer = $(document.getElementById(this.containerDivId));
-  
+        graphDefinition = _this.substituteHashPrefixedNotation(graphDefinition, data);
+        graphDefinition = _this.templateSrv.replaceWithText(graphDefinition);
+        _this.diagramType = mermaidAPI.detectType(graphDefinition);
+        var diagramContainer = $(document.getElementById(_this.containerDivId));
+
         var renderCallback = function (svgCode, bindFunctions){
           if(svgCode === '') {
             diagramContainer.html('There was a problem rendering the graph');
@@ -249,25 +251,25 @@ class DiagramCtrl extends MetricsPanelCtrl {
           }
         };
         // if parsing the graph definition fails, the error handler will be called but the renderCallback() may also still be called.
-        mermaidAPI.render(this.panel.graphId, graphDefinition, renderCallback);
+        mermaidAPI.render(_this.panel.graphId, graphDefinition, renderCallback);
       }
 
 			if(mode == 'url') {
-				var me = this;
+				var _this = this;
 				this.$http({
 					method: 'GET',
 					url: templatedURL
 				}).then(function successCallback(response) {
 					//the response must have text/plain content-type
 //					console.info(response.data);
-          updateDiagram_cont.call(me, response.data);
+          updateDiagram_cont.call(_this, response.data);
 				}, function errorCallback(response) {
 					console.warn('error', response);
 				})
 			} else {
-        updateDiagram_cont.call(this, this.panel.content);
+        updateDiagram_cont(this, this.panel.content);
 			}
-		}
+    }
 	} // End updateDiagram()
 
 
@@ -349,14 +351,14 @@ class DiagramCtrl extends MetricsPanelCtrl {
     }
     return graphDefinition;
   }
-	
+
 	renderDiagram(data, graphDefinition) {
-		console.info(graphDefinition);
+		console.debug(graphDefinition);
 		graphDefinition = this.templateSrv.replace(graphDefinition);
-		console.info(graphDefinition);
+		console.debug(graphDefinition);
 		this.diagramType = mermaidAPI.detectType(graphDefinition);
 		var diagramContainer = $(document.getElementById(this.containerDivId));
-		
+
 		var renderCallback = function (svgCode, bindFunctions){
 			if(svgCode == '') {
 				diagramContainer.html('There was a problem rendering the graph');
@@ -370,7 +372,7 @@ class DiagramCtrl extends MetricsPanelCtrl {
 		this.svgData = data;
 		this.render();
 	}
-	
+
 
 	setValues(data) {
 	    if (this.series && this.series.length > 0) {
@@ -473,7 +475,7 @@ class DiagramCtrl extends MetricsPanelCtrl {
   }
 
 	getGradientForValue(data, value){
-		console.info('Getting gradient for value');
+		console.debug('Getting gradient for value');
 		console.debug(data);
 		console.debug(value);
 		var min = Math.min.apply(Math, data.thresholds);
@@ -495,7 +497,7 @@ class DiagramCtrl extends MetricsPanelCtrl {
 	applyOverrides(seriesItemAlias){
 		var seriesItem = {}, colorData = {}, overrides = {};
 
-		console.info('applying overrides for seriesItem');
+		console.debug('applying overrides for seriesItem');
 		console.debug(seriesItemAlias);
 		console.debug(this.panel.seriesOverrides);
 		for(var i=0; i<=this.panel.seriesOverrides.length; i++){
@@ -624,22 +626,22 @@ class DiagramCtrl extends MetricsPanelCtrl {
 	    function updateStyle(){
 	    	var data = ctrl.svgData;
 	    	ctrl.svgData = {}; // get rid of the data after consuming it. This prevents adding duplicate DOM elements
-			console.info('updating svg style');
-			var svg = $(document.getElementById(ctrl.panel.graphId));
-			$(svg).css('min-width', $(svg).css('max-width'));
-			if (ctrl.panel.maxWidth){
-				$(svg).css('max-width', '100%');
-			}
+			  console.debug('updating svg style');
+			  var svg = $(document.getElementById(ctrl.panel.graphId));
+			  $(svg).css('min-width', $(svg).css('max-width'));
+			  if (ctrl.panel.maxWidth){
+				  $(svg).css('max-width', '100%');
+			  }
 
-			if(svg[0] === undefined){
-				return;
-			}
+			  if(svg[0] === undefined){
+				  return;
+			  }
 
 			for(var key in data){
 				var seriesItem = data[key];
 
 				// Find nodes by ID if we can
-				console.info('finding targetElement');
+				//console.info('finding targetElement');
 				var targetElement = d3.select(svg[0].getElementById(key)); // $(svg).find('#'+key).first(); // jquery doesnt work for some ID expressions [prometheus data]
 
 				if(targetElement[0][0] !== null){ // probably a flowchart
@@ -682,7 +684,7 @@ class DiagramCtrl extends MetricsPanelCtrl {
 					} else {
 						targetElement = $(svg).find('text:contains("'+key+'")'); // sequence diagram, gantt ?
 						if(targetElement.length === 0){
-							console.warn('couldnt not find a diagram node with id/text: ' + key);
+							console.debug('couldnt not find a diagram node with id/text: ' + key);
 							continue;
 						}
 						// for node matches
@@ -692,7 +694,7 @@ class DiagramCtrl extends MetricsPanelCtrl {
 				}
 
 				console.debug(targetElement);
-				console.info('set nodes:' + key + ' to color:' + seriesItem.color);
+				console.debug('set nodes:' + key + ' to color:' + seriesItem.color);
 			}
 			//return $(svg).html();
 		} // End updateStyle()
@@ -701,7 +703,7 @@ class DiagramCtrl extends MetricsPanelCtrl {
 }
 
 function getColorForValue(data, value) {
-	console.info('Getting color for value');
+	console.debug('Getting color for value');
 	console.debug(data);
 	console.debug(value);
 	for (var i = data.thresholds.length; i > 0; i--) {
