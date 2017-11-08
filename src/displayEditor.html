@@ -6,6 +6,31 @@
 </div>
 
 <div class="gf-form-group">
+	<h5>Metric Character Replacement<tip>Additional Characters in metric names to replace</tip></h5>
+	<h6>Default Characters that are replaced with underscore: <code>" , ; = : { }</code></h6>
+	<div class="gf-form-inline" ng-repeat="replacement in ctrl.panel.metricCharacterReplacements">
+		<div class="gf-form">
+			<label class="gf-form-label">Character or regex<tip>Single Character or Regular Expression /foo/g</tip></label>
+		</div>
+		<div class="gf-form width-15">
+			<input type="text" ng-model="replacement.replacementPattern" ng-blur="ctrl.refresh()" class="gf-form-input width-15">
+		</div>
+		<div class="gf-form">
+			<label class="gf-form-label">Replace With<tip>Text used by replacement</tip></label>
+		</div>
+		<div class="gf-form width-5">
+			<input type="text" ng-model="replacement.replaceWithText" ng-blur="ctrl.refresh()" class="gf-form-input width-5">
+		</div>
+		<div class="gf-form">
+			<i class="fa fa-trash pointer" ng-click="ctrl.removeMetricCharacterReplacement(replacement)"></i>
+		</div>
+	</div>
+	<button class="btn btn-inverse" ng-click="ctrl.addMetricCharacterReplacement()">
+		<i class="fa fa-plus"></i>&nbsp;Add Character Replacement
+	</button>
+</div>
+
+<div class="gf-form-group">
 	<h5>Format</h5>
 	<div class="gf-form">
 		<label class="gf-form-label width-10">Unit</label>

@@ -11,7 +11,22 @@ This is a Grafana panel plugin that provides a way to create flow-charts, sequen
 * The target or 'alias' of the series is compared to the ID of the diagram node to find a match, then applies a 'fill' style to the shape.  
 * Composites can be used to aggregate multiple series for a single node, with custom thresholds for each series.
 
-**Note - Special characters in an alias are replace with an underscore.
+**Note - Special characters in an alias are replace with an underscore. See character replacement below
+
+## Character Replacement
+
+The following characters in metric names are automatically replaced with an underscore.
+
+```
+" , ; = : { }
+```
+
+You can add additional metric replacements in the Display tab, under the section Metric Character Replacement:
+
+![Diagram](https://raw.githubusercontent.com/jdbranham/grafana-diagram/master/src/img/grafana-diagram-metric-replacement-option.png?raw=true)  
+
+A single character can be specified or a regular expression, along with the text to be used for the replacement (the default is underscore).
+
 
 ## Examples  
 

@@ -90,6 +90,7 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
 
       panelDefaults = {
         composites: [],
+        metricCharacterReplacements: [],
         // other style overrides
         seriesOverrides: [],
         thresholds: '0,10',
@@ -218,11 +219,30 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
             this.render();
           }
         }, {
+          key: 'replaceMetricCharacters',
+          value: function replaceMetricCharacters(metricName) {
+            var replacedText = metricName.replace(/"|,|;|=|:|{|}/g, '_');
+            for (var index in this.panel.metricCharacterReplacements) {
+              var replacement = this.panel.metricCharacterReplacements[index];
+              // start with a simple replacement
+              var pattern = replacement.replacementPattern;
+              // check if the pattern is empty
+              if (pattern.length === 0) continue;
+              // if it is a regex, convert
+              if (pattern[0] === '/') {
+                pattern = kbn.stringToJsRegex(replacement.replacementPattern);
+              }
+              replacedText = replacedText.replace(pattern, replacement.replaceWithText);
+            }
+            return replacedText;
+          }
+        }, {
           key: 'seriesHandler',
           value: function seriesHandler(seriesData) {
+            var alias = this.replaceMetricCharacters(seriesData.target);
             var series = new TimeSeries({
               datapoints: seriesData.datapoints,
-              alias: seriesData.target.replace(/"|,|;|=|:|{|}/g, '_'),
+              alias: alias,
               unit: seriesData.unit
             });
             series.flotpairs = series.getFlotPairs(this.panel.nullPointMode);
@@ -237,7 +257,7 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
           key: 'removeSeriesOverride',
           value: function removeSeriesOverride(override) {
             this.panel.seriesOverrides = _.without(this.panel.seriesOverrides, override);
-            this.render();
+            this.refresh();
           }
         }, {
           key: 'addComposite',
@@ -248,7 +268,7 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
           key: 'removeComposite',
           value: function removeComposite(composite) {
             this.panel.composites = _.without(this.panel.composites, composite);
-            this.render();
+            this.refresh();
           }
         }, {
           key: 'getSeriesNamesForComposites',
@@ -265,11 +285,27 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
             } else {
               composite.metrics.push({});
             }
+            this.refresh();
           }
         }, {
           key: 'removeMetricFromComposite',
           value: function removeMetricFromComposite(composite, metric) {
             composite.metrics = _.without(composite.metrics, metric);
+            this.refresh();
+          }
+        }, {
+          key: 'addMetricCharacterReplacement',
+          value: function addMetricCharacterReplacement(replacement) {
+            this.panel.metricCharacterReplacements.push(replacement || {
+              replacementPattern: '',
+              replaceWithText: '_'
+            });
+          }
+        }, {
+          key: 'removeMetricCharacterReplacement',
+          value: function removeMetricCharacterReplacement(replacement) {
+            this.panel.metricCharacterReplacements = _.without(this.panel.metricCharacterReplacements, replacement);
+            this.refresh();
           }
         }, {
           key: 'updateThresholds',
@@ -297,7 +333,7 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
           key: 'setUnitFormat',
           value: function setUnitFormat(subItem) {
             this.panel.format = subItem.value;
-            this.render();
+            this.refresh();
           }
         }, {
           key: 'clearDiagram',
@@ -476,6 +512,8 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
               for (var j = 0; j < aComposite.metrics.length; j++) {
                 var aMetric = aComposite.metrics[j];
                 var seriesName = aMetric.seriesName;
+                // make sure we have a match
+                if (!data.hasOwnProperty(seriesName)) continue;
                 var seriesItem = data[seriesName];
                 // add the name of the series Item
                 seriesItem.nameOfMetric = seriesName;
@@ -490,11 +528,13 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
                 delete seriesItem.nameOfMetric;
               }
               // Prefix the valueFormatted with the actual metric name
-              currentWorstSeries.valueFormattedWithPrefix = currentWorstSeriesName + ': ' + currentWorstSeries.valueFormatted;
-              currentWorstSeries.valueRawFormattedWithPrefix = currentWorstSeriesName + ': ' + currentWorstSeries.value;
-              // currentWorstSeries.valueFormatted = currentWorstSeriesName + ': ' + currentWorstSeries.valueFormatted;
-              // now push the composite into data
-              data[aComposite.name] = currentWorstSeries;
+              if (currentWorstSeries !== null) {
+                currentWorstSeries.valueFormattedWithPrefix = currentWorstSeriesName + ': ' + currentWorstSeries.valueFormatted;
+                currentWorstSeries.valueRawFormattedWithPrefix = currentWorstSeriesName + ': ' + currentWorstSeries.value;
+                // currentWorstSeries.valueFormatted = currentWorstSeriesName + ': ' + currentWorstSeries.valueFormatted;
+                // now push the composite into data
+                data[aComposite.name] = currentWorstSeries;
+              }
             }
           }
         }, {
