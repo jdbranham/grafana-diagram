@@ -221,6 +221,8 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
         }, {
           key: 'replaceMetricCharacters',
           value: function replaceMetricCharacters(metricName) {
+            // a datasource sending bad data will have a type other than string, set it to "MISSING_METRIC_TARGET" and return
+            if (typeof metricName !== 'string') return "DATASOURCE_SENT_INVALID_METRIC_TARGET";
             var replacedText = metricName.replace(/"|,|;|=|:|{|}/g, '_');
             for (var index in this.panel.metricCharacterReplacements) {
               var replacement = this.panel.metricCharacterReplacements[index];
@@ -246,6 +248,14 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
               unit: seriesData.unit
             });
             series.flotpairs = series.getFlotPairs(this.panel.nullPointMode);
+            var datapoints = seriesData.datapoints || [];
+            if (datapoints && datapoints.length > 0) {
+              var last = datapoints[datapoints.length - 1][1];
+              var from = this.range.from;
+              if (last - from < -10000) {
+                series.isOutsideRange = true;
+              }
+            }
             return series;
           }
         }, {
