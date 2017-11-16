@@ -3,7 +3,7 @@ module.exports = (grunt) => {
 
   grunt.loadNpmTasks('grunt-execute');
   grunt.loadNpmTasks('grunt-contrib-clean');
-  //grunt.loadNpmTasks('grunt-sass');
+  grunt.loadNpmTasks('grunt-sass');
 
   grunt.initConfig({
 
