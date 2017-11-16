@@ -2,7 +2,7 @@
   "name": "grafana-diagram",
   "homepage": "https://github.com/jdbranham/grafana-diagram",
   "authors": [
-    "Jeremy <jdbranham@hotmail.com>"
+    "Jeremy <jeremy@savantly.net>"
   ],
   "description": "A diagram panel plugin for grafana",
   "main": "module.js",

@@ -354,49 +354,60 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
         }, {
           key: 'updateDiagram',
           value: function updateDiagram(data) {
+            var _this3 = this;
+
             if (this.panel.content.length > 0) {
-              var updateDiagram_cont = function updateDiagram_cont(_this, graphDefinition) {
-                // substitute values inside "link text"
-                // this will look for any composite prefixed with a # and substitute the value of the composite
-                // if a series alias is found, in the form #alias, the value will be substituted
-                // this allows link values to be displayed based on the metric
-                graphDefinition = _this.substituteHashPrefixedNotation(graphDefinition, data);
-                graphDefinition = _this.templateSrv.replaceWithText(graphDefinition);
-                _this.diagramType = mermaidAPI.detectType(graphDefinition);
-                var diagramContainer = $(document.getElementById(_this.containerDivId));
+              var mode;
+              var templatedURL;
 
-                var renderCallback = function renderCallback(svgCode, bindFunctions) {
-                  if (svgCode === '') {
-                    diagramContainer.html('There was a problem rendering the graph');
-                  } else {
-                    diagramContainer.html(svgCode);
-                    bindFunctions(diagramContainer[0]);
-                  }
+              var _this;
+
+              (function () {
+                var updateDiagram_cont = function updateDiagram_cont(_this, graphDefinition) {
+                  // substitute values inside "link text"
+                  // this will look for any composite prefixed with a # and substitute the value of the composite
+                  // if a series alias is found, in the form #alias, the value will be substituted
+                  // this allows link values to be displayed based on the metric
+                  graphDefinition = _this.substituteHashPrefixedNotation(graphDefinition, data);
+                  graphDefinition = _this.templateSrv.replaceWithText(graphDefinition);
+                  _this.diagramType = mermaidAPI.detectType(graphDefinition);
+                  var diagramContainer = $(document.getElementById(_this.containerDivId));
+
+                  var renderCallback = function renderCallback(svgCode, bindFunctions) {
+                    if (svgCode === '') {
+                      diagramContainer.html('There was a problem rendering the graph');
+                    } else {
+                      diagramContainer.html(svgCode);
+                      bindFunctions(diagramContainer[0]);
+                    }
+                  };
+                  // if parsing the graph definition fails, the error handler will be called but the renderCallback() may also still be called.
+                  mermaidAPI.render(_this.panel.graphId, graphDefinition, renderCallback);
                 };
-                // if parsing the graph definition fails, the error handler will be called but the renderCallback() may also still be called.
-                mermaidAPI.render(_this.panel.graphId, graphDefinition, renderCallback);
-              };
 
-              this.clearDiagram();
+                _this3.clearDiagram();
 
-              var mode = this.panel.mode;
-              var templatedURL = this.templateSrv.replace(this.panel.mermaidServiceUrl, this.panel.scopedVars);
+                mode = _this3.panel.mode;
+                templatedURL = _this3.templateSrv.replace(_this3.panel.mermaidServiceUrl, _this3.panel.scopedVars);
 
-              if (mode == 'url') {
-                var _this = this;
-                this.$http({
-                  method: 'GET',
-                  url: templatedURL
-                }).then(function successCallback(response) {
-                  //the response must have text/plain content-type
-                  // console.info(response.data);
-                  updateDiagram_cont.call(_this, response.data);
-                }, function errorCallback(response) {
-                  console.warn('error', response);
-                });
-              } else {
-                updateDiagram_cont(this, this.panel.content);
-              }
+
+                if (mode == 'url') {
+                  _this = _this3;
+
+                  _this3.$http({
+                    method: 'GET',
+                    url: templatedURL
+                  }).then(function successCallback(response) {
+                    //the response must have text/plain content-type
+                    // console.info(response.data);
+                    updateDiagram_cont.call(_this, response.data);
+                  }, function errorCallback(response) {
+                    console.warn('error', response);
+                  });
+                } else {
+                  updateDiagram_cont(_this3, _this3.panel.content);
+                }
+              })();
             }
           }
         }, {
