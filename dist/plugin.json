@@ -5,7 +5,10 @@
 
   "info": {
     "description": "Diagram panel for grafana",
-    "author": "Jeremy Branham <jeremy@savantly.net> (https://www.linkedin.com/in/jeremybranham/)",
+    "author": {
+      "name": "Jeremy Branham",
+      "url": "https://www.linkedin.com/in/jeremybranham/"
+    },
     "contributors": [
       "Brian Gann (https://github.com/briangann)"
     ],
