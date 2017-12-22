@@ -16,7 +16,10 @@
     "diagram",
     "panel"
   ],
-  "author": "Jeremy Branham",
+  "author": "Jeremy Branham <jeremy@savantly.net> (https://github.com/jdbranham)",
+  "contributors": [
+    "Brian Gann (https://github.com/briangann)"
+  ],
   "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/jdbranham/grafana-diagram/issues"

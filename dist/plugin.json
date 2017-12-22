@@ -7,8 +7,11 @@
     "description": "Diagram panel for grafana",
     "author": {
       "name": "Jeremy Branham",
-      "url": "https://github.com/jdbranham"
+      "url": "https://www.linkedin.com/in/jeremybranham/"
     },
+    "contributors": [
+      "Brian Gann (https://github.com/briangann)"
+    ],
     "keywords": ["diagram", "panel"],
     "links": [
       {"name": "Project site", "url": "https://github.com/jdbranham/grafana-diagram"},
