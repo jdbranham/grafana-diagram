@@ -53,7 +53,7 @@ const panelDefaults = {
   mode: 'content', //allowed values: 'content' and 'url'
   mermaidServiceUrl: '',
   init: {
-    logLevel: 1, //1:debug, 2:info, 3:warn, 4:error, 5:fatal
+    logLevel: 3, //1:debug, 2:info, 3:warn, 4:error, 5:fatal
     cloneCssStyles: false, // - This options controls whether or not the css rules should be copied into the generated svg
     startOnLoad: false, // - This options controls whether or mermaid starts when the page loads
     arrowMarkerAbsolute: true, // - This options controls whether or arrow markers in html code will be absolute paths or an anchor, #. This matters if you are using base tag settings.
