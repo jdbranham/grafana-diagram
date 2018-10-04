@@ -314,7 +314,7 @@ class DiagramCtrl extends MetricsPanelCtrl {
         }).then(function successCallback(response) {
           //the response must have text/plain content-type
           // console.info(response.data);
-          updateDiagram_cont.call(_this, response.data);
+          updateDiagram_cont(_this, response.data);
         }, function errorCallback(response) {
           console.warn('error', response);
         })
