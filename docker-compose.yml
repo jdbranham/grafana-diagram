@@ -3,6 +3,6 @@ grafana:
   ports:
     - "3000:3000"
   volumes:
-    - ./dist:/var/lib/grafana/plugins/grafana-diagram
+    - ./dist:/var/lib/grafana/plugins/jdbranham-diagram-panel
   environment:
     - TERM=linux

@@ -17,8 +17,8 @@
       {"name": "Project site", "url": "https://github.com/jdbranham/grafana-diagram"},
       {"name": "Apache License", "url": "https://github.com/jdbranham/grafana-diagram/blob/master/LICENSE"}
     ],
-    "version": "1.4.4",
-    "updated": "2017-11-07",
+    "version": "1.4.5",
+    "updated": "2017-12-22",
     "logos": {
         "small": "img/icn-diagram-panel.svg",
         "large": "img/icn-diagram-panel.svg"
