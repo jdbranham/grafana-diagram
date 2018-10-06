@@ -124,7 +124,6 @@ class DiagramCtrl extends MetricsPanelCtrl {
     this.events.on('init-edit-mode', this.onInitEditMode.bind(this));
     this.events.on('data-received', this.onDataReceived.bind(this));
     this.events.on('data-snapshot-load', this.onDataReceived.bind(this));
-    //this.panel.content = 'abc';
     this.unitFormats = kbn.getUnitFormats();
     this.initializeMermaid();
   }
@@ -158,9 +157,9 @@ class DiagramCtrl extends MetricsPanelCtrl {
 
     var data = {};
     this.setValues(data);
-    this.svgData = data;
     this.updateDiagram(data);
-    //this.render();
+    this.svgData = data;
+    this.render();
   }
 
   replaceMetricCharacters(metricName) {
@@ -315,14 +314,12 @@ class DiagramCtrl extends MetricsPanelCtrl {
         }).then(function successCallback(response) {
           //the response must have text/plain content-type
           // console.info(response.data);
-          updateDiagram_cont(_this, response.data);
-          _this.render();
+          updateDiagram_cont.call(_this, response.data);
         }, function errorCallback(response) {
           console.warn('error', response);
         })
       } else {
         updateDiagram_cont(this, this.panel.content);
-        this.render();
       }
     }
   } // End updateDiagram()
