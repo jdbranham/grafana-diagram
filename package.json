@@ -1,6 +1,6 @@
 {
   "name": "grafana-diagram",
-  "version": "1.4.4",
+  "version": "1.4.5",
   "description": "A diagram panel plugin for Grafana",
   "main": "src/module.js",
   "scripts": {

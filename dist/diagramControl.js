@@ -237,11 +237,10 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
             this.series = dataList.map(this.seriesHandler.bind(this));
             console.debug('mapped dataList to series');
             console.debug(this.series);
-
-            var data = {};
-            this.setValues(data);
-            this.updateDiagram(data);
+            var data = this.setValues();
+            // this update works for local diagrams, if the url method is used the data has to be stored in the callback
             this.svgData = data;
+            this.updateDiagram(data);
             this.render();
           }
         }, {
@@ -374,41 +373,46 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
         }, {
           key: 'clearDiagram',
           value: function clearDiagram() {
-            $('#' + this.panel.graphId).remove();
+            if ($('#' + this.panel.graphId).length) {
+              $('#' + this.panel.graphId).remove();
+            }
             this.svg = {};
+          }
+        }, {
+          key: 'renderDiagram',
+          value: function renderDiagram(graphDefinition, data) {
+            // substitute values inside "link text"
+            // this will look for any composite prefixed with a # and substitute the value of the composite
+            // if a series alias is found, in the form #alias, the value will be substituted
+            // this allows link values to be displayed based on the metric
+            graphDefinition = this.substituteHashPrefixedNotation(graphDefinition, data);
+            graphDefinition = this.templateSrv.replaceWithText(graphDefinition);
+            this.diagramType = mermaidAPI.detectType(graphDefinition);
+            var diagramContainer = $(document.getElementById(this.containerDivId));
+            var _this = this;
+            var renderCallback = function renderCallback(svgCode, bindFunctions) {
+              if (svgCode === '') {
+                diagramContainer.html('There was a problem rendering the graph');
+              } else {
+                diagramContainer.html(svgCode);
+                bindFunctions(diagramContainer[0]);
+                console.debug("Inside rendercallback of renderDiagram");
+                // svgData is empty when this callback happens, update it so the styles will be applied
+                _this.svgData = data;
+                // force a render or we will not see an update
+                _this.render();
+              }
+            };
+            // if parsing the graph definition fails, the error handler will be called but the renderCallback() may also still be called.
+            mermaidAPI.render(this.panel.graphId, graphDefinition, renderCallback);
           }
         }, {
           key: 'updateDiagram',
           value: function updateDiagram(data) {
             if (this.panel.content.length > 0) {
-              var updateDiagram_cont = function updateDiagram_cont(_this, graphDefinition) {
-                // substitute values inside "link text"
-                // this will look for any composite prefixed with a # and substitute the value of the composite
-                // if a series alias is found, in the form #alias, the value will be substituted
-                // this allows link values to be displayed based on the metric
-                graphDefinition = _this.substituteHashPrefixedNotation(graphDefinition, data);
-                graphDefinition = _this.templateSrv.replaceWithText(graphDefinition);
-                _this.diagramType = mermaidAPI.detectType(graphDefinition);
-                var diagramContainer = $(document.getElementById(_this.containerDivId));
-
-                var renderCallback = function renderCallback(svgCode, bindFunctions) {
-                  if (svgCode === '') {
-                    diagramContainer.html('There was a problem rendering the graph');
-                  } else {
-                    diagramContainer.html(svgCode);
-                    bindFunctions(diagramContainer[0]);
-                  }
-                };
-                // if parsing the graph definition fails, the error handler will be called but the renderCallback() may also still be called.
-                mermaidAPI.render(_this.panel.graphId, graphDefinition, renderCallback);
-              };
-
-              this.clearDiagram();
-
               var mode = this.panel.mode;
-              var templatedURL = this.templateSrv.replace(this.panel.mermaidServiceUrl, this.panel.scopedVars);
-
               if (mode == 'url') {
+                var templatedURL = this.templateSrv.replace(this.panel.mermaidServiceUrl, this.panel.scopedVars);
                 var _this = this;
                 this.$http({
                   method: 'GET',
@@ -416,13 +420,15 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
                   headers: { 'Accept': 'text/x-mermaid,text/plain;q=0.9,*/*;q=0.8' }
                 }).then(function successCallback(response) {
                   //the response must have text/plain content-type
-                  // console.info(response.data);
-                  updateDiagram_cont.call(_this, response.data);
+                  // clearing the diagram here will result in less artifacting waiting for the response
+                  _this.clearDiagram();
+                  _this.renderDiagram(response.data, data);
                 }, function errorCallback(response) {
                   console.warn('error', response);
                 });
               } else {
-                updateDiagram_cont(this, this.panel.content);
+                this.clearDiagram();
+                this.renderDiagram(this.panel.content, data);
               }
             }
           }
@@ -485,30 +491,9 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
             return graphDefinition;
           }
         }, {
-          key: 'renderDiagram',
-          value: function renderDiagram(data, graphDefinition) {
-            console.debug(graphDefinition);
-            graphDefinition = this.templateSrv.replace(graphDefinition);
-            console.debug(graphDefinition);
-            this.diagramType = mermaidAPI.detectType(graphDefinition);
-            var diagramContainer = $(document.getElementById(this.containerDivId));
-
-            var renderCallback = function renderCallback(svgCode, bindFunctions) {
-              if (svgCode == '') {
-                diagramContainer.html('There was a problem rendering the graph');
-              } else {
-                diagramContainer.html(svgCode);
-                bindFunctions(diagramContainer[0]);
-              }
-            };
-            // if parsing the graph definition fails, the error handler will be called but the renderCallback() may also still be called.
-            mermaidAPI.render(this.panel.graphId, graphDefinition, renderCallback);
-            this.svgData = data;
-            this.render();
-          }
-        }, {
           key: 'setValues',
-          value: function setValues(data) {
+          value: function setValues() {
+            var data = {};
             if (this.series && this.series.length > 0) {
               for (var i = 0; i < this.series.length; i++) {
                 var seriesItem = this.series[i];
@@ -573,6 +558,7 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
                 data[aComposite.name] = currentWorstSeries;
               }
             }
+            return data;
           }
         }, {
           key: 'getWorstSeries',
@@ -580,8 +566,8 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
             var worstSeries = series1;
             var series1thresholdLevel = this.getThresholdLevel(series1);
             var series2thresholdLevel = this.getThresholdLevel(series2);
-            console.log("Series1 threshold level: " + series1thresholdLevel);
-            console.log("Series2 threshold level: " + series2thresholdLevel);
+            console.debug("Series1 threshold level: " + series1thresholdLevel);
+            console.debug("Series2 threshold level: " + series2thresholdLevel);
             if (series2thresholdLevel > series1thresholdLevel) {
               // series2 has higher threshold violation
               worstSeries = series2;
@@ -680,7 +666,6 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
         }, {
           key: 'getDecimalsForValue',
           value: function getDecimalsForValue(value) {
-            //debugger;
             if (_.isNumber(this.panel.decimals)) {
               return {
                 decimals: this.panel.decimals,
