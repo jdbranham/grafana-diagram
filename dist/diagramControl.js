@@ -41,7 +41,8 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
     console.debug(value);
     for (var i = data.thresholds.length; i > 0; i--) {
       if (value >= data.thresholds[i - 1]) {
-        return data.colorMap[i];
+        console.debug('Color[' + (i - 1) + ']: ' + data.colorMap[i]);
+        return data.colorMap[i - 1];
       }
     }
     return _.first(data.colorMap);
@@ -831,7 +832,12 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
                 }
 
                 console.debug(targetElement);
-                console.debug('set nodes:' + key + ' to color:' + seriesItem.color);
+                if (data[0].color != null) {
+                  console.log('[0] color:' + data[0].color);
+                } else {
+                  console.log('Data[0] not found');
+                }
+                //console.debug('set nodes:' + key + ' to [0] color:' + data[0].color);
               }
               //return $(svg).html();
             } // End updateStyle()
