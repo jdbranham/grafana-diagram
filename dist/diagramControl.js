@@ -41,7 +41,9 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
     console.debug(value);
     for (var i = data.thresholds.length; i > 0; i--) {
       if (value >= data.thresholds[i - 1]) {
-        return data.colorMap[i];
+        console.debug('Color[' + (i - 1) + ']: ' + data.colorMap[i]);
+        return data.colorMap[i - 1];
+        //return data.colorMap[i];
       }
     }
     return _.first(data.colorMap);
