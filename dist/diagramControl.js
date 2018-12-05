@@ -41,7 +41,9 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
     console.debug(value);
     for (var i = data.thresholds.length; i > 0; i--) {
       if (value >= data.thresholds[i - 1]) {
-        return data.colorMap[i];
+        console.debug('Color[' + (i - 1) + ']: ' + data.colorMap[i]);
+        return data.colorMap[i - 1];
+        //return data.colorMap[i];
       }
     }
     return _.first(data.colorMap);
@@ -112,6 +114,7 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
         mappingType: 1,
         maxWidth: false,
         nullPointMode: 'connected',
+        moddedSeriesVal: 0,
         format: 'none',
         valueName: 'avg',
         valueOptions: ['avg', 'min', 'max', 'total', 'current'],
@@ -534,6 +537,9 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
               for (var j = 0; j < aComposite.metrics.length; j++) {
                 var aMetric = aComposite.metrics[j];
                 var seriesName = aMetric.seriesName;
+                // For testing
+                console.debug("aMetric value: " + seriesItem.valueFormatted);
+                console.debug("aMetric: " + seriesName);
                 // make sure we have a match
                 if (!data.hasOwnProperty(seriesName)) continue;
                 var seriesItem = data[seriesName];
@@ -779,7 +785,7 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
                 // Find nodes by ID if we can
                 //console.info('finding targetElement');
                 var targetElement = d3.select(svg[0].getElementById(key)); // $(svg).find('#'+key).first(); // jquery doesnt work for some ID expressions [prometheus data]
-
+                console.debug("Series item: " + seriesItem.valueFormated);
                 if (targetElement[0][0] !== null) {
                   // probably a flowchart
                   targetElement.selectAll('rect,circle,polygon').style('fill', seriesItem.color);
