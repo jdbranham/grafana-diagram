@@ -6,6 +6,7 @@
   "scripts": {
     "lint": "eslint --color .",
     "test": "grunt",
+    "preinstall": "npm install -g bower",
     "postinstall": "bower install",
     "build": "grunt"
   },
