@@ -1,6 +1,13 @@
 .diagram {
   overflow: auto; }
 
+.diagram-legend .graph-legend {
+  overflow-x: auto; }
+
+.diagram .label, .diagram .edgeLabel {
+  text-shadow: none;
+  /** prevent shadow from grafana css **/ }
+
 .gradient-values-container .gradient-value-max {
   float: right; }
 

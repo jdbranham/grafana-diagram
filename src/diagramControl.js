@@ -628,18 +628,12 @@ class DiagramCtrl extends MetricsPanelCtrl {
     var diagramContainer = $(document.getElementById(ctrl.containerDivId));
     console.debug('found diagramContainer');
     console.debug(diagramContainer);
-    elem.css('height', ctrl.height + 'px');
+    elem.css('height', '100%');
 
     var canvas = elem.find('.canvas')[0];
     ctrl.canvas = canvas;
     var gradientValueMax = elem.find('.gradient-value-max')[0];
     var gradientValueMin = elem.find('.gradient-value-min')[0];
-
-    function render() {
-      setElementHeight();
-      updateCanvasStyle();
-      updateStyle();
-    }
 
     function updateCanvasStyle() {
       canvas.width = Math.max(diagramElement[0].clientWidth, 100);
@@ -659,17 +653,7 @@ class DiagramCtrl extends MetricsPanelCtrl {
       gradientValueMax.innerText = Math.max.apply(Math, ctrl.panel.thresholds.split(','));
       gradientValueMin.innerText = Math.min.apply(Math, ctrl.panel.thresholds.split(','));
     }
-
-
-
-    function setElementHeight() {
-      //diagramContainer.css('height', ctrl.height + 'px');
-    }
-
-    this.events.on('render', function() {
-      render();
-      ctrl.renderingCompleted();
-    });
+    updateCanvasStyle(); // run once at beginning so the gradients are ready on first data
 
     function updateStyle() {
       var data = ctrl.svgData;
@@ -746,6 +730,16 @@ class DiagramCtrl extends MetricsPanelCtrl {
       }
       //return $(svg).html();
     } // End updateStyle()
+
+     function render() {
+      updateCanvasStyle();
+      updateStyle();
+    }
+
+    this.events.on('render', function() {
+      render();
+      ctrl.renderingCompleted();
+    });
   }
   // End Class
 }
