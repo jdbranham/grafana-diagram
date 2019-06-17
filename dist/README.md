@@ -143,11 +143,11 @@ Value and range mapping can be used to replace numeric values by human readable 
 
 To map values or ranges to text define one more mapping descriptions using aliases or regular expressions matching aliases:
 
-![Mapping Editor](https://raw.githubusercontent.com/ffo/grafana-diagram/master/src/img/mapping-edit-tab.png?raw=true)
+![Mapping Editor](https://raw.githubusercontent.com/jdbranham/grafana-diagram/master/src/img/mapping-editor-tab.png?raw=true)
 
 In the diagram the value of the matching series will be mapped to text:
 
-![Value Mapping](https://raw.githubusercontent.com/ffo/grafana-diagram/master/src/img/mapping-value.png?raw=true)
+![Value Mapping](https://raw.githubusercontent.com/jdbranham/grafana-diagram/master/src/img/mapping-value.png?raw=true)
 
 ## Roadmap  
 
