@@ -1,13 +1,11 @@
 {
   "name": "grafana-diagram",
-  "version": "1.4.5",
+  "version": "1.5.0",
   "description": "A diagram panel plugin for Grafana",
   "main": "src/module.js",
   "scripts": {
     "lint": "eslint --color .",
     "test": "grunt",
-    "preinstall": "npm install -g bower",
-    "postinstall": "bower install",
     "build": "grunt"
   },
   "repository": {
@@ -51,6 +49,7 @@
     "sass": "^1.0.0-beta.3"
   },
   "dependencies": {
-    "lodash": "^4.17.11"
+    "lodash": "^4.17.11",
+    "mermaid": "^8.1.0"
   }
 }

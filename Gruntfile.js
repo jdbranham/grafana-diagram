@@ -17,9 +17,12 @@ module.exports = (grunt) => {
         dest: 'dist'
       },
       libs_to_dist: {
-		  cwd: 'bower_components',
+		  cwd: 'node_modules',
 		  expand: true,
-		  src: ['mermaid/dist/mermaidAPI*'],
+		  src: [
+			  'mermaid/dist/mermaid.js',
+			  'mermaid/dist/mermaid.js.map',
+			  'd3/dist/d3.min.js'],
 		  dest: 'dist/libs'
 		},
       readme: {

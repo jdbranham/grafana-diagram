@@ -1,9 +1,9 @@
 'use strict';
 
-System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app/core/utils/kbn', 'app/plugins/sdk', './properties', 'lodash', './series_overrides_diagram_ctrl', './css/diagram.css!'], function (_export, _context) {
+System.register(['./libs/mermaid/dist/mermaid', './libs/d3/dist/d3.min', 'app/core/time_series2', 'app/core/utils/kbn', 'app/plugins/sdk', './properties', 'lodash', './series_overrides_diagram_ctrl', './css/diagram.css!'], function (_export, _context) {
   "use strict";
 
-  var TimeSeries, kbn, MetricsPanelCtrl, diagramEditor, displayEditor, compositeEditor, _, _createClass, panelDefaults, DiagramCtrl;
+  var mermaid, d3, TimeSeries, kbn, MetricsPanelCtrl, diagramEditor, displayEditor, compositeEditor, _, _createClass, mermaidAPI, panelDefaults, DiagramCtrl;
 
   function _classCallCheck(instance, Constructor) {
     if (!(instance instanceof Constructor)) {
@@ -58,7 +58,11 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
   }
 
   return {
-    setters: [function (_libsMermaidDistMermaidAPI) {}, function (_appCoreTime_series) {
+    setters: [function (_libsMermaidDistMermaid) {
+      mermaid = _libsMermaidDistMermaid.default;
+    }, function (_libsD3DistD3Min) {
+      d3 = _libsD3DistD3Min.default;
+    }, function (_appCoreTime_series) {
       TimeSeries = _appCoreTime_series.default;
     }, function (_appCoreUtilsKbn) {
       kbn = _appCoreUtilsKbn.default;
@@ -90,6 +94,7 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
         };
       }();
 
+      mermaidAPI = mermaid.mermaidAPI;
       panelDefaults = {
         composites: [],
         metricCharacterReplacements: [],
@@ -390,7 +395,6 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
             // this allows link values to be displayed based on the metric
             graphDefinition = this.substituteHashPrefixedNotation(graphDefinition, data);
             graphDefinition = this.templateSrv.replaceWithText(graphDefinition);
-            this.diagramType = mermaidAPI.detectType(graphDefinition);
             var diagramContainer = $(document.getElementById(this.containerDivId));
             var _this = this;
             var renderCallback = function renderCallback(svgCode, bindFunctions) {
@@ -771,10 +775,11 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
                 // Find nodes by ID if we can
                 //console.info('finding targetElement');
                 var targetElement = d3.select(svg[0].getElementById(key)); // $(svg).find('#'+key).first(); // jquery doesnt work for some ID expressions [prometheus data]
-                console.debug("Series item: " + seriesItem.valueFormated);
-                if (targetElement[0][0] !== null) {
+                console.debug("Series item: " + seriesItem.valueFormatted);
+                if (!targetElement.empty()) {
                   // probably a flowchart
-                  targetElement.selectAll('rect,circle,polygon').style('fill', seriesItem.color);
+                  var shapes = targetElement.selectAll('rect,circle,polygon');
+                  shapes.style('fill', seriesItem.color);
 
                   var div = targetElement.select('div');
                   var fo = targetElement.select('foreignObject');
@@ -782,7 +787,7 @@ System.register(['./libs/mermaid/dist/mermaidAPI', 'app/core/time_series2', 'app
                   fo.attr('height', 45);
                   // Add value text
                   var p = div.append('p');
-                  p.classed('diagram-value');
+                  p.classed('diagram-value', true);
                   p.style('background-color', seriesItem.color);
                   p.html(seriesItem.valueFormatted);
                 } else {

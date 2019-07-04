@@ -1,4 +1,5 @@
-import './libs/mermaid/dist/mermaidAPI';
+import mermaid from './libs/mermaid/dist/mermaid';
+import d3 from './libs/d3/dist/d3.min';
 import TimeSeries from 'app/core/time_series2';
 import kbn from 'app/core/utils/kbn';
 import {
@@ -12,6 +13,8 @@ import {
 import _ from 'lodash';
 import './series_overrides_diagram_ctrl';
 import './css/diagram.css!';
+
+const mermaidAPI = mermaid.mermaidAPI;
 
 const panelDefaults = {
   composites: [],
@@ -286,7 +289,6 @@ class DiagramCtrl extends MetricsPanelCtrl {
     // this allows link values to be displayed based on the metric
     graphDefinition = this.substituteHashPrefixedNotation(graphDefinition, data);
     graphDefinition = this.templateSrv.replaceWithText(graphDefinition);
-    this.diagramType = mermaidAPI.detectType(graphDefinition);
     var diagramContainer = $(document.getElementById(this.containerDivId));
     var _this = this;
     var renderCallback = function(svgCode, bindFunctions) {
@@ -679,9 +681,10 @@ class DiagramCtrl extends MetricsPanelCtrl {
         // Find nodes by ID if we can
         //console.info('finding targetElement');
         var targetElement = d3.select(svg[0].getElementById(key)); // $(svg).find('#'+key).first(); // jquery doesnt work for some ID expressions [prometheus data]
-        console.debug("Series item: " + seriesItem.valueFormated);
-        if (targetElement[0][0] !== null) { // probably a flowchart
-          targetElement.selectAll('rect,circle,polygon').style('fill', seriesItem.color);
+        console.debug("Series item: " + seriesItem.valueFormatted);
+        if (!targetElement.empty()) { // probably a flowchart
+          var shapes = targetElement.selectAll('rect,circle,polygon');
+          shapes.style('fill', seriesItem.color);
 
           var div = targetElement.select('div');
           var fo = targetElement.select('foreignObject');
@@ -689,7 +692,7 @@ class DiagramCtrl extends MetricsPanelCtrl {
           fo.attr('height', 45);
           // Add value text
           var p = div.append('p');
-          p.classed('diagram-value');
+          p.classed('diagram-value', true);
           p.style('background-color', seriesItem.color);
           p.html(seriesItem.valueFormatted);
         } else {
