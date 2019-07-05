@@ -18,5 +18,9 @@
 <span> (This area uses <a target="_blank"
 	href="http://knsv.github.io/mermaid/">Mermaid syntax</a>.)
 </span>
-<textarea class="gf-form-input" ng-model="ctrl.panel.content" rows="20"
+<textarea class="gf-form-input" ng-model="ctrl.panel.content" rows="25"
+	style="width: 95%" ng-change="ctrl.refresh()" ng-model-onblur></textarea>
+	
+<label>Custom Styles</label>
+<textarea class="gf-form-input" ng-model="ctrl.panel.style" rows="10"
 	style="width: 95%" ng-change="ctrl.refresh()" ng-model-onblur></textarea>
