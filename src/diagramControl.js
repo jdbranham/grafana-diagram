@@ -467,8 +467,8 @@ class DiagramCtrl extends MetricsPanelCtrl {
           currentWorstSeries = seriesItem;
           currentWorstSeriesName = seriesItem.nameOfMetric;
         } else {
-          currentWorstSeries = this.getWorstSeries(currentWorstSeries, seriesItem);
-          currentWorstSeriesName = currentWorstSeries.nameOfMetric;
+          currentWorstSeries = this.getWorstSeries(currentWorstSeries, seriesItem, aComposite.showLowest);
+          currentWorstSeriesName = seriesItem.nameOfMetric;
         }
         delete seriesItem.nameOfMetric;
       }
@@ -476,7 +476,7 @@ class DiagramCtrl extends MetricsPanelCtrl {
       if (currentWorstSeries !== null) {
         currentWorstSeries.valueFormattedWithPrefix = currentWorstSeriesName + ': ' + currentWorstSeries.valueFormatted;
         currentWorstSeries.valueRawFormattedWithPrefix = currentWorstSeriesName + ': ' + currentWorstSeries.value;
-        // currentWorstSeries.valueFormatted = currentWorstSeriesName + ': ' + currentWorstSeries.valueFormatted;
+        currentWorstSeries.valueFormatted = currentWorstSeriesName + ': ' + currentWorstSeries.valueFormatted;
         // now push the composite into data
         data[aComposite.name] = currentWorstSeries;
       }
@@ -484,42 +484,14 @@ class DiagramCtrl extends MetricsPanelCtrl {
     return data;
   } // End setValues()
 
-  getWorstSeries(series1, series2) {
-    var worstSeries = series1;
-    var series1thresholdLevel = this.getThresholdLevel(series1);
-    var series2thresholdLevel = this.getThresholdLevel(series2);
-    console.debug("Series1 threshold level: " + series1thresholdLevel);
-    console.debug("Series2 threshold level: " + series2thresholdLevel);
-    if (series2thresholdLevel > series1thresholdLevel) {
-      // series2 has higher threshold violation
-      worstSeries = series2;
+  getWorstSeries(series1, series2, showLowest) {
+    if (showLowest) {
+    	// return series1 if the value is lower, otherwise return series2
+    	return series1.value < series2.value ? series1 : series2;
+    } else {
+    	// return series1 if the value is greater, otherwise return series2
+    	return series1.value > series2.value ? series1 : series2;
     }
-    return worstSeries;
-  }
-
-  // returns level of threshold, 0 = ok, 1 = warnimg, 2 = critical
-  getThresholdLevel(series) {
-    // default to ok
-    var thresholdLevel = 0;
-    var value = series.value;
-    var thresholds = series.colorData.thresholds;
-    // if no thresholds are defined, return 0
-    if (thresholds === undefined) {
-      return thresholdLevel;
-    }
-    // make sure thresholds is an array of size 2
-    if (thresholds.length !== 2) {
-      return thresholdLevel;
-    }
-    if (value >= thresholds[0]) {
-      // value is equal or greater than first threshold
-      thresholdLevel = 1;
-    }
-    if (value >= thresholds[1]) {
-      // value is equal or greater than second threshold
-      thresholdLevel = 2;
-    }
-    return thresholdLevel;
   }
 
   getGradientForValue(data, value) {
@@ -550,7 +522,7 @@ class DiagramCtrl extends MetricsPanelCtrl {
     console.debug('applying overrides for seriesItem');
     console.debug(seriesItemAlias);
     console.debug(this.panel.seriesOverrides);
-    for (var i = 0; i <= this.panel.seriesOverrides.length; i++) {
+    for (var i = 0; i < this.panel.seriesOverrides.length; i++) {
       console.debug('comparing:');
       console.debug(this.panel.seriesOverrides[i]);
 
@@ -660,6 +632,53 @@ class DiagramCtrl extends MetricsPanelCtrl {
       gradientValueMin.innerText = Math.min.apply(Math, ctrl.panel.thresholds.split(','));
     }
     updateCanvasStyle(); // run once at beginning so the gradients are ready on first data
+    
+    function selectElementById(container, id) {
+    	return d3.select(container.getElementById(id)); // $(svg).find('#'+key).first(); // jquery doesnt work for some ID expressions [prometheus data]
+    }
+    
+    function selectElementByEdgeLabel(container, id) {
+    	return d3.select(container).selectAll('span')
+	    	.filter(function(){ 
+				return d3.select(this).text() == id;
+	    	});
+    }
+
+    function selectElementByAlias(container, alias) {
+    	var targetElement = d3.select(container).selectAll('div')
+	    	.filter(function(){ 
+				return d3.select(this).text() == alias;
+	    	});
+    	var node = targetElement.node();
+    	if (node != null) {
+    		var parentShape = $(node).closest('.node');
+    		if (parentShape.length > 0) {
+    			return d3.select(parentShape[0]);
+    		}     		
+    	}
+    	return d3.select();
+    }
+    
+    function styleD3Shapes(targetElement, seriesItem) {
+    	var shapes = targetElement.selectAll('rect,circle,polygon');
+        shapes.style('fill', seriesItem.color);
+
+        var div = targetElement.select('div');
+        var fo = targetElement.select('foreignObject');
+        var p = div.append('p');
+        p.classed('diagram-value', true);
+        p.style('background-color', seriesItem.color);
+        p.html(seriesItem.valueFormatted);
+    }
+    
+    function styleEdgeLabel(targetElement, seriesItem) {
+    	var edgeParent = d3.select(targetElement.node().parentNode);
+    	edgeParent.append('br');
+        var v = edgeParent.append('span');
+        v.classed('diagram-value', true);
+        v.style('background-color', seriesItem.color);
+        v.html(seriesItem.valueFormatted);
+    }
 
     function updateStyle() {
       var data = ctrl.svgData;
@@ -680,60 +699,25 @@ class DiagramCtrl extends MetricsPanelCtrl {
         
         // Find nodes by ID if we can
         //console.info('finding targetElement');
-        var targetElement = d3.select(svg[0].getElementById(key)); // $(svg).find('#'+key).first(); // jquery doesnt work for some ID expressions [prometheus data]
-        console.debug("Series item: " + seriesItem.valueFormatted);
-        if (!targetElement.empty()) { // probably a flowchart
-          var shapes = targetElement.selectAll('rect,circle,polygon');
-          shapes.style('fill', seriesItem.color);
-
-          var div = targetElement.select('div');
-          var fo = targetElement.select('foreignObject');
-          // make foreign object element taller to accomdate value in FireFox/IE
-          fo.attr('height', 45);
-          // Add value text
-          var p = div.append('p');
-          p.classed('diagram-value', true);
-          p.style('background-color', seriesItem.color);
-          p.html(seriesItem.valueFormatted);
-        } else {
-          console.debug('finding element that contains id: ' + key);
-          // maybe a flowchart with an alias text node
-          targetElement = $(svg).find('div:contains("' + key + '")').filter(function() {
-            // Matches node name ( 'foo' in both 'foo' and 'foo[bar]')
-            return $(this).attr('id') === key;
-          });
-          if (targetElement.length > 0) {
-            targetElement.parents('.node').find('rect, circle, polygon').css('fill', seriesItem.color);
-            // make foreign object element taller to accomdate value in FireFox/IE
-            targetElement.parents('.node').find('foreignObject').attr('height', 45);
-            // for edge matches
-            var edgeElement = targetElement.parent().find('.edgeLabel');
-            if (edgeElement.length > 0) {
-              edgeElement.css('background-color', 'transparent');
-              edgeElement.append('<br/>' + seriesItem.valueFormatted).addClass('diagram-value');
-              edgeElement.parent('div').css('text-align', 'center').css('background-color', seriesItem.color);
-            } else {
-              var dElement = d3.select(targetElement[0]);
-              // Add value text
-              var p = dElement.append('p');
-              p.classed('diagram-value');
-              p.style('background-color', seriesItem.color);
-              p.html(seriesItem.valueFormatted);
-            }
-          } else {
-            targetElement = $(svg).find('text:contains("' + key + '")'); // sequence diagram, gantt ?
-            if (targetElement.length === 0) {
-              console.debug('couldnt not find a diagram node with id/text: ' + key);
-              continue;
-            }
-            // for node matches
-            targetElement.parent().find('rect, circle, polygon').css('fill', seriesItem.color);
-            targetElement.append('\n' + seriesItem.valueFormatted);
-          }
+        var targetElement = selectElementById(svg[0], key);
+        if (!targetElement.empty()) {
+            styleD3Shapes(targetElement, seriesItem);
+            continue;
         }
+        
+        targetElement = selectElementByEdgeLabel(svg[0], key);
+    	if (!targetElement.empty()) {
+    		styleEdgeLabel(targetElement, seriesItem);
+    		continue;
+    	}
+    	
+    	targetElement = selectElementByAlias(svg[0], key);
+		if (!targetElement.empty()) {
+			styleD3Shapes(targetElement, seriesItem);
+			continue;
+		}
 
-        console.debug(targetElement);
-        console.debug('set nodes:' + key + ' to color:' + seriesItem.color);
+		console.debug('couldnt not find a diagram node with id/text: ' + key);
       }
       //return $(svg).html();
     } // End updateStyle()

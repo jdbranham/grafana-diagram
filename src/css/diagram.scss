@@ -20,6 +20,7 @@ $task-fill: #487e3a;
 
 .diagram .label, .diagram .edgeLabel {
     text-shadow: none; /** prevent shadow from grafana css **/
+	padding: 2px;
 }
 
 .gradient-values-container .gradient-value-max {
@@ -28,6 +29,8 @@ $task-fill: #487e3a;
 
 .diagram g.label div {
 	color: $text-color;
+	width: 100%;
+	text-align: center;
 }
 
 .diagram div p {
@@ -60,6 +63,15 @@ svg > g {
 .mermaid .label {
   font-family: 'trebuchet ms', verdana, arial;
   color: $text-color;
+}
+
+/* For edgeLabels */
+.diagram g > foreignObject {
+	overflow: visible;
+}
+
+.diagram g > foreignObject > div {
+	font-size: 1.3rem;
 }
 .node rect,
 .node circle,
