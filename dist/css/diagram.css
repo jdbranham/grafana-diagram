@@ -6,13 +6,16 @@
 
 .diagram .label, .diagram .edgeLabel {
   text-shadow: none;
-  /** prevent shadow from grafana css **/ }
+  /** prevent shadow from grafana css **/
+  padding: 2px; }
 
 .gradient-values-container .gradient-value-max {
   float: right; }
 
 .diagram g.label div {
-  color: #333; }
+  color: #333;
+  width: 100%;
+  text-align: center; }
 
 .diagram div p {
   text-align: center; }
@@ -39,6 +42,13 @@ svg > g {
 .mermaid .label {
   font-family: 'trebuchet ms', verdana, arial;
   color: #333; }
+
+/* For edgeLabels */
+.diagram g > foreignObject {
+  overflow: visible; }
+
+.diagram g > foreignObject > div {
+  font-size: 1.3rem; }
 
 .node rect,
 .node circle,
