@@ -561,11 +561,12 @@ System.register(['./libs/mermaid/dist/mermaid', './libs/d3/dist/d3.min', 'app/co
               }
               // Prefix the valueFormatted with the actual metric name
               if (currentWorstSeries !== null) {
-                currentWorstSeries.valueFormattedWithPrefix = currentWorstSeriesName + ': ' + currentWorstSeries.valueFormatted;
-                currentWorstSeries.valueRawFormattedWithPrefix = currentWorstSeriesName + ': ' + currentWorstSeries.value;
-                currentWorstSeries.valueFormatted = currentWorstSeriesName + ': ' + currentWorstSeries.valueFormatted;
+                var copy = _.clone(currentWorstSeries);
+                copy.valueFormattedWithPrefix = currentWorstSeriesName + ': ' + currentWorstSeries.valueFormatted;
+                copy.valueRawFormattedWithPrefix = currentWorstSeriesName + ': ' + currentWorstSeries.value;
+                copy.valueFormatted = currentWorstSeriesName + ': ' + currentWorstSeries.valueFormatted;
                 // now push the composite into data
-                data[aComposite.name] = currentWorstSeries;
+                data[aComposite.name] = copy;
               }
             }
             return data;
@@ -777,7 +778,7 @@ System.register(['./libs/mermaid/dist/mermaid', './libs/d3/dist/d3.min', 'app/co
               ctrl.svgData = {}; // get rid of the data after consuming it. This prevents adding duplicate DOM elements
               console.debug('updating svg style');
               var svg = $(document.getElementById(ctrl.panel.graphId));
-              $(svg).css('min-width', $(svg).css('max-width'));
+              //$(svg).css('min-width', $(svg).css('max-width'));
               if (ctrl.panel.maxWidth) {
                 $(svg).css('max-width', '100%');
               }

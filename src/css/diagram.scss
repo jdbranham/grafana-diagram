@@ -10,12 +10,29 @@ $message-stroke: #777;
 $message-fill: #D8D9DA;
 $task-fill: #487e3a;
 
+.diagram-container {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+}
+
 .diagram {
 	overflow: auto;
+	flex-grow: 1;
 }
 
 .diagram-legend .graph-legend {
     overflow-x: auto;
+}
+
+.diagram-legend {
+	display: flex;
+	flex-direction: column;
+}
+
+.graph-legend {
+	flex-grow: 1;
+	max-height: unset;
 }
 
 .diagram .label, .diagram .edgeLabel {
