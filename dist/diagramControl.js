@@ -882,7 +882,6 @@ System.register(['./libs/mermaid/dist/mermaid', './libs/d3/dist/d3.min', 'app/co
               ctrl.svgData = {}; // get rid of the data after consuming it. This prevents adding duplicate DOM elements
               console.debug('updating svg style');
               var svg = $(document.getElementById(ctrl.panel.graphId));
-              //$(svg).css('min-width', $(svg).css('max-width'));
               if (ctrl.panel.maxWidth) {
                 $(svg).css('max-width', '100%');
               }
