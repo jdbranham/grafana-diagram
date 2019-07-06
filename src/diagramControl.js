@@ -63,7 +63,7 @@ const panelDefaults = {
   mermaidServiceUrl: '',
   init: {
     logLevel: 3, //1:debug, 2:info, 3:warn, 4:error, 5:fatal
-    cloneCssStyles: false, // - This options controls whether or not the css rules should be copied into the generated svg
+    cloneCssStyles: true, // - This options controls whether or not the css rules should be copied into the generated svg
     startOnLoad: false, // - This options controls whether or mermaid starts when the page loads
     arrowMarkerAbsolute: true, // - This options controls whether or arrow markers in html code will be absolute paths or an anchor, #. This matters if you are using base tag settings.
     flowchart: {
@@ -782,7 +782,6 @@ class DiagramCtrl extends MetricsPanelCtrl {
       ctrl.svgData = {}; // get rid of the data after consuming it. This prevents adding duplicate DOM elements
       console.debug('updating svg style');
       var svg = $(document.getElementById(ctrl.panel.graphId));
-      //$(svg).css('min-width', $(svg).css('max-width'));
       if (ctrl.panel.maxWidth) {
         $(svg).css('max-width', '100%');
       }
