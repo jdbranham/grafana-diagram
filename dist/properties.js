@@ -3,7 +3,7 @@
 System.register([], function (_export, _context) {
 	"use strict";
 
-	var pluginName, diagramEditor, displayEditor, compositeEditor;
+	var pluginName, diagramEditor, displayEditor, compositeEditor, mappingEditor;
 	return {
 		setters: [],
 		execute: function () {
@@ -15,6 +15,8 @@ System.register([], function (_export, _context) {
 
 			_export('compositeEditor', compositeEditor = 'public/plugins/' + pluginName + '/compositeEditor.html');
 
+			_export('mappingEditor', mappingEditor = 'public/plugins/' + pluginName + '/mappingEditor.html');
+
 			_export('pluginName', pluginName);
 
 			_export('diagramEditor', diagramEditor);
@@ -22,6 +24,8 @@ System.register([], function (_export, _context) {
 			_export('displayEditor', displayEditor);
 
 			_export('compositeEditor', compositeEditor);
+
+			_export('mappingEditor', mappingEditor);
 		}
 	};
 });
