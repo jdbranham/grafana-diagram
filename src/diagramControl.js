@@ -25,6 +25,7 @@ const panelDefaults = {
   thresholds: '0,10',
   decimals: 2, // decimal precision
   colors: ['rgba(50, 172, 45, 0.97)', 'rgba(237, 129, 40, 0.89)', 'rgba(245, 54, 54, 0.9)'],
+  style: '',
   legend: {
     show: true,
     min: true,
@@ -776,6 +777,12 @@ class DiagramCtrl extends MetricsPanelCtrl {
         v.style('background-color', seriesItem.color);
         v.html(seriesItem.valueFormatted);
     }
+    
+    function injectCustomStyle(ctrl) {
+    	var diagramDiv = d3.select(document.getElementById(ctrl.panel.graphId));
+    	var styleElement = diagramDiv.append('style');
+    	styleElement.text(ctrl.panel.style);
+    }
 
     function updateStyle() {
       var data = ctrl.svgData;
@@ -815,7 +822,8 @@ class DiagramCtrl extends MetricsPanelCtrl {
 
 		console.debug('couldnt not find a diagram node with id/text: ' + key);
       }
-      //return $(svg).html();
+      
+      injectCustomStyle(ctrl);
     } // End updateStyle()
 
      function render() {
