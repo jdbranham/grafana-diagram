@@ -3,7 +3,7 @@
 System.register(['./libs/mermaid/dist/mermaid', './libs/d3/dist/d3.min', 'app/core/time_series2', 'app/core/utils/kbn', 'app/plugins/sdk', './properties', 'lodash', './series_overrides_diagram_ctrl', './css/diagram.css!'], function (_export, _context) {
   "use strict";
 
-  var mermaid, d3, TimeSeries, kbn, MetricsPanelCtrl, diagramEditor, displayEditor, compositeEditor, _, _createClass, mermaidAPI, panelDefaults, DiagramCtrl;
+  var mermaid, d3, TimeSeries, kbn, MetricsPanelCtrl, diagramEditor, displayEditor, compositeEditor, mappingEditor, _, _createClass, mermaidAPI, panelDefaults, DiagramCtrl;
 
   function _classCallCheck(instance, Constructor) {
     if (!(instance instanceof Constructor)) {
@@ -72,6 +72,7 @@ System.register(['./libs/mermaid/dist/mermaid', './libs/d3/dist/d3.min', 'app/co
       diagramEditor = _properties.diagramEditor;
       displayEditor = _properties.displayEditor;
       compositeEditor = _properties.compositeEditor;
+      mappingEditor = _properties.mappingEditor;
     }, function (_lodash) {
       _ = _lodash.default;
     }, function (_series_overrides_diagram_ctrl) {}, function (_cssDiagramCss) {}],
@@ -129,6 +130,7 @@ System.register(['./libs/mermaid/dist/mermaid', './libs/d3/dist/d3.min', 'app/co
           op: '=',
           text: 'N/A'
         }],
+        mappingTypes: [{ name: 'value to text', value: 1 }, { name: 'range to text', value: 2 }],
         content: 'graph LR\n' + 'A[Square Rect] -- Link text --> B((Circle))\n' + 'A --> C(Round Rect)\n' + 'B --> D{Rhombus}\n' + 'C --> D\n',
         mode: 'content', //allowed values: 'content' and 'url'
         mermaidServiceUrl: '',
@@ -232,6 +234,7 @@ System.register(['./libs/mermaid/dist/mermaid', './libs/d3/dist/d3.min', 'app/co
             this.addEditorTab('Diagram', diagramEditor, 2);
             this.addEditorTab('Display', displayEditor, 3);
             this.addEditorTab('Metric Composites', compositeEditor, 4);
+            this.addEditorTab('Value Mappings', mappingEditor, 5);
           }
         }, {
           key: 'getDiagramContainer',
@@ -350,6 +353,42 @@ System.register(['./libs/mermaid/dist/mermaid', './libs/d3/dist/d3.min', 'app/co
           value: function removeMetricCharacterReplacement(replacement) {
             this.panel.metricCharacterReplacements = _.without(this.panel.metricCharacterReplacements, replacement);
             this.refresh();
+          }
+        }, {
+          key: 'addValueMapping',
+          value: function addValueMapping(mapping) {
+            this.panel.valueMaps.push(mapping || {});
+          }
+        }, {
+          key: 'removeValueMapping',
+          value: function removeValueMapping(mapping) {
+            this.panel.valueMaps = _.without(this.panel.valueMaps, mapping);
+          }
+        }, {
+          key: 'addEntryToValueMapping',
+          value: function addEntryToValueMapping(mapping) {
+            if (mapping.type == 1) {
+              if (mapping.valueToText === undefined) {
+                mapping.valueToText = [{}];
+              } else {
+                mapping.valueToText.push({});
+              }
+            } else if (mapping.type == 2) {
+              if (mapping.rangeToText === undefined) {
+                mapping.rangeToText = [{}];
+              } else {
+                mapping.rangeToText.push({});
+              }
+            }
+          }
+        }, {
+          key: 'removeEntryFromValueMapping',
+          value: function removeEntryFromValueMapping(valueMap, mapping) {
+            if (valueMap.type == 1) {
+              valueMap.valueToText = _.without(valueMap.valueToText, mapping);
+            } else if (valueMap.type == 2) {
+              valueMap.rangeToText = _.without(valueMap.rangeToText, mapping);
+            }
           }
         }, {
           key: 'updateThresholds',
@@ -534,6 +573,8 @@ System.register(['./libs/mermaid/dist/mermaid', './libs/d3/dist/d3.min', 'app/co
                 }
               }
             }
+            // Map values to text if needed
+            this.applyValueMapping(data);
             // now add the composites to data
             for (var i = 0; i < this.panel.composites.length; i++) {
               var aComposite = this.panel.composites[i];
@@ -640,6 +681,62 @@ System.register(['./libs/mermaid/dist/mermaid', './libs/d3/dist/d3.min', 'app/co
 
             seriesItem.format = overrides.unitFormat || this.panel.format;
             return seriesItem;
+          }
+        }, {
+          key: 'applyValueMapping',
+          value: function applyValueMapping(data) {
+            for (var i = 0; i < this.panel.valueMaps.length; i++) {
+              var map = this.panel.valueMaps[i];
+              if (!map.hasOwnProperty('alias')) continue;
+              var regex = kbn.stringToJsRegex(map.alias);
+              console.debug("Checking mapping: " + map.alias);
+              for (var j = 0; j < this.series.length; j++) {
+                var matches = this.series[j].alias.match(regex);
+                console.debug("  Series: " + this.series[j].alias);
+                if (matches && matches.length > 0) {
+                  var seriesItem = this.series[j];
+                  var dataItem = data[seriesItem.alias];
+                  if (map.type == 1) {
+                    for (var k = 0; k < map.valueToText.length; k++) {
+                      //	
+                      // Value mappings
+                      //	
+                      var valueMapping = map.valueToText[k];
+                      console.debug("    Mapping: " + dataItem.valueFormatted + " =? " + valueMapping.value);
+                      if (valueMapping.value === 'null') {
+                        if (dataItem.value === null || dataItem.value === void 0) {
+                          dataItem.valueFormatted = valueMapping.text;
+                          return;
+                        }
+                        continue;
+                      } else if (parseFloat(valueMapping.value) == dataItem.valueRounded) {
+                        dataItem.valueFormatted = valueMapping.text;
+                        console.debug("Map value of series " + seriesItem.alias + ": " + dataItem.valueRounded + " -> " + valueMapping.text);
+                        continue;
+                      }
+                    }
+                  } else if (map.type == 2) {
+                    for (var _k = 0; _k < map.rangeToText.length; _k++) {
+                      //	
+                      // Range Mappings
+                      //	
+                      var rangeMapping = map.rangeToText[_k];
+                      if (rangeMapping.from === 'null' && rangeNapping.to == 'null') {
+                        if (dataItem.value === null || dataItem.value === void 0) {
+                          dataItem.valueFormatted = rangeMapping.text;
+                          return;
+                        }
+                        continue;
+                      } else if (parseFloat(rangeMapping.from) <= dataItem.valueRounded && parseFloat(rangeMapping.to) >= dataItem.valueRounded) {
+                        dataItem.valueFormatted = rangeMapping.text;
+                        console.debug("Map value of series " + seriesItem.alias + ": " + dataItem.valueRounded + " -> " + rangeMapping.text);
+                        continue;
+                      }
+                    }
+                  }
+                }
+              }
+            }
           }
         }, {
           key: 'invertColorOrder',
