@@ -547,6 +547,8 @@ System.register(['./libs/mermaid/dist/mermaid', './libs/d3/dist/d3.min', 'app/co
                 console.debug('setting values for series');
                 console.debug(seriesItem);
                 data[seriesItem.alias] = this.applyOverrides(seriesItem.alias);
+                // store alias in data
+                data[seriesItem.alias].alias = seriesItem.alias;
                 var lastPoint = _.last(seriesItem.datapoints);
                 var lastValue = _.isArray(lastPoint) ? lastPoint[0] : null;
 
@@ -576,37 +578,31 @@ System.register(['./libs/mermaid/dist/mermaid', './libs/d3/dist/d3.min', 'app/co
             // Map values to text if needed
             this.applyValueMapping(data);
             // now add the composites to data
-            for (var i = 0; i < this.panel.composites.length; i++) {
-              var aComposite = this.panel.composites[i];
+            for (var _i = 0; _i < this.panel.composites.length; _i++) {
+              var aComposite = this.panel.composites[_i];
               var currentWorstSeries = null;
               var currentWorstSeriesName = null;
               for (var j = 0; j < aComposite.metrics.length; j++) {
                 var aMetric = aComposite.metrics[j];
                 var seriesName = aMetric.seriesName;
-                // For testing
-                console.debug("aMetric value: " + seriesItem.valueFormatted);
-                console.debug("aMetric: " + seriesName);
                 // make sure we have a match
-                if (!data.hasOwnProperty(seriesName)) continue;
-                var seriesItem = data[seriesName];
-                // add the name of the series Item
-                seriesItem.nameOfMetric = seriesName;
+                if (!data.hasOwnProperty(seriesName)) {
+                  continue;
+                }
+                var _seriesItem = data[seriesName];
                 // check colorData thresholds
                 if (currentWorstSeries === null) {
-                  currentWorstSeries = seriesItem;
-                  currentWorstSeriesName = seriesItem.nameOfMetric;
+                  currentWorstSeries = _seriesItem;
                 } else {
-                  currentWorstSeries = this.getWorstSeries(currentWorstSeries, seriesItem, aComposite.showLowest);
-                  currentWorstSeriesName = seriesItem.nameOfMetric;
+                  currentWorstSeries = this.getWorstSeries(currentWorstSeries, _seriesItem, aComposite.showLowest);
                 }
-                delete seriesItem.nameOfMetric;
               }
               // Prefix the valueFormatted with the actual metric name
               if (currentWorstSeries !== null) {
                 var copy = _.clone(currentWorstSeries);
-                copy.valueFormattedWithPrefix = currentWorstSeriesName + ': ' + currentWorstSeries.valueFormatted;
-                copy.valueRawFormattedWithPrefix = currentWorstSeriesName + ': ' + currentWorstSeries.value;
-                copy.valueFormatted = currentWorstSeriesName + ': ' + currentWorstSeries.valueFormatted;
+                copy.valueFormattedWithPrefix = currentWorstSeries.alias + ': ' + currentWorstSeries.valueFormatted;
+                copy.valueRawFormattedWithPrefix = currentWorstSeries.alias + ': ' + currentWorstSeries.value;
+                copy.valueFormatted = currentWorstSeries.alias + ': ' + currentWorstSeries.valueFormatted;
                 // now push the composite into data
                 data[aComposite.name] = copy;
               }
