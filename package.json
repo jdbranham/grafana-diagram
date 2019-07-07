@@ -6,7 +6,8 @@
   "scripts": {
     "lint": "eslint --color .",
     "test": "grunt",
-    "build": "grunt"
+    "build": "grunt",
+    "watch": "grunt watch"
   },
   "repository": {
     "type": "git",

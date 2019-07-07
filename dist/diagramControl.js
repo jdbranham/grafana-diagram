@@ -1,9 +1,9 @@
 'use strict';
 
-System.register(['./libs/mermaid/dist/mermaid', './libs/d3/dist/d3.min', 'app/core/time_series2', 'app/core/utils/kbn', 'app/plugins/sdk', './properties', 'lodash', './series_overrides_diagram_ctrl', './css/diagram.css!'], function (_export, _context) {
+System.register(['./libs/mermaid/dist/mermaid', './libs/d3/dist/d3.min', 'app/core/time_series2', 'app/core/utils/kbn', 'app/plugins/sdk', './properties', 'lodash', './series_overrides_diagram_ctrl', './css/diagram.css!', './diagramStyle'], function (_export, _context) {
   "use strict";
 
-  var mermaid, d3, TimeSeries, kbn, MetricsPanelCtrl, diagramEditor, displayEditor, compositeEditor, mappingEditor, _, _createClass, mermaidAPI, panelDefaults, DiagramCtrl;
+  var mermaid, d3, TimeSeries, kbn, MetricsPanelCtrl, diagramEditor, displayEditor, compositeEditor, mappingEditor, _, diagramStyleFormatter, _createClass, mermaidAPI, panelDefaults, DiagramCtrl;
 
   function _classCallCheck(instance, Constructor) {
     if (!(instance instanceof Constructor)) {
@@ -75,7 +75,9 @@ System.register(['./libs/mermaid/dist/mermaid', './libs/d3/dist/d3.min', 'app/co
       mappingEditor = _properties.mappingEditor;
     }, function (_lodash) {
       _ = _lodash.default;
-    }, function (_series_overrides_diagram_ctrl) {}, function (_cssDiagramCss) {}],
+    }, function (_series_overrides_diagram_ctrl) {}, function (_cssDiagramCss) {}, function (_diagramStyle) {
+      diagramStyleFormatter = _diagramStyle.diagramStyleFormatter;
+    }],
     execute: function () {
       _createClass = function () {
         function defineProperties(target, props) {
@@ -104,6 +106,7 @@ System.register(['./libs/mermaid/dist/mermaid', './libs/d3/dist/d3.min', 'app/co
         thresholds: '0,10',
         decimals: 2, // decimal precision
         colors: ['rgba(50, 172, 45, 0.97)', 'rgba(237, 129, 40, 0.89)', 'rgba(245, 54, 54, 0.9)'],
+        styleValues: {},
         style: '',
         legend: {
           show: true,
@@ -869,8 +872,10 @@ System.register(['./libs/mermaid/dist/mermaid', './libs/d3/dist/d3.min', 'app/co
 
             function injectCustomStyle(ctrl) {
               var diagramDiv = d3.select(document.getElementById(ctrl.panel.graphId));
-              var styleElement = diagramDiv.append('style');
-              styleElement.text(ctrl.panel.style);
+              var diagramStyleElement = diagramDiv.append('style');
+              diagramStyleElement.text(diagramStyleFormatter(ctrl.panel.styleValues));
+              var customStyleElement = diagramDiv.append('style');
+              customStyleElement.text(ctrl.panel.style);
             }
 
             function updateStyle() {

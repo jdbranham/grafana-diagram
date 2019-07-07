@@ -15,6 +15,10 @@ import _ from 'lodash';
 import './series_overrides_diagram_ctrl';
 import './css/diagram.css!';
 
+// Work In Progress
+// Build a custom style editor
+import { diagramStyleFormatter } from './diagramStyle';
+
 const mermaidAPI = mermaid.mermaidAPI;
 
 const panelDefaults = {
@@ -25,6 +29,7 @@ const panelDefaults = {
   thresholds: '0,10',
   decimals: 2, // decimal precision
   colors: ['rgba(50, 172, 45, 0.97)', 'rgba(237, 129, 40, 0.89)', 'rgba(245, 54, 54, 0.9)'],
+  styleValues: {},
   style: '',
   legend: {
     show: true,
@@ -776,8 +781,10 @@ class DiagramCtrl extends MetricsPanelCtrl {
     
     function injectCustomStyle(ctrl) {
     	var diagramDiv = d3.select(document.getElementById(ctrl.panel.graphId));
-    	var styleElement = diagramDiv.append('style');
-    	styleElement.text(ctrl.panel.style);
+    	var diagramStyleElement = diagramDiv.append('style');
+    	diagramStyleElement.text(diagramStyleFormatter(ctrl.panel.styleValues));
+    	var customStyleElement = diagramDiv.append('style');
+    	customStyleElement.text(ctrl.panel.style);
     }
 
     function updateStyle() {
