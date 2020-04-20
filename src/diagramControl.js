@@ -13,7 +13,7 @@ import {
 } from './properties';
 import _ from 'lodash';
 import './series_overrides_diagram_ctrl';
-import './css/diagram.css!';
+//import './css/diagram.css!';
 
 // Work In Progress
 // Build a custom style editor
@@ -67,7 +67,9 @@ const panelDefaults = {
     'C --> D\n',
   mode: 'content', //allowed values: 'content' and 'url'
   mermaidServiceUrl: '',
+  themes: ['default', 'dark', 'forest', 'neutral'],
   init: {
+    theme: 'dark',
     securityLevel: 'loose',
     logLevel: 3, //1:debug, 2:info, 3:warn, 4:error, 5:fatal
     cloneCssStyles: true, // - This options controls whether or not the css rules should be copied into the generated svg
@@ -147,6 +149,11 @@ class DiagramCtrl extends MetricsPanelCtrl {
   initializeMermaid() {
     mermaidAPI.initialize(this.panel.init);
     mermaidAPI.parseError = this.handleParseError.bind(this);
+  }
+
+  changeTheme(){
+    this.initializeMermaid();
+    this.updateDiagram(this.svgData);
   }
 
   handleParseError(err, hash) {
@@ -778,11 +785,12 @@ class DiagramCtrl extends MetricsPanelCtrl {
         shapes.style('fill', seriesItem.color);
 
         var div = targetElement.select('div');
-        var fo = targetElement.select('foreignObject');
         var p = div.append('p');
         p.classed('diagram-value', true);
         p.style('background-color', seriesItem.color);
         p.html(seriesItem.valueFormatted);
+        targetElement.select('foreignObject')
+          .attr('height', div.node().clientHeight);
     }
     
     function styleFlowChartEdgeLabel(targetElement, seriesItem) {

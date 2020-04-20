@@ -1,6 +1,6 @@
 'use strict';
 
-System.register(['./libs/mermaid/dist/mermaid', './libs/d3/dist/d3.min', 'app/core/time_series2', 'app/core/utils/kbn', 'app/plugins/sdk', './properties', 'lodash', './series_overrides_diagram_ctrl', './css/diagram.css!', './diagramStyle'], function (_export, _context) {
+System.register(['./libs/mermaid/dist/mermaid', './libs/d3/dist/d3.min', 'app/core/time_series2', 'app/core/utils/kbn', 'app/plugins/sdk', './properties', 'lodash', './series_overrides_diagram_ctrl', './diagramStyle'], function (_export, _context) {
   "use strict";
 
   var mermaid, d3, TimeSeries, kbn, MetricsPanelCtrl, diagramEditor, displayEditor, compositeEditor, mappingEditor, _, diagramStyleFormatter, _createClass, mermaidAPI, panelDefaults, DiagramCtrl;
@@ -75,7 +75,7 @@ System.register(['./libs/mermaid/dist/mermaid', './libs/d3/dist/d3.min', 'app/co
       mappingEditor = _properties.mappingEditor;
     }, function (_lodash) {
       _ = _lodash.default;
-    }, function (_series_overrides_diagram_ctrl) {}, function (_cssDiagramCss) {}, function (_diagramStyle) {
+    }, function (_series_overrides_diagram_ctrl) {}, function (_diagramStyle) {
       diagramStyleFormatter = _diagramStyle.diagramStyleFormatter;
     }],
     execute: function () {
@@ -137,7 +137,9 @@ System.register(['./libs/mermaid/dist/mermaid', './libs/d3/dist/d3.min', 'app/co
         content: 'graph LR\n' + 'A[Square Rect] -- Link text --> B((Circle))\n' + 'A --> C(Round Rect)\n' + 'B --> D{Rhombus}\n' + 'C --> D\n',
         mode: 'content', //allowed values: 'content' and 'url'
         mermaidServiceUrl: '',
+        themes: ['default', 'dark', 'forest', 'neutral'],
         init: {
+          theme: 'dark',
           securityLevel: 'loose',
           logLevel: 3, //1:debug, 2:info, 3:warn, 4:error, 5:fatal
           cloneCssStyles: true, // - This options controls whether or not the css rules should be copied into the generated svg
@@ -225,6 +227,12 @@ System.register(['./libs/mermaid/dist/mermaid', './libs/d3/dist/d3.min', 'app/co
           value: function initializeMermaid() {
             mermaidAPI.initialize(this.panel.init);
             mermaidAPI.parseError = this.handleParseError.bind(this);
+          }
+        }, {
+          key: 'changeTheme',
+          value: function changeTheme() {
+            this.initializeMermaid();
+            this.updateDiagram(this.svgData);
           }
         }, {
           key: 'handleParseError',
@@ -868,11 +876,11 @@ System.register(['./libs/mermaid/dist/mermaid', './libs/d3/dist/d3.min', 'app/co
               shapes.style('fill', seriesItem.color);
 
               var div = targetElement.select('div');
-              var fo = targetElement.select('foreignObject');
               var p = div.append('p');
               p.classed('diagram-value', true);
               p.style('background-color', seriesItem.color);
               p.html(seriesItem.valueFormatted);
+              targetElement.select('foreignObject').attr('height', div.node().clientHeight);
             }
 
             function styleFlowChartEdgeLabel(targetElement, seriesItem) {
