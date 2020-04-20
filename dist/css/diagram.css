@@ -61,9 +61,6 @@ svg > g {
 .diagram g > foreignObject {
   overflow: visible; }
 
-.diagram g > foreignObject > div {
-  font-size: 1.3rem; }
-
 .node rect,
 .node circle,
 .node ellipse,

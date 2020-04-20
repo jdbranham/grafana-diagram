@@ -1,3 +1,11 @@
+<div class="section gf-form-group">
+	<h5 class="section-heading">Theme</h5>
+	<div class="gf-form">
+		<select class="gf-form-input" ng-model="ctrl.panel.init.theme"
+		  ng-options="f for f in ctrl.panel.themes" ng-change="ctrl.changeTheme()"></select>
+	</div>
+</div>
+
 <div class="gf-form-group">
 	<h5>Size</h5>
 	<div class="gf-form">

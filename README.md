@@ -13,6 +13,22 @@ This is a Grafana panel plugin that provides a way to create flow-charts, sequen
 
 **Note - Special characters in an alias are replace with an underscore. See character replacement below
 
+## Development
+
+For easy development, use the `docker-compose.yml`.
+
+In a terminal - 
+`docker-compose up -d`
+Grafana will start on port 3000 with user/pass = `admin`  
+The plugin project will be mounted inside the docker container so changes are reflected immediately.  
+Add a new dashboard with the diagram plugin to test changes.  
+
+`npm run watch`  
+The diagram plugin will watch for changes in the project, and rebuild.  
+
+Open the plugin files in your favorite editor and make changes.  
+Refresh your browser to see the diagram plugin changes.  
+
 ## Character Replacement
 
 The following characters in metric names are automatically replaced with an underscore.

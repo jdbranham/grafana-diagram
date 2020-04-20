@@ -1,12 +1,13 @@
 {
   "name": "grafana-diagram",
-  "version": "1.5.0",
+  "version": "1.6.2",
   "description": "A diagram panel plugin for Grafana",
   "main": "src/module.js",
   "scripts": {
     "lint": "eslint --color .",
     "test": "grunt",
-    "build": "grunt"
+    "build": "grunt",
+    "watch": "grunt watch"
   },
   "repository": {
     "type": "git",
@@ -46,10 +47,10 @@
     "grunt-sass": "^1.2.1",
     "grunt-systemjs-builder": "^0.2.5",
     "load-grunt-tasks": "~3.2.0",
-    "sass": "^1.0.0-beta.3"
+    "node-sass": "^4.12.0"
   },
   "dependencies": {
     "lodash": "^4.17.11",
-    "mermaid": "^8.1.0"
+    "mermaid": "^8.5.0"
   }
 }
