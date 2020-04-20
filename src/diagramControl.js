@@ -68,6 +68,7 @@ const panelDefaults = {
   mode: 'content', //allowed values: 'content' and 'url'
   mermaidServiceUrl: '',
   init: {
+    securityLevel: 'loose',
     logLevel: 3, //1:debug, 2:info, 3:warn, 4:error, 5:fatal
     cloneCssStyles: true, // - This options controls whether or not the css rules should be copied into the generated svg
     startOnLoad: false, // - This options controls whether or mermaid starts when the page loads
@@ -337,7 +338,7 @@ class DiagramCtrl extends MetricsPanelCtrl {
     var _this = this;
     var renderCallback = function(svgCode, bindFunctions) {
       if (svgCode === '') {
-        diagramContainer.html('There was a problem rendering the graph');
+        diagramContainer.html('<p>There was a problem rendering the graph</p>');
       } else {
         diagramContainer.html(svgCode);
         bindFunctions(diagramContainer[0]);
@@ -348,10 +349,15 @@ class DiagramCtrl extends MetricsPanelCtrl {
         _this.render();
       }
     };
-    // if parsing the graph definition fails, the error handler will be called but the renderCallback() may also still be called.
-    mermaidAPI.render(this.panel.graphId, graphDefinition, renderCallback);
+    
+    try {
+      // if parsing the graph definition fails, the error handler will be called but the renderCallback() may also still be called.
+      mermaidAPI.render(this.panel.graphId, graphDefinition, renderCallback, diagramContainer[0]);
+    } catch (err) {
+      diagramContainer.html('<p>Error rendering diagram. Check the diagram definition</p><p>'+ err + '</p>');
+    }
   }
-
+  
   updateDiagram(data) {
     if (this.panel.content.length > 0) {
       var mode = this.panel.mode;

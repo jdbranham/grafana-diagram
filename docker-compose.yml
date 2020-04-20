@@ -1,8 +1,11 @@
-grafana:
-  image: grafana/grafana
-  ports:
+version: "3"
+
+services:
+  grafana:
+    image: grafana/grafana
+    ports:
     - "3000:3000"
-  volumes:
+    volumes:
     - ./dist:/var/lib/grafana/plugins/jdbranham-diagram-panel
-  environment:
+    environment:
     - TERM=linux
