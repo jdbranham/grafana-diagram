@@ -137,6 +137,9 @@ System.register(['./libs/mermaid/dist/mermaid', './libs/d3/dist/d3.min', 'app/co
         content: 'graph LR\n' + 'A[Square Rect] -- Link text --> B((Circle))\n' + 'A --> C(Round Rect)\n' + 'B --> D{Rhombus}\n' + 'C --> D\n',
         mode: 'content', //allowed values: 'content' and 'url'
         mermaidServiceUrl: '',
+        useBasicAuth: false,
+        authUsername: '',
+        authPassword: '',
         themes: ['default', 'dark', 'forest', 'neutral'],
         init: {
           theme: 'dark',
@@ -480,10 +483,16 @@ System.register(['./libs/mermaid/dist/mermaid', './libs/d3/dist/d3.min', 'app/co
               if (mode == 'url') {
                 var templatedURL = this.templateSrv.replace(this.panel.mermaidServiceUrl, this.panel.scopedVars);
                 var _this = this;
+                var headerObj = {};
+                headerObj.Accept = 'text/x-mermaid,text/plain;q=0.9,*/*;q=0.8';
+                if (this.panel.useBasicAuth) {
+                  headerObj.Authorization = 'Basic ' + btoa(this.panel.authUsername + ':' + this.panel.authPassword);
+                }
+
                 this.$http({
                   method: 'GET',
                   url: templatedURL,
-                  headers: { 'Accept': 'text/x-mermaid,text/plain;q=0.9,*/*;q=0.8' }
+                  headers: headerObj
                 }).then(function successCallback(response) {
                   //the response must have text/plain content-type
                   // clearing the diagram here will result in less artifacting waiting for the response
