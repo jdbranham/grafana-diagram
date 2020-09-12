@@ -1,21 +1,30 @@
 <div class="section gf-form-group">
-	<h5 class="section-heading">Theme</h5>
 	<div class="gf-form">
-		<select class="gf-form-input" ng-model="ctrl.panel.init.theme"
-		  ng-options="f for f in ctrl.panel.themes" ng-change="ctrl.changeTheme()"></select>
+		<label class="gf-form-label width-6">Theme</label>
+		<div class="gf-form-select-wrapper max-width-15">
+			<select class="gf-form-input" ng-model="ctrl.panel.init.theme"
+			  ng-options="f for f in ctrl.panel.themes" ng-change="ctrl.changeTheme()"></select>
+		</div>
 	</div>
 </div>
 
 <div class="gf-form-group">
-	<h5>Size</h5>
 	<div class="gf-form">
-		<editor-checkbox text="Scale to Panel" model="ctrl.panel.maxWidth" class="gf-form-checkbox" ></editor-checkbox>
+		<h6>Size</h6>
+	</div>
+	<div class="gf-form">
+		<gf-form-switch class="gf-form" label="Scale to Panel" label-class="width-10" checked="ctrl.panel.maxWidth" on-change="ctrl.refresh()"></gf-form-switch>
 	</div>
 </div>
 
+
 <div class="gf-form-group">
-	<h5>Metric Character Replacement<tip>Additional Characters in metric names to replace</tip></h5>
-	<h6>Default Characters that are replaced with underscore: <code>" , ; = : { }</code></h6>
+	<div class="gf-form">
+		<h6>Metric Character Replacement<tip>Additional Characters in metric names to replace</tip></h6>
+	</div>
+	<div class="gf-form">
+		<h6 class="muted">Default Characters that are replaced with underscore: <code>" , ; = : { }</code></h6>
+	</div>
 	<div class="gf-form-inline" ng-repeat="replacement in ctrl.panel.metricCharacterReplacements">
 		<div class="gf-form">
 			<label class="gf-form-label">Character or regex<tip>Single Character or Regular Expression /foo/g</tip></label>
@@ -39,40 +48,55 @@
 </div>
 
 <div class="gf-form-group">
-	<h5>Format</h5>
 	<div class="gf-form">
-		<label class="gf-form-label width-10">Unit</label>
+		<h6>Format</h6>
+	</div>
+	<div class="gf-form">
+		<label class="gf-form-label width-6">Unit</label>
 		<div class="gf-form-dropdown-typeahead max-width-15" ng-model="ctrl.panel.format" dropdown-typeahead2="ctrl.unitFormats" dropdown-typeahead-on-select="ctrl.setUnitFormat($subItem)"></div>
 	</div>
 
-<div class="gf-form max-width-11">
-	<label class="gf-form-label width-6">Decimals</label>
-	<input type="number" class="gf-form-input width-5"
-		placeholder="auto" data-placement="right"
-		bs-tooltip="'Override automatic decimal precision for legend and tooltips'"
-		ng-model="ctrl.panel.decimals"
-		ng-change="ctrl.render()"
-		ng-model-onblur>
-</div>
+	<div class="gf-form max-width-11">
+		<label class="gf-form-label width-6">Decimals</label>
+		<input type="number" class="gf-form-input width-5"
+			placeholder="auto" data-placement="right"
+			bs-tooltip="'Override automatic decimal precision for legend and tooltips'"
+			ng-model="ctrl.panel.decimals"
+			ng-change="ctrl.refresh()"
+			ng-model-onblur>
+	</div>
 </div>
 
+<div class="editor-row">
+	<div class="section gf-form-group">
+		<h6 class="section-heading">Options</h6>
+		<gf-form-switch class="gf-form" label="Show" label-class="width-7" checked="ctrl.panel.legend.show" on-change="ctrl.refresh()"></gf-form-switch>
+	</div>
 
-<div class="gf-form-group">
-	<h5>Legend</h5>
-	<div class="gf-form">
-		<editor-checkbox text="Show Legend" model="ctrl.panel.legend.show" class="gf-form-checkbox" ></editor-checkbox>
-		<div ng-show="ctrl.panel.legend.show">
-			<editor-checkbox text="Min" model="ctrl.panel.legend.min" class="gf-form-checkbox" ></editor-checkbox>
-			<editor-checkbox text="Max" model="ctrl.panel.legend.max" class="gf-form-checkbox" ></editor-checkbox>
-			<editor-checkbox text="Avg" model="ctrl.panel.legend.avg" class="gf-form-checkbox" ></editor-checkbox>
-			<editor-checkbox text="Total" model="ctrl.panel.legend.total" class="gf-form-checkbox" ></editor-checkbox>
-			<editor-checkbox text="Current" model="ctrl.panel.legend.current" class="gf-form-checkbox" ></editor-checkbox>
+	<div class="section gf-form-group" ng-show="ctrl.panel.legend.show">
+		<h6 class="section-heading">Values</h6>
+		<div class="gf-form">
+			<gf-form-switch class="gf-form" label="Min" label-class="width-6" checked="ctrl.panel.legend.min"></gf-form-switch>
+		</div>
+		<div class="gf-form">
+			<gf-form-switch class="gf-form" label="Max" label-class="width-6" switch-class="max-width-5" checked="ctrl.panel.legend.max"></gf-form-switch>
+		</div>
+		<div class="gf-form">
+			<gf-form-switch class="gf-form" label="Avg" label-class="width-6" checked="ctrl.panel.legend.avg"></gf-form-switch>
+		</div>
+		<div class="gf-form">
+			<gf-form-switch class="gf-form" label="Total" label-class="width-6" checked="ctrl.panel.legend.total"></gf-form-switch>
+		</div>
+		<div class="gf-form">
+			<gf-form-switch class="gf-form" label="Current" label-class="width-6" switch-class="max-width-5" checked="ctrl.panel.legend.current"></gf-form-switch>
 		</div>
 	</div>
 </div>
 
 <div class="gf-form-group">
-	<h5>Threshold Options</h5>
+	<div class="gf-form">
+		<h6>Threshold Options</h6>
+	</div>
 	<div class="gf-form">
 		<label class="gf-form-label width-10">Thresholds
 			<tip>Define threshold values to map the colors</tip>
@@ -85,31 +109,32 @@
 	<div class="gf-form">
 		<label class="gf-form-label width-10">Colors</label>
 		<div class="gf-form-inline" ng-repeat="color in ctrl.panel.colors track by $index">
-			<label class="gf-form-label">
+			<span class="gf-form-label">
 				<a ng-click="ctrl.removeColor($index)"><i class="pointer fa fa-remove">&nbsp;</i></a>
+			</span>
+			<span class="gf-form-label">
 				<spectrum-picker ng-model="color" ng-change="ctrl.changeColor($index, color)" ng-model-onblur></spectrum-picker>
-			</label>
+			</span>
 		</div>
-		<span class="gf-form-label">
-	        <a  ng-click="ctrl.addColor()">
-	          <i class="fa fa-plus"></i>&nbsp;
-	        </a>
-    	</span>
-		<span class="gf-form-label">
-	        <a  ng-click="ctrl.invertColorOrder()">
-	          Invert
-	        </a>
-    	</span>
-    	<span>
-   			<label class="gf-form-label">
-				<editor-checkbox text="Gradient" model="ctrl.panel.legend.gradient.enabled" class="gf-form-checkbox" ></editor-checkbox>
-				<tip>Only the Max and Min threshold values are considered when using Gradient mode</tip>
-			</label>
-    	</span>
+		<div class="gf-form">
+			<span class="gf-form-label">
+				<a  ng-click="ctrl.addColor()">
+				  <i class="fa fa-plus"></i>&nbsp;
+				</a>
+			</span>
+			<span class="gf-form-label">
+				<a ng-click="ctrl.invertColorOrder()">
+				  Invert
+				</a>
+			</span>
+			<gf-form-switch class="gf-form" label="Gradient" tooltip="Only the Max and Min threshold values are considered when using Gradient mode" label-class="width-7" switch-class="max-width-5" checked="ctrl.panel.legend.gradient.enabled" onChange="ctrl.refresh()"></gf-form-switch>
+		</div>
     </div>
 	<div class="gf-form">
 		<label class="gf-form-label width-10">Value</label>
-		<select ng-options="option for option in ctrl.panel.valueOptions" ng-model="ctrl.panel.valueName" ng-change="ctrl.refresh()"></select>
+		<div class="gf-form-select-wrapper max-width-10">
+			<select class="gf-form-input" ng-options="option for option in ctrl.panel.valueOptions" ng-model="ctrl.panel.valueName" ng-change="ctrl.refresh()"></select>
+		</div>
 	</div>
 </div>
 

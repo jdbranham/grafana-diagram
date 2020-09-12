@@ -1,26 +1,64 @@
-<h5 class="section-heading">Diagram Definition</h5>
+<div class="gf-form-group">
+	<div class="gf-form">
+		<h6>Diagram Definition</h6>
+	</div>
+</div>	
+<div class="gf-form-group">
+	<div class="gf-form">
+		<label class="gf-form-label width-9">Content</label>
+		<div class="gf-form-select-wrapper max-width-15">
+			<select class="gf-form-input" ng-model="ctrl.panel.mode" ng-options="f.value as f.text for f in [{value: 'content', text: 'Static Content'}, {value: 'url', text: 'Load content from URL'}]" ng-change="ctrl.refresh()">
+			</select>
+		</div>
+	</div>
+</div>
 
+<div class="gf-form-group" ng-if="ctrl.panel.mode == 'content'">
+	<div class="gf-form">
+		<div class="gf-form gf-form--grow">
+			<label class="gf-form-label width-9">Static content</label>
+			<textarea class="gf-form-input" ng-model="ctrl.panel.content" rows="25" style="width: 95%" ng-change="ctrl.refresh()" ng-model-onblur></textarea>
+		</div>
+	</div>
+	<div class="gf-form-hint">
+		<div class="gf-form-hint-text muted">
+			(This area uses <a target="_blank" href="http://knsv.github.io/mermaid/">Mermaid syntax</a>.)
+		</div>
+	</div>
+</div>
 
-<label><input type="radio" ng-model="ctrl.panel.mode" value="url" ng-change="ctrl.refresh()">URL</label>
-<span> (This service should respond with a text/plain response containing <a target="_blank"
-	href="http://knsv.github.io/mermaid/">Mermaid syntax</a>.)
-</span>
-<input type="text" 
-	style="width: 95%" 
-	ng-model="ctrl.panel.mermaidServiceUrl" 
-	ng-change="ctrl.refresh()"
-	ng-model-onblur/>
-<label>
-<input type="radio" 
-	ng-model="ctrl.panel.mode" 
-	ng-change="ctrl.refresh()"
-	value="content">Content</label>
-<span> (This area uses <a target="_blank"
-	href="http://knsv.github.io/mermaid/">Mermaid syntax</a>.)
-</span>
-<textarea class="gf-form-input" ng-model="ctrl.panel.content" rows="25"
-	style="width: 95%" ng-change="ctrl.refresh()" ng-model-onblur></textarea>
-	
-<label>Custom Styles</label>
-<textarea class="gf-form-input" ng-model="ctrl.panel.style" rows="10"
-	style="width: 95%" ng-change="ctrl.refresh()" ng-model-onblur></textarea>
+<div class="gf-form-group" ng-if="ctrl.panel.mode == 'url'">
+	<div class="gf-form">
+		<div class="form-field">
+			<label class="gf-form-label width-9">URL</label>
+			<input type="text" class="gf-form-input width-30" ng-model="ctrl.panel.mermaidServiceUrl">
+		</div>
+	</div>
+	<div class="gf-form-inline">
+		<div class="gf-form">
+			<gf-form-switch class="gf-form" label="Use Basic Auth" label-class="width-9" checked="ctrl.panel.useBasicAuth" on-change="ctrl.refresh()"></gf-form-switch>
+		</div>
+		<div class="gf-form" ng-if="ctrl.panel.useBasicAuth">
+			<label class="gf-form-label width-6">Username: </label>
+			<input type="text" class="gf-form-input width-12" ng-model="ctrl.panel.authUsername" /><br />
+		</div>
+		<div class="gf-form" ng-if="ctrl.panel.useBasicAuth">
+			<label class="gf-form-label width-6">Password: </label>
+			<input type="password" class="gf-form-input width-12" ng-model="ctrl.panel.authPassword" /><br />
+		</div>
+	</div>
+	<div class="gf-form">
+		<div class="form-field">
+			<label class="muted">(This service should respond with a text/plain response containing <a target="_blank" href="http://knsv.github.io/mermaid/">Mermaid syntax</a>.)</label>
+		</div>
+	</div>
+</div>
+
+<div class="gf-form-group">
+	<div class="gf-form-inline">
+		<div class="gf-form gf-form--grow">
+			<label class="gf-form-label width-9">Custom Styles</label>
+			<textarea class="gf-form-input" ng-model="ctrl.panel.style" rows="10" style="width: 95%" ng-change="ctrl.refresh()" ng-model-onblur></textarea>
+		</div>
+	</div>
+</div>
