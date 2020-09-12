@@ -127,7 +127,7 @@ The composite name is evaluated in the Diagram definition.
 
 For example, combining two series "A-series" and "B-series" into a single composite named "xyz", the following can be used:
 
-![Composite Editor](https://raw.githubusercontent.com/jdbranham/grafana-diagram/master/src/img/composite-edit-tab.png?raw=true)
+![Composite Editor](https://raw.githubusercontent.com/jdbranham/grafana-diagram/master/src/img/composite-editor-tab.png?raw=true)
 
 With series specific overrides for these two series:
 
