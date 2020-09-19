@@ -44,13 +44,13 @@
     "grunt-contrib-uglify": "~0.11.0",
     "grunt-contrib-watch": "^0.6.1",
     "grunt-execute": "~0.2.2",
-    "grunt-sass": "^1.2.1",
+    "grunt-sass": "^2",
     "grunt-systemjs-builder": "^0.2.5",
     "load-grunt-tasks": "~3.2.0",
-    "node-sass": "^4.12.0"
+    "node-sass": "^4.14.1"
   },
   "dependencies": {
     "lodash": "^4.17.11",
-    "mermaid": "^8.5.0"
+    "mermaid": "^8.8.0"
   }
 }
