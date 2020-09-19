@@ -1,6 +1,12 @@
-
+ 
+[![savantly.net](https://savantly.net/images/logo.svg)](http://savantly.net)
 
 [![Build Status](https://travis-ci.org/jdbranham/grafana-diagram.svg?branch=master)](https://travis-ci.org/jdbranham/grafana-diagram)
+
+[![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://paypal.me/Savantly)  
+Help feed my hungry children by donating a few bucks  
+:sweat_smile:  
+Also, I'm available for custom plugin development contracts [and other technology projects] 
 
 # grafana-diagram
 
