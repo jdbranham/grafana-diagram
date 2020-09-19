@@ -56,7 +56,19 @@ export class DiagramPanelController extends React.Component<DiagramPanelControll
     this.onToggleSort = this.onToggleSort.bind(this);
     this.setDiagramRef = this.setDiagramRef.bind(this);
     this.renderCallback = this.renderCallback.bind(this);
-    this.state = DiagramPanelController.getDerivedStateFromProps(props, {});
+  }
+
+  static getDerivedStateFromProps(props: DiagramPanelControllerProps, state: DiagramPanelControllerState) {
+    const { diagramContainer, wrapper, legendContainer } = getDiagramWithLegendStyles(props);
+    if (!state) {
+      return {
+        diagramContainer,
+        wrapper,
+        legendContainer,
+      };
+    } else {
+      return null;
+    }
   }
 
   setDiagramRef(element: HTMLDivElement) {
@@ -68,7 +80,12 @@ export class DiagramPanelController extends React.Component<DiagramPanelControll
   }
 
   componentDidUpdate(prevProps: DiagramPanelControllerProps) {
-    if (prevProps !== this.props) {
+    if (
+      prevProps.options !== this.props.options ||
+      prevProps.fieldConfig != this.props.fieldConfig ||
+      prevProps.theme != this.props.theme ||
+      prevProps.data != this.props.data
+    ) {
       this.initializeMermaid();
     }
   }
@@ -126,16 +143,6 @@ export class DiagramPanelController extends React.Component<DiagramPanelControll
         this.diagramRef.innerHTML = `<div><p>Error rendering diagram. Check the diagram definition</p><p>${err}</p></div>`;
       }
     }
-  }
-
-  static getDerivedStateFromProps(props: DiagramPanelControllerProps, state: DiagramPanelControllerState) {
-    const { diagramContainer, wrapper, legendContainer } = getDiagramWithLegendStyles(props);
-    return {
-      ...state,
-      diagramContainer,
-      wrapper,
-      legendContainer,
-    };
   }
 
   onToggleSort(sortBy: string) {
