@@ -2022,7 +2022,7 @@
   resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.14.161.tgz#a21ca0777dabc6e4f44f3d07f37b765f54188b18"
   integrity sha512-EP6O3Jkr7bXvZZSZYlsgt5DIjiGr0dXP1/jVEwVLTFgg0d+3lWVQkRavYVQszV7dYUwvg0B8R0MBDpcmXg7XIA==
 
-"@types/mermaid@^8.8.0":
+"@types/mermaid@^8.2.1":
   version "8.2.1"
   resolved "https://registry.yarnpkg.com/@types/mermaid/-/mermaid-8.2.1.tgz#778fd45393965d6acf885b878911627fe9365d56"
   integrity sha512-y3n4I34mKBGmHPiP7+dL7c+gMe+dI9h3I/5N6WJXHpnVn8hHcWH+YSsf+GwNx1LmjYVHmK8rcfbumjG+uprS0Q==
