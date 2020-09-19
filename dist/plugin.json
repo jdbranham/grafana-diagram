@@ -2,31 +2,32 @@
   "type": "panel",
   "name": "Diagram",
   "id": "jdbranham-diagram-panel",
-
   "info": {
-    "description": "Diagram panel for grafana",
+    "description": "Display diagrams and charts with colored metric indicators",
     "author": {
       "name": "Jeremy Branham",
-      "url": "https://www.linkedin.com/in/jeremybranham/"
+      "url": "https://savantly.net"
     },
-    "contributors": [
-      "Brian Gann (https://github.com/briangann)"
+    "keywords": [
+      "diagram",
+      "chart",
+      "flow",
+      "gantt"
     ],
-    "keywords": ["diagram", "panel"],
+    "logos": {
+      "small": "img/logo.svg",
+      "large": "img/logo.svg"
+    },
     "links": [
       {"name": "Project site", "url": "https://github.com/jdbranham/grafana-diagram"},
       {"name": "Apache License", "url": "https://github.com/jdbranham/grafana-diagram/blob/master/LICENSE"}
     ],
-    "version": "1.6.2",
-    "updated": "2019-07-04",
-    "logos": {
-        "small": "img/icn-diagram-panel.svg",
-        "large": "img/icn-diagram-panel.svg"
-    }
+    "screenshots": [],
+    "version": "1.7.0",
+    "updated": "2020-09-18"
   },
-
   "dependencies": {
-    "grafanaVersion": "6.x.x",
-    "plugins": [ ]
+    "grafanaVersion": "7.0.x",
+    "plugins": []
   }
 }

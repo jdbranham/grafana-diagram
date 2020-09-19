@@ -1,8 +1,8 @@
-version: "3"
+version: "3.5"
 
 services:
   grafana:
-    image: grafana/grafana
+    image: grafana/grafana:7.1.5
     ports:
     - "3000:3000"
     volumes:
