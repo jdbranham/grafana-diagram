@@ -151,7 +151,7 @@ class DiagramCtrl extends MetricsPanelCtrl {
 
   initializeMermaid() {
     mermaidAPI.initialize(this.panel.init);
-    mermaidAPI.parseError = this.handleParseError.bind(this);
+    //mermaidAPI.parseError = this.handleParseError.bind(this);
   }
 
   changeTheme(){
@@ -788,12 +788,38 @@ class DiagramCtrl extends MetricsPanelCtrl {
 				return d3.select(this).text() == alias;
 	    	});
     }
+
+
+    function resizeGrouping(element) {
+      if (!element) {
+        return;
+      }
+      const closestGroup = element.node().closest('g');
+      const closestLabelGroup = element.node().closest('g.label');
+      const closestForeignObject = element.node().closest('foreignObject');
+
+      if (closestGroup && closestLabelGroup && closestForeignObject) {
+        closestGroup.setAttribute('transform', '');
+        const _minWidth = Math.max(
+          Number.parseInt(closestForeignObject.getAttribute('width') || '1', 10), 
+          30
+        );
+        const _minHeight = Math.max(
+          Number.parseInt(closestForeignObject.getAttribute('height') || '1', 10), 
+          40
+        );
+        closestForeignObject.setAttribute('height', _minHeight.toString());
+        closestForeignObject.setAttribute('width', _minWidth.toString());
+        closestLabelGroup.setAttribute('transform', `translate(-${_minWidth / 2},-${_minHeight / 2})`);
+      }
+    };
     
     function styleD3Shapes(targetElement, seriesItem) {
     	var shapes = targetElement.selectAll('rect,circle,polygon');
         shapes.style('fill', seriesItem.color);
 
         var div = targetElement.select('div');
+        resizeGrouping(div);
         var p = div.append('p');
         p.classed('diagram-value', true);
         p.style('background-color', seriesItem.color);
@@ -803,7 +829,8 @@ class DiagramCtrl extends MetricsPanelCtrl {
     }
     
     function styleFlowChartEdgeLabel(targetElement, seriesItem) {
-    	var edgeParent = d3.select(targetElement.node().parentNode);
+      var edgeParent = d3.select(targetElement.node().parentNode);
+      resizeGrouping(edgeParent);
     	edgeParent.append('br');
         var v = edgeParent.append('span');
         v.classed('diagram-value', true);

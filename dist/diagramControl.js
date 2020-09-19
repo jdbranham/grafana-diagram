@@ -229,7 +229,7 @@ System.register(['./libs/mermaid/dist/mermaid', './libs/d3/dist/d3.min', 'app/co
           key: 'initializeMermaid',
           value: function initializeMermaid() {
             mermaidAPI.initialize(this.panel.init);
-            mermaidAPI.parseError = this.handleParseError.bind(this);
+            //mermaidAPI.parseError = this.handleParseError.bind(this);
           }
         }, {
           key: 'changeTheme',
@@ -880,11 +880,30 @@ System.register(['./libs/mermaid/dist/mermaid', './libs/d3/dist/d3.min', 'app/co
               });
             }
 
+            function resizeGrouping(element) {
+              if (!element) {
+                return;
+              }
+              var closestGroup = element.node().closest('g');
+              var closestLabelGroup = element.node().closest('g.label');
+              var closestForeignObject = element.node().closest('foreignObject');
+
+              if (closestGroup && closestLabelGroup && closestForeignObject) {
+                closestGroup.setAttribute('transform', '');
+                var _minWidth = Math.max(Number.parseInt(closestForeignObject.getAttribute('width') || '1', 10), 30);
+                var _minHeight = Math.max(Number.parseInt(closestForeignObject.getAttribute('height') || '1', 10), 40);
+                closestForeignObject.setAttribute('height', _minHeight.toString());
+                closestForeignObject.setAttribute('width', _minWidth.toString());
+                closestLabelGroup.setAttribute('transform', 'translate(-' + _minWidth / 2 + ',-' + _minHeight / 2 + ')');
+              }
+            };
+
             function styleD3Shapes(targetElement, seriesItem) {
               var shapes = targetElement.selectAll('rect,circle,polygon');
               shapes.style('fill', seriesItem.color);
 
               var div = targetElement.select('div');
+              resizeGrouping(div);
               var p = div.append('p');
               p.classed('diagram-value', true);
               p.style('background-color', seriesItem.color);
@@ -894,6 +913,7 @@ System.register(['./libs/mermaid/dist/mermaid', './libs/d3/dist/d3.min', 'app/co
 
             function styleFlowChartEdgeLabel(targetElement, seriesItem) {
               var edgeParent = d3.select(targetElement.node().parentNode);
+              resizeGrouping(edgeParent);
               edgeParent.append('br');
               var v = edgeParent.append('span');
               v.classed('diagram-value', true);
