@@ -899,7 +899,7 @@ System.register(['./libs/mermaid/dist/mermaid', './libs/d3/dist/d3.min', 'app/co
             };
 
             function styleD3Shapes(targetElement, seriesItem) {
-              var shapes = targetElement.selectAll('rect,circle,polygon');
+              var shapes = targetElement.selectAll('rect,circle,polygon,path');
               shapes.style('fill', seriesItem.color);
 
               var div = targetElement.select('div');
