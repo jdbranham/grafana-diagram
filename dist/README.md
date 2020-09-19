@@ -91,7 +91,7 @@ graph LR
 
 ### Using Variables
 
-![Diagram](https://raw.githubusercontent.com/jdbranham/grafana-diagram/master/docs/images/variables.gif?raw=true)  
+<img src="https://raw.githubusercontent.com/jdbranham/grafana-diagram/master/docs/images/variables.gif?raw=true" width="800px"/> 
 
 ### Using background as indicator
 
