@@ -7,62 +7,68 @@ import { DiagramOptions, ValueType } from './config/types';
 import { DiagramPanel } from './DiagramPanel';
 
 interface PanelProperty {
-  key: string,
-  name: string,
-  description: string,
+  key: string;
+  name: string;
+  description: string;
 }
 
 const commonTextKeys: PanelProperty[] = [
   {
-    key: 'fontFamily', name: 'Font Family', description: 'CSS Font Family'
+    key: 'fontFamily',
+    name: 'Font Family',
+    description: 'CSS Font Family',
   },
   //{
   //  key: 'fontSize', name: 'Font Size', description: 'Font size in px'
   //}
-]
+];
 
 const commonColorKeys: PanelProperty[] = [
   {
-    key: 'mainBkg', name: 'Shape Background Color',
-    description: 'Background in flowchart objects like rects/circles, class diagram classes, sequence diagram etc'
+    key: 'mainBkg',
+    name: 'Shape Background Color',
+    description: 'Background in flowchart objects like rects/circles, class diagram classes, sequence diagram etc',
   },
   {
-    key: 'lineColor', name: 'Line Color',
-    description: 'Default color of Lines'
+    key: 'lineColor',
+    name: 'Line Color',
+    description: 'Default color of Lines',
   },
   {
-    key: 'textColor', name: 'Text Color',
-    description: 'Text in diagram over the background for instance text on labels and on signals in sequence diagram or the title in gantt diagram'
-  }
+    key: 'textColor',
+    name: 'Text Color',
+    description:
+      'Text in diagram over the background for instance text on labels and on signals in sequence diagram or the title in gantt diagram',
+  },
 ];
 
 const flowChartKeys: PanelProperty[] = [
   {
-    key: 'nodeBorder', name: 'Shape Border Color',
-    description: 'Border color of shapes'
+    key: 'nodeBorder',
+    name: 'Shape Border Color',
+    description: 'Border color of shapes',
   },
-]
+];
 
-const statSelectOptions: SelectableValue<ValueType>[] = [
-  {label: 'mean', value: 'mean', description: 'Use the mean value of all datapoints'}, 
-  {label: 'min', value: 'min', description: 'Use the minimum datapoint value'},
-  {label: 'max', value: 'max', description: 'Use the maximum datapoint value'},
-  {label: 'sum', value: 'sum', description: 'Use the summation of all datapoints'},
-  {label: 'last', value: 'last', description: 'Use the last datapoint value'}]
-
+const statSelectOptions: Array<SelectableValue<ValueType>> = [
+  { label: 'mean', value: 'mean', description: 'Use the mean value of all datapoints' },
+  { label: 'min', value: 'min', description: 'Use the minimum datapoint value' },
+  { label: 'max', value: 'max', description: 'Use the maximum datapoint value' },
+  { label: 'sum', value: 'sum', description: 'Use the summation of all datapoints' },
+  { label: 'last', value: 'last', description: 'Use the last datapoint value' },
+];
 
 const addStyleEditors = (builder: PanelOptionsEditorBuilder<DiagramOptions>) => {
-
-   // dark common
-   commonTextKeys.forEach(obj => {
+  // dark common
+  commonTextKeys.forEach(obj => {
     builder.addTextInput({
       name: obj.name,
       path: `mermaidThemeVariablesDark.common.${obj.key}`,
       category: ['Style Common: Dark'],
       description: obj.description,
       defaultValue: (defaults.mermaidThemeVariablesDark.common as any)[obj.key],
-      settings: {}
-    })
+      settings: {},
+    });
   });
 
   // light common
@@ -73,8 +79,8 @@ const addStyleEditors = (builder: PanelOptionsEditorBuilder<DiagramOptions>) => 
       category: ['Style Common: Light'],
       description: obj.description,
       defaultValue: (defaults.mermaidThemeVariablesLight.common as any)[obj.key],
-      settings: {}
-    })
+      settings: {},
+    });
   });
 
   // dark common
@@ -85,8 +91,8 @@ const addStyleEditors = (builder: PanelOptionsEditorBuilder<DiagramOptions>) => 
       category: ['Style Common: Dark'],
       description: obj.description,
       defaultValue: (defaults.mermaidThemeVariablesDark.common as any)[obj.key],
-      settings: { disableNamedColors: true, allowUndefined: true, textWhenUndefined: 'default' }
-    })
+      settings: { disableNamedColors: true, allowUndefined: true, textWhenUndefined: 'default' },
+    });
   });
 
   // light common
@@ -97,8 +103,8 @@ const addStyleEditors = (builder: PanelOptionsEditorBuilder<DiagramOptions>) => 
       category: ['Style Common: Light'],
       description: obj.description,
       defaultValue: (defaults.mermaidThemeVariablesLight.common as any)[obj.key],
-      settings: { disableNamedColors: true, allowUndefined: true, textWhenUndefined: 'default' }
-    })
+      settings: { disableNamedColors: true, allowUndefined: true, textWhenUndefined: 'default' },
+    });
   });
 
   // dark flowchart
@@ -109,8 +115,8 @@ const addStyleEditors = (builder: PanelOptionsEditorBuilder<DiagramOptions>) => 
       category: ['Style FlowChart: Dark'],
       description: obj.description,
       defaultValue: (defaults.mermaidThemeVariablesDark.flowChart as any)[obj.key],
-      settings: { disableNamedColors: true, allowUndefined: true, textWhenUndefined: 'default' }
-    })
+      settings: { disableNamedColors: true, allowUndefined: true, textWhenUndefined: 'default' },
+    });
   });
 
   // light flowchart
@@ -121,8 +127,8 @@ const addStyleEditors = (builder: PanelOptionsEditorBuilder<DiagramOptions>) => 
       category: ['Style FlowChart: Light'],
       description: obj.description,
       defaultValue: (defaults.mermaidThemeVariablesLight.flowChart as any)[obj.key],
-      settings: { disableNamedColors: true, allowUndefined: true, textWhenUndefined: 'default' }
-    })
+      settings: { disableNamedColors: true, allowUndefined: true, textWhenUndefined: 'default' },
+    });
   });
 
   builder.addTextInput({
@@ -133,12 +139,12 @@ const addStyleEditors = (builder: PanelOptionsEditorBuilder<DiagramOptions>) => 
     description: 'Applied after other styles and overrides',
     settings: {
       useTextarea: true,
-      rows: 10
-    }
-  })
+      rows: 10,
+    },
+  });
 
   return builder;
-}
+};
 
 const createPanelPlugin = () => {
   const plugin = new PanelPlugin<DiagramOptions>(DiagramPanel)
@@ -152,7 +158,8 @@ const createPanelPlugin = () => {
         FieldConfigProperty.Thresholds,
         FieldConfigProperty.Mappings,
         //FieldConfigProperty.Links,
-        FieldConfigProperty.NoValue,],
+        FieldConfigProperty.NoValue,
+      ],
       useCustomConfig: builder => {
         builder.addSelect({
           name: 'Value By',
@@ -161,10 +168,10 @@ const createPanelPlugin = () => {
           defaultValue: defaults.valueName,
           category: ['Indicator'],
           settings: {
-            options: statSelectOptions
-          }
-        })
-      }
+            options: statSelectOptions,
+          },
+        });
+      },
     })
     .setPanelOptions(builder => {
       builder
@@ -175,26 +182,26 @@ const createPanelPlugin = () => {
           defaultValue: defaults.useBackground,
         })
         .addTextInput({
-          name: "Diagram Definition",
-          path: "content",
-          description: "(This area uses Mermaid syntax - http://knsv.github.io/mermaid/)",
+          name: 'Diagram Definition',
+          path: 'content',
+          description: '(This area uses Mermaid syntax - http://knsv.github.io/mermaid/)',
           defaultValue: defaults.content,
           settings: {
             rows: 10,
-            useTextarea: true
-          }
+            useTextarea: true,
+          },
         })
         .addNumberInput({
           name: 'Min Text Node Width',
           path: 'nodeSize.minWidth',
           defaultValue: defaults.nodeSize.minWidth,
-          description: 'The minimum width a matched diagram text node should be'
+          description: 'The minimum width a matched diagram text node should be',
         })
         .addNumberInput({
           name: 'Min Text Node Height',
           path: 'nodeSize.minHeight',
           defaultValue: defaults.nodeSize.minHeight,
-          description: 'The minimum height a matched diagram text node should be'
+          description: 'The minimum height a matched diagram text node should be',
         })
         // Legend Options
         .addBooleanSwitch({
@@ -202,7 +209,7 @@ const createPanelPlugin = () => {
           path: 'legend.show',
           description: 'Show the legend',
           category: ['Legend'],
-          defaultValue: defaults.legend.show
+          defaultValue: defaults.legend.show,
         })
         // Composites
         .addCustomEditor({
@@ -211,14 +218,13 @@ const createPanelPlugin = () => {
           path: 'composites',
           name: 'Composite Metrics',
           category: ['Composites'],
-          description: 'Combine series into a composite metric'
-        })
-        ;
+          description: 'Combine series into a composite metric',
+        });
       builder = addStyleEditors(builder);
       return builder;
     });
 
   return plugin;
-}
+};
 
 export const plugin = createPanelPlugin();

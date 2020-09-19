@@ -9,19 +9,19 @@ export type DiagramThemeType = 'default' | 'dark' | 'forest' | 'neutral';
 export declare type DiagramSeriesValue = number | null;
 /** View model projection of a series */
 export interface DiagramSeriesModel {
-    data: DiagramSeriesValue[][];
-    isVisible: boolean;
-    label: string;
-    timeField: Field;
-    valueField: Field;
-    seriesIndex: number;
-    timeStep: number;
-    info?: DisplayValue[];
+  data: DiagramSeriesValue[][];
+  isVisible: boolean;
+  label: string;
+  timeField: Field;
+  valueField: Field;
+  seriesIndex: number;
+  timeStep: number;
+  info?: DisplayValue[];
 }
 
 export interface NodeSizeOptions {
-  minWidth: number,
-  minHeight: number
+  minWidth: number;
+  minHeight: number;
 }
 
 export interface LegendOptions {
@@ -37,27 +37,23 @@ export interface LegendOptions {
   gradient: {
     enabled: boolean;
     show: boolean;
-  }
-}
-
-export interface SeriesOptions {
-  [key: string]: any;
+  };
 }
 
 export interface MetricCharacterReplacement {
-  replacementPattern: string | RegExp,
-  replaceWithText: string
+  replacementPattern: string | RegExp;
+  replaceWithText: string;
 }
 
 export interface CompositeMetric {
-  name: string,
-  members: string[],
-  valueName: ValueType,
-  showLowestValue: boolean
+  name: string;
+  members: string[];
+  valueName: ValueType;
+  showLowestValue: boolean;
 }
 
 export interface DiagramOptions {
-  nodeSize: NodeSizeOptions,
+  nodeSize: NodeSizeOptions;
   composites: CompositeMetric[];
   metricCharacterReplacements: MetricCharacterReplacement[];
   style: string;

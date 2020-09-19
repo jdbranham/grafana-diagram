@@ -3,7 +3,7 @@ import { DiagramLegendListItem, DiagramLegendTableRow } from './DiagramLegendIte
 import union from 'lodash/union';
 import sortBy from 'lodash/sortBy';
 import { css } from 'emotion';
-import { ThemeContext, selectThemeVariant, LegendList, LegendTable, LegendItem, LegendDisplayMode } from "@grafana/ui";
+import { ThemeContext, selectThemeVariant, LegendList, LegendTable, LegendItem, LegendDisplayMode } from '@grafana/ui';
 import { LegendProps } from '@grafana/ui/components/Legend/Legend';
 
 export interface DiagramLegendProps extends LegendProps {
@@ -93,12 +93,7 @@ export const DiagramLegend: React.FunctionComponent<DiagramLegendProps> = ({
     <LegendList
       items={items}
       placement={placement}
-      itemRenderer={item => (
-        <DiagramLegendListItem
-          item={item}
-          {...graphLegendItemProps}
-        />
-      )}
+      itemRenderer={item => <DiagramLegendListItem item={item} {...graphLegendItemProps} />}
     />
   );
 };

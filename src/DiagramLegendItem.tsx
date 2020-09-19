@@ -11,10 +11,7 @@ export interface DiagramLegendItemProps {
   onLabelClick?: (item: LegendItem, event: React.MouseEvent<HTMLDivElement>) => void;
 }
 
-export const DiagramLegendListItem: React.FunctionComponent<DiagramLegendItemProps> = ({
-  item,
-  onLabelClick,
-}) => {
+export const DiagramLegendListItem: React.FunctionComponent<DiagramLegendItemProps> = ({ item, onLabelClick }) => {
   const theme = useContext(ThemeContext);
 
   return (
@@ -34,14 +31,20 @@ export const DiagramLegendListItem: React.FunctionComponent<DiagramLegendItemPro
         {item.label}
       </div>
 
-      {item.displayValues && <div
-        className={css`
+      {item.displayValues && (
+        <div
+          className={css`
             margin-left: 6px;
-        `}
-        > {item.displayValues.forEach(stat => {
-            (<div>{stat.title && `${capitalize(stat.title)}:`} {formattedValueToString(stat)}</div>)
-            })}
-        </div>}
+          `}
+        >
+          {' '}
+          {item.displayValues.forEach(stat => {
+            <div>
+              {stat.title && `${capitalize(stat.title)}:`} {formattedValueToString(stat)}
+            </div>;
+          })}
+        </div>
+      )}
     </>
   );
 };

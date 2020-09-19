@@ -6,7 +6,7 @@ import { getDiagramSeriesModel } from 'getDiagramSeriesModel';
 import React from 'react';
 import { DiagramOptions } from 'config/types';
 
-export interface DiagramPanelOptions extends PanelProps<DiagramOptions> { }
+export interface DiagramPanelOptions extends PanelProps<DiagramOptions> {}
 
 export const DiagramPanel: React.FC<DiagramPanelOptions> = ({
   id,
@@ -20,7 +20,6 @@ export const DiagramPanel: React.FC<DiagramPanelOptions> = ({
   onOptionsChange,
   onChangeTimeRange,
 }) => {
-
   const theme = useTheme();
   const styles = getStyles();
 
@@ -32,13 +31,7 @@ export const DiagramPanel: React.FC<DiagramPanelOptions> = ({
     );
   }
 
-
-  const diagramModels = getDiagramSeriesModel(
-    data.series,
-    timeZone,
-    options,
-    fieldConfig
-  )
+  const diagramModels = getDiagramSeriesModel(data.series, timeZone, options, fieldConfig);
 
   return (
     <div
@@ -61,7 +54,8 @@ export const DiagramPanel: React.FC<DiagramPanelOptions> = ({
         fieldConfig={fieldConfig}
         replaceVariables={replaceVariables}
         onOptionsChange={onOptionsChange}
-        onChangeTimeRange={onChangeTimeRange}></DiagramPanelController>
+        onChangeTimeRange={onChangeTimeRange}
+      ></DiagramPanelController>
     </div>
   );
 };

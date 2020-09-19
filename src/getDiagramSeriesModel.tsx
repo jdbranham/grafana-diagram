@@ -1,33 +1,45 @@
 import {
-  DataFrame, DEFAULT_DATE_TIME_FORMAT, DisplayValue,
-  FieldConfigSource, FieldType, getDisplayProcessor,
-  getFieldDisplayName, getFlotPairs, getSeriesTimeStep,
-  getTimeField, hasMsResolution, MS_DATE_TIME_FORMAT, NullValueMode,
-  reduceField, stringToJsRegex, TimeZone
+  DataFrame,
+  DEFAULT_DATE_TIME_FORMAT,
+  DisplayValue,
+  FieldConfigSource,
+  FieldType,
+  getDisplayProcessor,
+  getFieldDisplayName,
+  getFlotPairs,
+  getSeriesTimeStep,
+  getTimeField,
+  hasMsResolution,
+  MS_DATE_TIME_FORMAT,
+  NullValueMode,
+  reduceField,
+  stringToJsRegex,
+  TimeZone,
 } from '@grafana/data';
 import { DiagramOptions, DiagramSeriesModel, MetricCharacterReplacement } from './config/types';
 
 const replaceMetricCharacters = (metricName: string, metricCharacterReplacements: MetricCharacterReplacement[]) => {
   // a datasource sending bad data will have a type other than string, set it to "MISSING_METRIC_TARGET" and return
-  if (typeof metricName !== 'string') return "DATASOURCE_SENT_INVALID_METRIC_TARGET";
+  if (typeof metricName !== 'string') {
+    return 'DATASOURCE_SENT_INVALID_METRIC_TARGET';
+  }
   var replacedText = metricName.replace(/"|,|;|=|:|{|}/g, '_');
   for (var index in metricCharacterReplacements) {
     const replacement = metricCharacterReplacements[index];
     // start with a simple replacement
     let pattern = replacement.replacementPattern;
     // check if the pattern is empty
-    if (pattern.toString().length === 0) continue;
+    if (pattern.toString().length === 0) {
+      continue;
+    }
     // if it is a regex, convert
     if (pattern.toString()[0] === '/') {
       pattern = stringToJsRegex(replacement.replacementPattern.toString());
     }
-    replacedText = replacedText.replace(
-      pattern,
-      replacement.replaceWithText
-    );
+    replacedText = replacedText.replace(pattern, replacement.replaceWithText);
   }
   return replacedText;
-}
+};
 
 const reducers = ['min', 'max', 'mean', 'last', 'sum'];
 
@@ -44,7 +56,7 @@ export const getDiagramSeriesModel = (
       config: {
         decimals: fieldOptions?.defaults?.decimals,
         unit: fieldOptions?.defaults?.unit,
-        thresholds: fieldOptions?.defaults?.thresholds
+        thresholds: fieldOptions?.defaults?.thresholds,
       },
     },
     timeZone,
@@ -77,7 +89,9 @@ export const getDiagramSeriesModel = (
         let statsDisplayValues: DisplayValue[] = [];
 
         statsDisplayValues = reducers.map<DisplayValue>((stat: any) => {
-          const statDisplayValue = field.display ? field.display(seriesStats[stat]) : displayProcessor(seriesStats[stat]);
+          const statDisplayValue = field.display
+            ? field.display(seriesStats[stat])
+            : displayProcessor(seriesStats[stat]);
 
           return {
             ...statDisplayValue,
@@ -100,7 +114,10 @@ export const getDiagramSeriesModel = (
         });
 
         models.push({
-          label: replaceMetricCharacters(getFieldDisplayName(field, series, dataFrames), options.metricCharacterReplacements),
+          label: replaceMetricCharacters(
+            getFieldDisplayName(field, series, dataFrames),
+            options.metricCharacterReplacements
+          ),
           data: points,
           info: statsDisplayValues,
           isVisible: true,
@@ -118,4 +135,3 @@ export const getDiagramSeriesModel = (
 
   return models;
 };
-

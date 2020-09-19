@@ -1,5 +1,5 @@
 function diagramStyleFormatter(customStyle: string, diagramId: string) {
-	return `
+  return `
 	#${diagramId} .badge, #${diagramId} .label {
 		text-shadow: none;
 	}
@@ -13,6 +13,4 @@ function diagramStyleFormatter(customStyle: string, diagramId: string) {
 	`;
 }
 
-export {
-	diagramStyleFormatter
-}
+export { diagramStyleFormatter };
