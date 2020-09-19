@@ -869,7 +869,7 @@ class DiagramCtrl extends MetricsPanelCtrl {
     function injectCustomStyle(ctrl) {
     	var diagramDiv = d3.select(document.getElementById(ctrl.panel.graphId));
     	var diagramStyleElement = diagramDiv.append('style');
-    	diagramStyleElement.text(diagramStyleFormatter(ctrl.panel.styleValues));
+    	diagramStyleElement.text(diagramStyleFormatter(ctrl.panel.styleValues, ctrl.panel.graphId));
     	var customStyleElement = diagramDiv.append('style');
     	customStyleElement.text(ctrl.panel.style);
     }

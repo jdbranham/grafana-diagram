@@ -939,7 +939,7 @@ System.register(['./libs/mermaid/dist/mermaid', './libs/d3/dist/d3.min', 'app/co
             function injectCustomStyle(ctrl) {
               var diagramDiv = d3.select(document.getElementById(ctrl.panel.graphId));
               var diagramStyleElement = diagramDiv.append('style');
-              diagramStyleElement.text(diagramStyleFormatter(ctrl.panel.styleValues));
+              diagramStyleElement.text(diagramStyleFormatter(ctrl.panel.styleValues, ctrl.panel.graphId));
               var customStyleElement = diagramDiv.append('style');
               customStyleElement.text(ctrl.panel.style);
             }
