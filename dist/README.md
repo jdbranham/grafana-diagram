@@ -1,12 +1,13 @@
- 
-[![savantly.net](https://savantly.net/images/logo.svg)](http://savantly.net)
+ [![savantly.net](https://savantly.net/images/logo.svg)](http://savantly.net)
 
 [![Build Status](https://travis-ci.org/jdbranham/grafana-diagram.svg?branch=master)](https://travis-ci.org/jdbranham/grafana-diagram)
 
+Vote for new features! [![Savantly Patreon](https://raw.githubusercontent.com/jdbranham/grafana-diagram/grafana-6x/src/img/patreon_sm.png?raw=true)](https://patreon.com/savantly) 
+
+Or help feed my hungry children by donating a few bucks :sweat_smile:  
 [![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://paypal.me/Savantly)  
-Help feed my hungry children by donating a few bucks  
-:sweat_smile:  
-Also, I'm available for custom plugin development contracts [and other technology projects] 
+
+I'm also available for custom plugin development contracts [and other technology projects] 
 
 # grafana-diagram
 
