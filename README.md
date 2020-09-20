@@ -43,7 +43,7 @@ The following characters in metric names are automatically replaced with an unde
 
 You can add additional metric replacements in the Display tab, under the section Metric Character Replacement:
 
-![Diagram](https://raw.githubusercontent.com/jdbranham/grafana-diagram/master/src/img/grafana-diagram-metric-replacement-option.png?raw=true)  
+![Diagram](https://raw.githubusercontent.com/jdbranham/grafana-diagram/grafana-6x/src/img/grafana-diagram-metric-replacement-option.png?raw=true)  
 
 A single character can be specified or a regular expression, along with the text to be used for the replacement (the default is underscore).
 
@@ -53,13 +53,13 @@ A single character can be specified or a regular expression, along with the text
 
 ### Diagram  
 
-![Diagram](https://raw.githubusercontent.com/jdbranham/grafana-diagram/master/src/img/diagram.PNG?raw=true)  
+![Diagram](https://raw.githubusercontent.com/jdbranham/grafana-diagram/grafana-6x/src/img/diagram.PNG?raw=true)  
 
 
 
 ### Diagram Definition  
 
-![Diagram Definition](https://raw.githubusercontent.com/jdbranham/grafana-diagram/master/src/img/diagram_definition.PNG?raw=true)  
+![Diagram Definition](https://raw.githubusercontent.com/jdbranham/grafana-diagram/grafana-6x/src/img/diagram_definition.PNG?raw=true)  
 
 
 
@@ -76,16 +76,16 @@ A single character can be specified or a regular expression, along with the text
   4. Value decimal precision
   5. Unit Format
 
-![Diagram Display Options](https://raw.githubusercontent.com/jdbranham/grafana-diagram/master/src/img/diagram_display.PNG?raw=true)  
+![Diagram Display Options](https://raw.githubusercontent.com/jdbranham/grafana-diagram/grafana-6x/src/img/diagram_display.PNG?raw=true)  
 
 ### With Gradient Coloring  
 
-![Diagram Heatmap](https://raw.githubusercontent.com/jdbranham/grafana-diagram/master/src/img/diagram_gradient.PNG?raw=true)
+![Diagram Heatmap](https://raw.githubusercontent.com/jdbranham/grafana-diagram/grafana-6x/src/img/diagram_gradient.PNG?raw=true)
 
 ### Metrics  
 
 Graphite Datasource  
-![Metrics](https://raw.githubusercontent.com/jdbranham/grafana-diagram/master/src/img/diagram_metrics_graphite.PNG?raw=true)
+![Metrics](https://raw.githubusercontent.com/jdbranham/grafana-diagram/grafana-6x/src/img/diagram_metrics_graphite.PNG?raw=true)
 
 
 
@@ -93,13 +93,13 @@ Graphite Datasource
 
 With prometheus, be sure to use the transformed alias [with underscores]  
 Metric  
-![Metrics](https://raw.githubusercontent.com/jdbranham/grafana-diagram/master/src/img/diagram_metrics_prometheus.PNG?raw=true)  
+![Metrics](https://raw.githubusercontent.com/jdbranham/grafana-diagram/grafana-6x/src/img/diagram_metrics_prometheus.PNG?raw=true)  
 
 Example Diagram -  
-![Prometheus Diagram](https://raw.githubusercontent.com/jdbranham/grafana-diagram/master/src/img/diagram_prometheus.PNG?raw=true)  
+![Prometheus Diagram](https://raw.githubusercontent.com/jdbranham/grafana-diagram/grafana-6x/src/img/diagram_prometheus.PNG?raw=true)  
 
 ### InfluxDB
-![InfluxDB Metrics](https://raw.githubusercontent.com/jdbranham/grafana-diagram/master/src/img/composite-metrics-influx.png?raw=true)
+![InfluxDB Metrics](https://raw.githubusercontent.com/jdbranham/grafana-diagram/grafana-6x/src/img/composite-metrics-influx.png?raw=true)
 
 ### Link Metrics
 Mermaid Notation is the same, but now supports supplying a metric name in the "text".
@@ -131,11 +131,11 @@ The composite name is evaluated in the Diagram definition.
 
 For example, combining two series "A-series" and "B-series" into a single composite named "xyz", the following can be used:
 
-![Composite Editor](https://raw.githubusercontent.com/jdbranham/grafana-diagram/master/src/img/composite-editor-tab.png?raw=true)
+![Composite Editor](https://raw.githubusercontent.com/jdbranham/grafana-diagram/grafana-6x/src/img/composite-editor-tab.png?raw=true)
 
 With series specific overrides for these two series:
 
-![Composite Overrides](https://raw.githubusercontent.com/jdbranham/grafana-diagram/master/src/img/composite-overrides.png?raw=true)
+![Composite Overrides](https://raw.githubusercontent.com/jdbranham/grafana-diagram/grafana-6x/src/img/composite-overrides.png?raw=true)
 
 When data is received for each series, the thresholds will be evaluated to find the "worst" threshold level, and the metrics and color value will be reflected in the "xyz" composite in the diagram.
 
@@ -143,19 +143,19 @@ Here are examples of the composite in action:
 
 This diagram has "xyz" node, with "all green" threholds for both series A and B:
 
-![threshold0](https://raw.githubusercontent.com/jdbranham/grafana-diagram/master/src/img/composite-threshold0.png?raw=true)
+![threshold0](https://raw.githubusercontent.com/jdbranham/grafana-diagram/grafana-6x/src/img/composite-threshold0.png?raw=true)
 
 This diagram has "xyz" node, where the A-series is green, but B-Series is yellow. The diagram node shows yellow, along with the value:
 
-![threshold1](https://raw.githubusercontent.com/jdbranham/grafana-diagram/master/src/img/composite-threshold1.png?raw=true)
+![threshold1](https://raw.githubusercontent.com/jdbranham/grafana-diagram/grafana-6x/src/img/composite-threshold1.png?raw=true)
 
 This diagram has "xyz" node, where the A-series is green, but B-Series is red. The diagram node shows red, along with the value:
 
-![threshold2](https://raw.githubusercontent.com/jdbranham/grafana-diagram/master/src/img/composite-threshold2.png?raw=true)
+![threshold2](https://raw.githubusercontent.com/jdbranham/grafana-diagram/grafana-6x/src/img/composite-threshold2.png?raw=true)
 
 This diagram has "xyz" node, where the A-series is yellow, and B-Series is green. The diagram node shows yellow, along with the value:
 
-![threshold3](https://raw.githubusercontent.com/jdbranham/grafana-diagram/master/src/img/composite-threshold3.png?raw=true)
+![threshold3](https://raw.githubusercontent.com/jdbranham/grafana-diagram/grafana-6x/src/img/composite-threshold3.png?raw=true)
 
 ### Value or Range to Text Mapping
 
@@ -163,11 +163,11 @@ Value and range mapping can be used to replace numeric values by human readable 
 
 To map values or ranges to text define one more mapping descriptions using aliases or regular expressions matching aliases:
 
-![Mapping Editor](https://raw.githubusercontent.com/jdbranham/grafana-diagram/master/src/img/mapping-editor-tab.png?raw=true)
+![Mapping Editor](https://raw.githubusercontent.com/jdbranham/grafana-diagram/grafana-6x/src/img/mapping-editor-tab.png?raw=true)
 
 In the diagram the value of the matching series will be mapped to text:
 
-![Value Mapping](https://raw.githubusercontent.com/jdbranham/grafana-diagram/master/src/img/mapping-value.png?raw=true)
+![Value Mapping](https://raw.githubusercontent.com/jdbranham/grafana-diagram/grafana-6x/src/img/mapping-value.png?raw=true)
 
 ## Roadmap  
 
