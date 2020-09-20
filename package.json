@@ -1,6 +1,6 @@
 {
   "name": "grafana-diagram",
-  "version": "1.6.3",
+  "version": "1.6.4",
   "description": "A diagram panel plugin for Grafana",
   "main": "src/module.js",
   "scripts": {
@@ -50,6 +50,8 @@
     "node-sass": "^4.14.1"
   },
   "dependencies": {
+    "@analytics/google-analytics": "^0.5.0",
+    "analytics": "^0.5.5",
     "lodash": "^4.17.11",
     "mermaid": "^8.8.0"
   }

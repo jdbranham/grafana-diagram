@@ -1,3 +1,7 @@
+Support this project on Patreon to vote for new features!  
+
+[![Savantly Patreon](https://raw.githubusercontent.com/jdbranham/grafana-diagram/grafana-6x/src/img/grafana-diagram-metric-replacement-option.png?raw=true)](https://patreon.com/savantly)
+
 [![Build Status](https://travis-ci.org/jdbranham/grafana-diagram.svg?branch=master)](https://travis-ci.org/jdbranham/grafana-diagram)
 
 # grafana-diagram

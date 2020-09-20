@@ -23,7 +23,9 @@ module.exports = (grunt) => {
 		  src: [
 			  'mermaid/dist/mermaid.js',
 			  'mermaid/dist/mermaid.js.map',
-			  'd3/dist/d3.min.js'],
+        'd3/dist/d3.min.js',
+        '@analytics/google-analytics/dist/@analytics/google-analytics.min.js',
+        'analytics/dist/analytics.min.js'],
 		  dest: 'dist/libs'
 		},
       readme: {

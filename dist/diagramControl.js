@@ -1,9 +1,9 @@
 'use strict';
 
-System.register(['./libs/mermaid/dist/mermaid', './libs/d3/dist/d3.min', 'app/core/time_series2', 'app/core/utils/kbn', 'app/plugins/sdk', './properties', 'lodash', './series_overrides_diagram_ctrl', './diagramStyle'], function (_export, _context) {
+System.register(['./libs/mermaid/dist/mermaid', './libs/d3/dist/d3.min', 'app/core/time_series2', 'app/core/utils/kbn', 'app/plugins/sdk', './properties', 'lodash', './series_overrides_diagram_ctrl', './diagramStyle', './analytics'], function (_export, _context) {
   "use strict";
 
-  var mermaid, d3, TimeSeries, kbn, MetricsPanelCtrl, diagramEditor, displayEditor, compositeEditor, mappingEditor, _, diagramStyleFormatter, _createClass, mermaidAPI, panelDefaults, DiagramCtrl;
+  var mermaid, d3, TimeSeries, kbn, MetricsPanelCtrl, diagramEditor, displayEditor, compositeEditor, mappingEditor, supportEditor, _, diagramStyleFormatter, initAnalytics, _createClass, mermaidAPI, panelDefaults, DiagramCtrl;
 
   function _classCallCheck(instance, Constructor) {
     if (!(instance instanceof Constructor)) {
@@ -73,10 +73,13 @@ System.register(['./libs/mermaid/dist/mermaid', './libs/d3/dist/d3.min', 'app/co
       displayEditor = _properties.displayEditor;
       compositeEditor = _properties.compositeEditor;
       mappingEditor = _properties.mappingEditor;
+      supportEditor = _properties.supportEditor;
     }, function (_lodash) {
       _ = _lodash.default;
     }, function (_series_overrides_diagram_ctrl) {}, function (_diagramStyle) {
       diagramStyleFormatter = _diagramStyle.diagramStyleFormatter;
+    }, function (_analytics) {
+      initAnalytics = _analytics.initAnalytics;
     }],
     execute: function () {
       _createClass = function () {
@@ -99,6 +102,7 @@ System.register(['./libs/mermaid/dist/mermaid', './libs/d3/dist/d3.min', 'app/co
 
       mermaidAPI = mermaid.mermaidAPI;
       panelDefaults = {
+        anonymousTracking: true,
         composites: [],
         metricCharacterReplacements: [],
         // other style overrides
@@ -213,6 +217,10 @@ System.register(['./libs/mermaid/dist/mermaid', './libs/d3/dist/d3.min', 'app/co
           var _this2 = _possibleConstructorReturn(this, (DiagramCtrl.__proto__ || Object.getPrototypeOf(DiagramCtrl)).call(this, $scope, $injector));
 
           _.defaults(_this2.panel, panelDefaults);
+          _this2.analytics = initAnalytics(_this2.panel.anonymousTracking);
+          _this2.analytics.track('load', {
+            category: 'Panel'
+          });
           _this2.$http = $http;
           _this2.panel.graphId = 'diagram_' + _this2.panel.id;
           _this2.containerDivId = 'container_' + _this2.panel.graphId;
@@ -250,6 +258,7 @@ System.register(['./libs/mermaid/dist/mermaid', './libs/d3/dist/d3.min', 'app/co
             this.addEditorTab('Display', displayEditor, 3);
             this.addEditorTab('Metric Composites', compositeEditor, 4);
             this.addEditorTab('Value Mappings', mappingEditor, 5);
+            this.addEditorTab('Support', supportEditor, 6);
           }
         }, {
           key: 'getDiagramContainer',
@@ -890,7 +899,7 @@ System.register(['./libs/mermaid/dist/mermaid', './libs/d3/dist/d3.min', 'app/co
 
               if (closestGroup && closestLabelGroup && closestForeignObject) {
                 closestGroup.setAttribute('transform', '');
-                var _minWidth = Math.max(Number.parseInt(closestForeignObject.getAttribute('width') || '1', 10), 30);
+                var _minWidth = Math.max(Number.parseInt(closestForeignObject.getAttribute('width') || '1', 10), 80);
                 var _minHeight = Math.max(Number.parseInt(closestForeignObject.getAttribute('height') || '1', 10), 40);
                 closestForeignObject.setAttribute('height', _minHeight.toString());
                 closestForeignObject.setAttribute('width', _minWidth.toString());

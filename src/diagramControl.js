@@ -9,7 +9,8 @@ import {
   diagramEditor,
   displayEditor,
   compositeEditor,
-  mappingEditor
+  mappingEditor,
+  supportEditor
 } from './properties';
 import _ from 'lodash';
 import './series_overrides_diagram_ctrl';
@@ -18,10 +19,12 @@ import './series_overrides_diagram_ctrl';
 // Work In Progress
 // Build a custom style editor
 import { diagramStyleFormatter } from './diagramStyle';
+import { initAnalytics } from './analytics';
 
 const mermaidAPI = mermaid.mermaidAPI;
 
 const panelDefaults = {
+  anonymousTracking: true,
   composites: [],
   metricCharacterReplacements: [],
   // other style overrides
@@ -138,6 +141,10 @@ class DiagramCtrl extends MetricsPanelCtrl {
   constructor($scope, $injector, $sce, $http) {
     super($scope, $injector);
     _.defaults(this.panel, panelDefaults);
+    this.analytics = initAnalytics(this.panel.anonymousTracking);
+    this.analytics.track('load', {
+      category: 'Panel'
+    });
     this.$http = $http;
     this.panel.graphId = 'diagram_' + this.panel.id;
     this.containerDivId = 'container_' + this.panel.graphId;
@@ -169,6 +176,7 @@ class DiagramCtrl extends MetricsPanelCtrl {
     this.addEditorTab('Display', displayEditor, 3);
     this.addEditorTab('Metric Composites', compositeEditor, 4);
     this.addEditorTab('Value Mappings', mappingEditor, 5);
+    this.addEditorTab('Support', supportEditor, 6);
   }
 
   getDiagramContainer() {
@@ -802,7 +810,7 @@ class DiagramCtrl extends MetricsPanelCtrl {
         closestGroup.setAttribute('transform', '');
         const _minWidth = Math.max(
           Number.parseInt(closestForeignObject.getAttribute('width') || '1', 10), 
-          30
+          80
         );
         const _minHeight = Math.max(
           Number.parseInt(closestForeignObject.getAttribute('height') || '1', 10), 
