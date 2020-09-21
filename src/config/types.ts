@@ -1,6 +1,6 @@
 import { DisplayValue, Field } from '@grafana/data';
 import { LegendDisplayMode, LegendPlacement } from '@grafana/ui';
-import { MermaidThemeVariables } from 'config/theme';
+import { MermaidThemeVariables } from './theme';
 
 export type ValueType = 'mean' | 'min' | 'max' | 'sum' | 'last' | 'name';
 export type DiagramPanelMode = 'content' | 'url';
@@ -53,6 +53,8 @@ export interface CompositeMetric {
 }
 
 export interface DiagramOptions {
+  pluginVersion: string;
+  anonymousTracking: boolean;
   nodeSize: NodeSizeOptions;
   composites: CompositeMetric[];
   metricCharacterReplacements: MetricCharacterReplacement[];

@@ -32,6 +32,8 @@
     "lodash": "^4.17.11"
   },
   "dependencies": {
+    "@analytics/google-analytics": "^0.5.0",
+    "analytics": "^0.5.5",
     "mermaid": "^8.8.0"
   },
   "engines": {

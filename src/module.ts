@@ -1,10 +1,11 @@
 import { FieldConfigProperty, PanelOptionsEditorBuilder, PanelPlugin, SelectableValue } from '@grafana/data';
-import { defaults } from 'config/diagramDefaults';
-import { diagramPanelChangeHandler } from 'config/diagramPanelChangeHandler';
-import { CompositeMetricEditor } from 'editors/CompositeMetricEditor';
+import { defaults } from './config/diagramDefaults';
+import { diagramPanelChangeHandler } from './config/diagramPanelChangeHandler';
+import { CompositeMetricEditor } from './editors/CompositeMetricEditor';
 import { diagramPanelMigrationHandler } from './config/diagramPanelMigrationHandler';
 import { DiagramOptions, ValueType } from './config/types';
 import { DiagramPanel } from './DiagramPanel';
+import { SupportEditor } from "./editors/SupportEditor";
 
 interface PanelProperty {
   key: string;
@@ -220,7 +221,17 @@ const createPanelPlugin = () => {
           category: ['Composites'],
           description: 'Combine series into a composite metric',
         });
+      
       builder = addStyleEditors(builder);
+
+      // Support
+      builder.addCustomEditor({
+        editor: SupportEditor,
+        id: 'anonymousTracking',
+        path: 'anonymousTracking',
+        name: 'Support',
+        category: ['Help'],
+      });
       return builder;
     });
 

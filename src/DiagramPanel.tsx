@@ -5,6 +5,7 @@ import { css, cx } from 'emotion';
 import { getDiagramSeriesModel } from 'getDiagramSeriesModel';
 import React from 'react';
 import { DiagramOptions } from 'config/types';
+import { initAnalytics } from 'analytics/analytics';
 
 export interface DiagramPanelOptions extends PanelProps<DiagramOptions> {}
 
@@ -37,6 +38,13 @@ export const DiagramPanel: React.FC<DiagramPanelOptions> = ({
     options,
     fieldConfig,
   ]);
+
+  const analytics = React.useMemo(() => initAnalytics({
+    enabled: options.anonymousTracking,
+    version: options.pluginVersion
+  }), [options])
+
+  React.useMemo(() => analytics.track('loaded panel'), [1]);
 
   return (
     <div
