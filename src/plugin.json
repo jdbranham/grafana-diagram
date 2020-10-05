@@ -23,15 +23,15 @@
     "screenshots": [
       {
         "name": "diagram",
-        "path": "./src/img/diagram.PNG"
+        "path": "./img/diagram.PNG"
       },
       {
         "name": "diagram definition",
-        "path": "./src/img/diagram_definition.PNG"
+        "path": "./img/diagram_definition.PNG"
       },
       {
         "name": "diagram_display",
-        "path": "./src/img/diagram_display.PNG"
+        "path": "./img/diagram_display.PNG"
       }
     ]
   },
