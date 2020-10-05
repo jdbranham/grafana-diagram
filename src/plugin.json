@@ -22,13 +22,7 @@
       {"name": "Project site", "url": "https://github.com/jdbranham/grafana-diagram"},
       {"name": "Apache License", "url": "https://github.com/jdbranham/grafana-diagram/blob/master/LICENSE"}
     ],
-    "screenshots": [],
-    "version": "%VERSION%",
-    "updated": "%TODAY%"
-  },
-  "dependencies": {
-    "grafanaDependency": "7.x",
-    "plugins": [
+    "screenshots": [
       {
         "name": "diagram",
         "path": "../docs/images/default.png"
@@ -65,6 +59,12 @@
         "name": "variables",
         "path": "../docs/images/variables.png"
       }
-    ]
+    ],
+    "version": "%VERSION%",
+    "updated": "%TODAY%"
+  },
+  "dependencies": {
+    "grafanaDependency": "7.x",
+    "plugins": []
   }
 }
