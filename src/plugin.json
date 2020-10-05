@@ -19,7 +19,21 @@
     "logos": {
         "small": "img/icn-diagram-panel.svg",
         "large": "img/icn-diagram-panel.svg"
-    }
+    },
+    "screenshots": [
+      {
+        "name": "diagram",
+        "path": "./src/img/diagram.PNG"
+      },
+      {
+        "name": "diagram definition",
+        "path": "./src/img/diagram_definition.PNG"
+      },
+      {
+        "name": "diagram_display",
+        "path": "./src/img/diagram_display.PNG"
+      }
+    ]
   },
 
   "dependencies": {
