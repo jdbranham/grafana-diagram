@@ -9,9 +9,6 @@
       "name": "Jeremy Branham",
       "url": "https://www.linkedin.com/in/jeremybranham/"
     },
-    "contributors": [
-      "Brian Gann (https://github.com/briangann)"
-    ],
     "keywords": ["diagram", "panel"],
     "links": [
       {"name": "Project site", "url": "https://github.com/jdbranham/grafana-diagram"},
@@ -26,7 +23,7 @@
   },
 
   "dependencies": {
-    "grafanaVersion": "6.x.x",
+    "grafanaDependency": "6.x.x",
     "plugins": [ ]
   }
 }
