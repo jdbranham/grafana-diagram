@@ -24,10 +24,10 @@
     ],
     "screenshots": [],
     "version": "1.7.0",
-    "updated": "2020-09-20"
+    "updated": "2020-10-05"
   },
   "dependencies": {
-    "grafanaVersion": "7.0.x",
+    "grafanaDependency": "7.x",
     "plugins": []
   }
 }

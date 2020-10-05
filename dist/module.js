@@ -50969,7 +50969,7 @@ function (_super) {
   };
 
   DiagramPanelController.prototype.componentDidUpdate = function (prevProps) {
-    if (prevProps.options !== this.props.options || prevProps.fieldConfig != this.props.fieldConfig || prevProps.theme != this.props.theme || prevProps.data != this.props.data) {
+    if (prevProps.options !== this.props.options || prevProps.fieldConfig !== this.props.fieldConfig || prevProps.theme !== this.props.theme || prevProps.data !== this.props.data) {
       this.initializeMermaid();
     }
   };
@@ -51351,7 +51351,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _analytics_google_analytics__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @analytics/google-analytics */ "../node_modules/@analytics/google-analytics/lib/analytics-plugin-ga.browser.es.js");
 
 
-;
 
 var DiagramAnalyticsImpl =
 /** @class */
@@ -51376,8 +51375,6 @@ function () {
 
   return DiagramAnalyticsImpl;
 }();
-
-;
 
 function createAnalytics(options) {
   return Object(analytics__WEBPACK_IMPORTED_MODULE_0__["Analytics"])({
@@ -51494,7 +51491,7 @@ var defaultMermaidThemeVariables = {
   userJourneyDiagram: {}
 };
 var defaults = {
-  pluginVersion: "",
+  pluginVersion: '',
   anonymousTracking: true,
   nodeSize: {
     minWidth: 30,
@@ -51571,7 +51568,7 @@ var diagramPanelMigrationHandler = function diagramPanelMigrationHandler(panel) 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "diagramStyleFormatter", function() { return diagramStyleFormatter; });
 function diagramStyleFormatter(customStyle, diagramId) {
-  return "\n\t#" + diagramId + " .badge, #" + diagramId + " .label {\n\t\ttext-shadow: none;\n\t}\n\t\n\t#" + diagramId + " .edgeLabel, #" + diagramId + " .edgeLabel rect {\n\t\tbackground-color: transparent;\n\t\tfill: transparent;\n\t}\n\n\t" + customStyle + "\n\t";
+  return "\n\t#" + diagramId + " .badge, #" + diagramId + " .label {\n\t\ttext-shadow: none;\n\t}\n\n\t#" + diagramId + " foreignObject {\n\t\toverflow: visible;\n\t}\n\t\n\t#" + diagramId + " .edgeLabel, #" + diagramId + " .edgeLabel rect {\n\t\tbackground-color: transparent;\n\t\tfill: transparent;\n\t}\n\n\t" + customStyle + "\n\t";
 }
 
 
@@ -52317,6 +52314,7 @@ var styleD3Shapes = function styleD3Shapes(targetElement, indicator, useBackgrou
 
     if (indicator.isComposite) {
       content += "<br/>" + indicator.originalName;
+      divElement.style.marginTop = "-" + nodeSize.minHeight / 4 + "px";
     } // TODO: Add Field/Series Links??
 
 
@@ -52426,7 +52424,12 @@ var reduceComposites = function reduceComposites(indicators, composites) {
         var previousValue = isNaN(prev.numeric) ? 0 : prev.numeric;
         var currentValue = isNaN(current.numeric) ? 0 : current.numeric;
         var currentIsLower = currentValue < previousValue;
-        return currentIsLower && c.showLowestValue ? current : prev;
+
+        if (c.showLowestValue) {
+          return currentIsLower ? current : prev;
+        } else {
+          return currentIsLower ? prev : current;
+        }
       });
       compositeIndicator.isComposite = true;
       compositeIndicator.originalName = compositeIndicator.metricName;

@@ -138,19 +138,19 @@ Here are examples of the composite in action:
 
 This diagram has "xyz" node, with "all green" threholds for both series A and B:
 
-![threshold0](https://raw.githubusercontent.com/jdbranham/grafana-diagram/master/src/img/composite-threshold0.png?raw=true)
+![threshold0](https://raw.githubusercontent.com/jdbranham/grafana-diagram/master/docs/images/composite-threshold0.png?raw=true)
 
 This diagram has "xyz" node, where the A-series is green, but B-Series is yellow. The diagram node shows yellow, along with the value:
 
-![threshold1](https://raw.githubusercontent.com/jdbranham/grafana-diagram/master/src/img/composite-threshold1.png?raw=true)
+![threshold1](https://raw.githubusercontent.com/jdbranham/grafana-diagram/master/docs/images/composite-threshold1.png?raw=true)
 
 This diagram has "xyz" node, where the A-series is green, but B-Series is red. The diagram node shows red, along with the value:
 
-![threshold2](https://raw.githubusercontent.com/jdbranham/grafana-diagram/master/src/img/composite-threshold2.png?raw=true)
+![threshold2](https://raw.githubusercontent.com/jdbranham/grafana-diagram/master/docs/images/composite-threshold2.png?raw=true)
 
 This diagram has "xyz" node, where the A-series is yellow, and B-Series is green. The diagram node shows yellow, along with the value:
 
-![threshold3](https://raw.githubusercontent.com/jdbranham/grafana-diagram/master/src/img/composite-threshold3.png?raw=true)
+![threshold3](https://raw.githubusercontent.com/jdbranham/grafana-diagram/master/docs/images/composite-threshold3.png?raw=true)
 
 ### Value or Range to Text Mapping
 

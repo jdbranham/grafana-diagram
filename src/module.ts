@@ -5,7 +5,7 @@ import { CompositeMetricEditor } from './editors/CompositeMetricEditor';
 import { diagramPanelMigrationHandler } from './config/diagramPanelMigrationHandler';
 import { DiagramOptions, ValueType } from './config/types';
 import { DiagramPanel } from './DiagramPanel';
-import { SupportEditor } from "./editors/SupportEditor";
+import { SupportEditor } from './editors/SupportEditor';
 
 interface PanelProperty {
   key: string;
@@ -221,7 +221,7 @@ const createPanelPlugin = () => {
           category: ['Composites'],
           description: 'Combine series into a composite metric',
         });
-      
+
       builder = addStyleEditors(builder);
 
       // Support

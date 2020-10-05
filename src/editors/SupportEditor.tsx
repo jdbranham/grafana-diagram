@@ -30,20 +30,22 @@ export const SupportEditor: React.FC<StandardEditorProps<boolean, any, DiagramPa
   return (
     <div className="gf-form-group">
       <div className="edit-tab-content">
-          <div className="gf-form">
-            <button className="btn btn-secondary gf-form-input" onClick={openSupportPage}>
-              <i className="fa fa-help pointer"></i>&nbsp;Community Support
-            </button>
-          </div>
-          <div className="gf-form">
-            <button className="btn btn-primary gf-form-input" onClick={openPatreonPage}>
-              <i className="fa fa-help pointer"></i>&nbsp;Vote for features
-            </button>
-          </div>
-          <div>
-            <p>This plugin uses anonymous reporting to improve development/features. You may opt-out by disabling this.</p>
-            <Checkbox css="" value={state} onChange={ev => handleInputValueChange(ev)} label="Enable"></Checkbox>
-          </div>
+        <div className="gf-form">
+          <button className="btn btn-secondary gf-form-input" onClick={openSupportPage}>
+            <i className="fa fa-help pointer"></i>&nbsp;Community Support
+          </button>
+        </div>
+        <div className="gf-form">
+          <button className="btn btn-primary gf-form-input" onClick={openPatreonPage}>
+            <i className="fa fa-help pointer"></i>&nbsp;Vote for features
+          </button>
+        </div>
+        <div>
+          <p>
+            This plugin uses anonymous reporting to improve development/features. You may opt-out by disabling this.
+          </p>
+          <Checkbox css="" value={state} onChange={ev => handleInputValueChange(ev)} label="Enable"></Checkbox>
+        </div>
       </div>
     </div>
   );
