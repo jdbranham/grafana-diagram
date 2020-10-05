@@ -86,6 +86,7 @@ const styleD3Shapes = (
     let content = divElement.innerText + `<br/> ${formattedValueToString(indicator)}`;
     if (indicator.isComposite) {
       content += `<br/>${indicator.originalName}`;
+      divElement.style.marginTop = `-${(nodeSize.minHeight/4)}px`;
     }
     // TODO: Add Field/Series Links??
     divElement.innerHTML = `<div style="margin:auto">${content}</div>`;
@@ -206,7 +207,11 @@ const reduceComposites = (indicators: MetricIndicator[], composites: CompositeMe
           const previousValue = isNaN(prev.numeric) ? 0 : prev.numeric;
           const currentValue = isNaN(current.numeric) ? 0 : current.numeric;
           const currentIsLower = currentValue < previousValue;
-          return currentIsLower && c.showLowestValue ? current : prev;
+          if(c.showLowestValue) {
+            return currentIsLower ? current : prev;
+          } else {
+            return currentIsLower ? prev : current;
+          }
         });
         compositeIndicator.isComposite = true;
         compositeIndicator.originalName = compositeIndicator.metricName;

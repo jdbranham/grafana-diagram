@@ -7,5 +7,6 @@ services:
     - "3000:3000"
     volumes:
     - ./dist:/var/lib/grafana/plugins/jdbranham-diagram-panel
+    - ./data:/var/lib/grafana
     environment:
     - TERM=linux

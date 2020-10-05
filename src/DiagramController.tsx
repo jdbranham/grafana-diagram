@@ -82,9 +82,9 @@ export class DiagramPanelController extends React.Component<DiagramPanelControll
   componentDidUpdate(prevProps: DiagramPanelControllerProps) {
     if (
       prevProps.options !== this.props.options ||
-      prevProps.fieldConfig != this.props.fieldConfig ||
-      prevProps.theme != this.props.theme ||
-      prevProps.data != this.props.data
+      prevProps.fieldConfig !== this.props.fieldConfig ||
+      prevProps.theme !== this.props.theme ||
+      prevProps.data !== this.props.data
     ) {
       this.initializeMermaid();
     }

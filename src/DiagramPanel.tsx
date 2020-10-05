@@ -39,10 +39,14 @@ export const DiagramPanel: React.FC<DiagramPanelOptions> = ({
     fieldConfig,
   ]);
 
-  const analytics = React.useMemo(() => initAnalytics({
-    enabled: options.anonymousTracking,
-    version: options.pluginVersion
-  }), [options])
+  const analytics = React.useMemo(
+    () =>
+      initAnalytics({
+        enabled: options.anonymousTracking,
+        version: options.pluginVersion,
+      }),
+    [options]
+  );
 
   React.useMemo(() => analytics.track('loaded panel'), [1]);
 
