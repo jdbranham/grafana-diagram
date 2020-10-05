@@ -3,7 +3,7 @@
 System.register(['./libs/analytics/dist/analytics.min', './libs/@analytics/google-analytics/dist/@analytics/google-analytics.min'], function (_export, _context) {
     "use strict";
 
-    var Analytics, googleAnalytics, _createClass, wrapper;
+    var Analytics, googleAnalytics, _createClass, version, wrapper;
 
     function _classCallCheck(instance, Constructor) {
         if (!(instance instanceof Constructor)) {
@@ -13,7 +13,8 @@ System.register(['./libs/analytics/dist/analytics.min', './libs/@analytics/googl
 
     function createAnalytics() {
         return Analytics._analytics.default({
-            app: 'diagram-pligin',
+            app: 'diagram-plugin',
+            version: version, // doesnt appear to work, so will configure as a custom dimension
             plugins: [googleAnalytics({
                 trackingId: 'UA-178409998-1',
                 /* Anonymize the IP addresses */
@@ -22,7 +23,7 @@ System.register(['./libs/analytics/dist/analytics.min', './libs/@analytics/googl
                 cookieConfig: {
                     cookieName: '_gaDiagram'
                 },
-                /* Google Analytics custom dimensions here */
+                /* Google Analytics custom dimensions */
                 customDimensions: {
                     pluginVersion: 'dimension1'
                 }
@@ -67,6 +68,8 @@ System.register(['./libs/analytics/dist/analytics.min', './libs/@analytics/googl
                 };
             }();
 
+            version = '1.6.4';
+
             wrapper = function () {
                 _createClass(wrapper, [{
                     key: 'track',
@@ -74,6 +77,8 @@ System.register(['./libs/analytics/dist/analytics.min', './libs/@analytics/googl
                         var _this = this;
 
                         if (this._analytics) {
+                            props = props || {};
+                            props.pluginVersion = version;
                             setTimeout(function () {
                                 return _this._analytics.track(action, props);
                             });
