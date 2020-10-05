@@ -22,7 +22,44 @@
       {"name": "Project site", "url": "https://github.com/jdbranham/grafana-diagram"},
       {"name": "Apache License", "url": "https://github.com/jdbranham/grafana-diagram/blob/master/LICENSE"}
     ],
-    "screenshots": [],
+    "screenshots": [
+      {
+        "name": "diagram",
+        "path": "../docs/images/default.png"
+      },
+      {
+        "name": "simple",
+        "path": "../docs/images/simple.png"
+      },
+      {
+        "name": "intro",
+        "path": "../docs/images/intro.gif"
+      },
+      {
+        "name": "field options",
+        "path": "../docs/images/field_options.png"
+      },
+      {
+        "name": "field override",
+        "path": "../docs/images/field_overrides.png"
+      },
+      {
+        "name": "composites",
+        "path": "../docs/images/composites.png"
+      },
+      {
+        "name": "dark",
+        "path": "../docs/images/theme_dark.png"
+      },
+      {
+        "name": "custom",
+        "path": "../docs/images/theme_custom.png"
+      },
+      {
+        "name": "variables",
+        "path": "../docs/images/variables.png"
+      }
+    ],
     "version": "%VERSION%",
     "updated": "%TODAY%"
   },
