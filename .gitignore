@@ -5,3 +5,4 @@
 /grafana-diagram-1.4.0.tgz
 package-lock.json
 docker-compose.override.yml
+data
