@@ -31,3 +31,4 @@ e2e-results/
 # Editors
 .idea
 
+.DS_Store
