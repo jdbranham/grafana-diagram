@@ -54,10 +54,6 @@
       {
         "name": "custom",
         "path": "img/theme_custom.png"
-      },
-      {
-        "name": "variables",
-        "path": "img/variables.gif"
       }
     ],
     "version": "%VERSION%",
