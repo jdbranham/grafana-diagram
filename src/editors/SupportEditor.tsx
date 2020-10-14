@@ -23,6 +23,10 @@ export const SupportEditor: React.FC<StandardEditorProps<boolean, any, DiagramPa
     window.open('https://github.com/jdbranham/grafana-diagram/issues', '_github');
   };
 
+  const openSponsorPage = () => {
+    window.open('https://github.com/sponsors/jdbranham', '_github');
+  };
+
   const openPatreonPage = () => {
     window.open('https://patreon.com/savantly', '_patreon');
   };
@@ -33,6 +37,11 @@ export const SupportEditor: React.FC<StandardEditorProps<boolean, any, DiagramPa
         <div className="gf-form">
           <button className="btn btn-secondary gf-form-input" onClick={openSupportPage}>
             <i className="fa fa-help pointer"></i>&nbsp;Community Support
+          </button>
+        </div>
+        <div className="gf-form">
+          <button className="btn btn-primary gf-form-input" onClick={openSponsorPage}>
+            <i className="fa fa-help pointer"></i>&nbsp;Sponsors
           </button>
         </div>
         <div className="gf-form">
