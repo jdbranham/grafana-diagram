@@ -32,10 +32,6 @@
         "path": "img/simple.png"
       },
       {
-        "name": "intro",
-        "path": "img/intro.gif"
-      },
-      {
         "name": "field options",
         "path": "img/field_options.png"
       },
@@ -54,10 +50,6 @@
       {
         "name": "custom",
         "path": "img/theme_custom.png"
-      },
-      {
-        "name": "variables",
-        "path": "img/variables.gif"
       }
     ],
     "version": "1.7.1",

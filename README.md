@@ -92,7 +92,7 @@ graph LR
 
 ### Using Variables
 
-<img src="https://raw.githubusercontent.com/jdbranham/grafana-diagram/grafana-7x/src/img/variables.gif?raw=true" width="800px"/> 
+<img src="https://raw.githubusercontent.com/jdbranham/grafana-diagram/grafana-7x/docs/variables.gif?raw=true" width="800px"/> 
 
 ### Using background as indicator
 
