@@ -25,43 +25,43 @@
     "screenshots": [
       {
         "name": "diagram",
-        "path": "../docs/images/default.png"
+        "path": "img/default.png"
       },
       {
         "name": "simple",
-        "path": "../docs/images/simple.png"
+        "path": "img/simple.png"
       },
       {
         "name": "intro",
-        "path": "../docs/images/intro.gif"
+        "path": "img/intro.gif"
       },
       {
         "name": "field options",
-        "path": "../docs/images/field_options.png"
+        "path": "img/field_options.png"
       },
       {
         "name": "field override",
-        "path": "../docs/images/field_overrides.png"
+        "path": "img/field_overrides.png"
       },
       {
         "name": "composites",
-        "path": "../docs/images/composites.png"
+        "path": "img/composites.png"
       },
       {
         "name": "dark",
-        "path": "../docs/images/theme_dark.png"
+        "path": "img/theme_dark.png"
       },
       {
         "name": "custom",
-        "path": "../docs/images/theme_custom.png"
+        "path": "img/theme_custom.png"
       },
       {
         "name": "variables",
-        "path": "../docs/images/variables.gif"
+        "path": "img/variables.gif"
       }
     ],
-    "version": "1.7.0",
-    "updated": "2020-10-05"
+    "version": "1.7.1",
+    "updated": "2020-10-14"
   },
   "dependencies": {
     "grafanaDependency": "7.x",

@@ -31,12 +31,12 @@ graph LR
 ```
 Producing this graph  
 
-![default](https://raw.githubusercontent.com/jdbranham/grafana-diagram/grafana-7x/docs/images/default.png?raw=true)  
+![default](https://raw.githubusercontent.com/jdbranham/grafana-diagram/grafana-7x/src/img/default.png?raw=true)  
 
 Supposing you have 2 series with aliases `A-series` and `B-series`   
 In the diagram plugin, you can modify the definition to match the identities of the data -  
 
-![default](https://raw.githubusercontent.com/jdbranham/grafana-diagram/grafana-7x/docs/images/simple.png?raw=true)  
+![default](https://raw.githubusercontent.com/jdbranham/grafana-diagram/grafana-7x/src/img/simple.png?raw=true)  
 
 
 
@@ -56,7 +56,7 @@ The following characters in metric names are automatically replaced with an unde
 
 ### With Subgraph
 
-![Simple](https://raw.githubusercontent.com/jdbranham/grafana-diagram/grafana-7x/docs/images/subgraph.png?raw=true)  
+![Simple](https://raw.githubusercontent.com/jdbranham/grafana-diagram/grafana-7x/src/img/subgraph.png?raw=true)  
 
 
 ### With custom shapes, aliases, and icons  
@@ -72,31 +72,31 @@ graph LR
       app1 --> D[(database)]
 ```
 
-![Diagram](https://raw.githubusercontent.com/jdbranham/grafana-diagram/grafana-7x/docs/images/theme_dark.png?raw=true)  
+![Diagram](https://raw.githubusercontent.com/jdbranham/grafana-diagram/grafana-7x/src/img/theme_dark.png?raw=true)  
 
 ### Field Options
 
-![Diagram](https://raw.githubusercontent.com/jdbranham/grafana-diagram/grafana-7x/docs/images/field_options.png?raw=true)  
+![Diagram](https://raw.githubusercontent.com/jdbranham/grafana-diagram/grafana-7x/src/img/field_options.png?raw=true)  
 
 ### Field Overrides
 
-![Diagram](https://raw.githubusercontent.com/jdbranham/grafana-diagram/grafana-7x/docs/images/field_overrides.png?raw=true)  
+![Diagram](https://raw.githubusercontent.com/jdbranham/grafana-diagram/grafana-7x/src/img/field_overrides.png?raw=true)  
 
 ### Custom Theme
 
-![Diagram](https://raw.githubusercontent.com/jdbranham/grafana-diagram/grafana-7x/docs/images/theme_custom.png?raw=true)  
+![Diagram](https://raw.githubusercontent.com/jdbranham/grafana-diagram/grafana-7x/src/img/theme_custom.png?raw=true)  
 
 ### CSS Override
 
-![Diagram](https://raw.githubusercontent.com/jdbranham/grafana-diagram/grafana-7x/docs/images/css_override.png?raw=true)  
+![Diagram](https://raw.githubusercontent.com/jdbranham/grafana-diagram/grafana-7x/src/img/css_override.png?raw=true)  
 
 ### Using Variables
 
-<img src="https://raw.githubusercontent.com/jdbranham/grafana-diagram/grafana-7x/docs/images/variables.gif?raw=true" width="800px"/> 
+<img src="https://raw.githubusercontent.com/jdbranham/grafana-diagram/grafana-7x/src/img/variables.gif?raw=true" width="800px"/> 
 
 ### Using background as indicator
 
-![Diagram](https://raw.githubusercontent.com/jdbranham/grafana-diagram/grafana-7x/docs/images/shape_background.png?raw=true)  
+![Diagram](https://raw.githubusercontent.com/jdbranham/grafana-diagram/grafana-7x/src/img/shape_background.png?raw=true)  
 
 
 ### Options  
@@ -128,7 +128,7 @@ Series/Field specific overrides will be evaluated for each metric, and the "wors
 
 The composite name is evaluated in the Diagram definition.  
 
-![Diagram](https://raw.githubusercontent.com/jdbranham/grafana-diagram/grafana-7x/docs/images/composites.png?raw=true)  
+![Diagram](https://raw.githubusercontent.com/jdbranham/grafana-diagram/grafana-7x/src/img/composites.png?raw=true)  
 
 For example, combining two series "A-series" and "B-series" into a single composite named "xyz", the following can be used:
 
@@ -138,26 +138,26 @@ Here are examples of the composite in action:
 
 This diagram has "xyz" node, with "all green" threholds for both series A and B:
 
-![threshold0](https://raw.githubusercontent.com/jdbranham/grafana-diagram/grafana-7x/docs/images/composites-threshold0.png?raw=true)
+![threshold0](https://raw.githubusercontent.com/jdbranham/grafana-diagram/grafana-7x/src/img/composites-threshold0.png?raw=true)
 
 This diagram has "xyz" node, where the A-series is green, but B-Series is yellow. The diagram node shows yellow, along with the value:
 
-![threshold1](https://raw.githubusercontent.com/jdbranham/grafana-diagram/grafana-7x/docs/images/composites-threshold1.png?raw=true)
+![threshold1](https://raw.githubusercontent.com/jdbranham/grafana-diagram/grafana-7x/src/img/composites-threshold1.png?raw=true)
 
 This diagram has "xyz" node, where the A-series is green, but B-Series is red. The diagram node shows red, along with the value:
 
-![threshold2](https://raw.githubusercontent.com/jdbranham/grafana-diagram/grafana-7x/docs/images/composites-threshold2.png?raw=true)
+![threshold2](https://raw.githubusercontent.com/jdbranham/grafana-diagram/grafana-7x/src/img/composites-threshold2.png?raw=true)
 
 This diagram has "xyz" node, where the A-series is yellow, and B-Series is green. The diagram node shows yellow, along with the value:
 
-![threshold3](https://raw.githubusercontent.com/jdbranham/grafana-diagram/grafana-7x/docs/images/composites-threshold3.png?raw=true)
+![threshold3](https://raw.githubusercontent.com/jdbranham/grafana-diagram/grafana-7x/src/img/composites-threshold3.png?raw=true)
 
 ### Value or Range to Text Mapping
 
 Value and range mapping can be used to replace numeric values by human readable text.   
 In the diagram the value of the matching series will be mapped to text:
 
-![Diagram](https://raw.githubusercontent.com/jdbranham/grafana-diagram/grafana-7x/docs/images/value_mapping.png?raw=true)  
+![Diagram](https://raw.githubusercontent.com/jdbranham/grafana-diagram/grafana-7x/src/img/value_mapping.png?raw=true)  
 
 
 ## Roadmap  
