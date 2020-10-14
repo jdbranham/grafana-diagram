@@ -32,10 +32,6 @@
         "path": "img/simple.png"
       },
       {
-        "name": "intro",
-        "path": "img/intro.gif"
-      },
-      {
         "name": "field options",
         "path": "img/field_options.png"
       },
