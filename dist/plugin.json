@@ -53,7 +53,7 @@
       }
     ],
     "version": "1.7.1",
-    "updated": "2020-10-14"
+    "updated": "2021-02-16"
   },
   "dependencies": {
     "grafanaDependency": "7.x",
