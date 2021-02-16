@@ -6,7 +6,8 @@
     "build": "grafana-toolkit plugin:build",
     "test": "grafana-toolkit plugin:test",
     "dev": "grafana-toolkit plugin:dev",
-    "watch": "grafana-toolkit plugin:dev --watch"
+    "watch": "grafana-toolkit plugin:dev --watch",
+    "sign": "grafana-toolkit plugin:sign"
   },
   "homepage": "https://github.com/jdbranham/grafana-diagram#readme",
   "repository": {
@@ -35,6 +36,6 @@
     "mermaid": "^8.8.0"
   },
   "engines": {
-    "node": ">=12 <13"
+    "node": ">=14"
   }
 }
