@@ -31,12 +31,7 @@ export const DiagramPanel: React.FC<DiagramPanelOptions> = ({
     );
   }
 
-  const diagramModels = React.useMemo(() => getDiagramSeriesModel(data.series, timeZone, options, fieldConfig), [
-    data.series,
-    timeZone,
-    options,
-    fieldConfig,
-  ]);
+  const diagramModels = getDiagramSeriesModel(data.series, timeZone, options, fieldConfig);
 
   return (
     <div
