@@ -5,7 +5,6 @@ import { css, cx } from 'emotion';
 import { getDiagramSeriesModel } from 'getDiagramSeriesModel';
 import React from 'react';
 import { DiagramOptions } from 'config/types';
-import { initAnalytics } from 'analytics/analytics';
 
 export interface DiagramPanelOptions extends PanelProps<DiagramOptions> {}
 
@@ -32,23 +31,7 @@ export const DiagramPanel: React.FC<DiagramPanelOptions> = ({
     );
   }
 
-  const diagramModels = React.useMemo(() => getDiagramSeriesModel(data.series, timeZone, options, fieldConfig), [
-    data.series,
-    timeZone,
-    options,
-    fieldConfig,
-  ]);
-
-  const analytics = React.useMemo(
-    () =>
-      initAnalytics({
-        enabled: options.anonymousTracking,
-        version: options.pluginVersion,
-      }),
-    [options]
-  );
-
-  React.useMemo(() => analytics.track('loaded panel'), [1]);
+  const diagramModels = getDiagramSeriesModel(data.series, timeZone, options, fieldConfig);
 
   return (
     <div

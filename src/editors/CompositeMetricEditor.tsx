@@ -9,7 +9,7 @@ export const CompositeMetricEditor: React.FC<StandardEditorProps<
   any,
   DiagramPanelControllerProps
 >> = ({ value, onChange, context, item }) => {
-  const [state, setState] = useState(value);
+  const [state, setState] = useState(value ?? []);
 
   const notify = () => {
     onChange(state);

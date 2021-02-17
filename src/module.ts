@@ -16,8 +16,8 @@ interface PanelProperty {
 const commonTextKeys: PanelProperty[] = [
   {
     key: 'fontFamily',
-    name: 'Font Family',
-    description: 'CSS Font Family',
+    name: 'Font family',
+    description: 'CSS font family',
   },
   //{
   //  key: 'fontSize', name: 'Font Size', description: 'Font size in px'
@@ -27,17 +27,17 @@ const commonTextKeys: PanelProperty[] = [
 const commonColorKeys: PanelProperty[] = [
   {
     key: 'mainBkg',
-    name: 'Shape Background Color',
+    name: 'Shape background color',
     description: 'Background in flowchart objects like rects/circles, class diagram classes, sequence diagram etc',
   },
   {
     key: 'lineColor',
-    name: 'Line Color',
+    name: 'Line color',
     description: 'Default color of Lines',
   },
   {
     key: 'textColor',
-    name: 'Text Color',
+    name: 'Text color',
     description:
       'Text in diagram over the background for instance text on labels and on signals in sequence diagram or the title in gantt diagram',
   },
@@ -46,7 +46,7 @@ const commonColorKeys: PanelProperty[] = [
 const flowChartKeys: PanelProperty[] = [
   {
     key: 'nodeBorder',
-    name: 'Shape Border Color',
+    name: 'Shape border color',
     description: 'Border color of shapes',
   },
 ];
@@ -163,7 +163,7 @@ const createPanelPlugin = () => {
       ],
       useCustomConfig: builder => {
         builder.addSelect({
-          name: 'Value By',
+          name: 'Value by',
           path: 'valueName',
           description: 'Use this reduction function on each series to determine the value of the metric indicator',
           defaultValue: defaults.valueName,
@@ -183,9 +183,9 @@ const createPanelPlugin = () => {
           defaultValue: defaults.useBackground,
         })
         .addTextInput({
-          name: 'Diagram Definition',
+          name: 'Diagram definition',
           path: 'content',
-          description: '(This area uses Mermaid syntax - http://knsv.github.io/mermaid/)',
+          description: `This area uses Mermaid syntax - http://knsv.github.io/mermaid/`,
           defaultValue: defaults.content,
           settings: {
             rows: 10,
@@ -193,20 +193,20 @@ const createPanelPlugin = () => {
           },
         })
         .addNumberInput({
-          name: 'Min Text Node Width',
+          name: 'Minimum text node width',
           path: 'nodeSize.minWidth',
           defaultValue: defaults.nodeSize.minWidth,
           description: 'The minimum width a matched diagram text node should be',
         })
         .addNumberInput({
-          name: 'Min Text Node Height',
+          name: 'Minimum text node height',
           path: 'nodeSize.minHeight',
           defaultValue: defaults.nodeSize.minHeight,
           description: 'The minimum height a matched diagram text node should be',
         })
         // Legend Options
         .addBooleanSwitch({
-          name: 'Show Legend',
+          name: 'Show legend',
           path: 'legend.show',
           description: 'Show the legend',
           category: ['Legend'],
@@ -217,7 +217,7 @@ const createPanelPlugin = () => {
           editor: CompositeMetricEditor,
           id: 'composites',
           path: 'composites',
-          name: 'Composite Metrics',
+          name: 'Composite metrics',
           category: ['Composites'],
           description: 'Combine series into a composite metric',
         });
@@ -227,8 +227,8 @@ const createPanelPlugin = () => {
       // Support
       builder.addCustomEditor({
         editor: SupportEditor,
-        id: 'anonymousTracking',
-        path: 'anonymousTracking',
+        id: 'support',
+        path: 'support',
         name: 'Support',
         category: ['Help'],
       });
