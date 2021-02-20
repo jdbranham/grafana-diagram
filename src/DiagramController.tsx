@@ -1,5 +1,5 @@
 import { AbsoluteTimeRange, FieldConfigSource, GrafanaTheme, InterpolateFunction, TimeZone } from '@grafana/data';
-import { CustomScrollbar, ErrorBoundary, LegendItem, stylesFactory } from '@grafana/ui';
+import { CustomScrollbar, LegendItem, stylesFactory } from '@grafana/ui';
 import { defaultMermaidOptions } from 'config/diagramDefaults';
 import DiagramErrorBoundary from 'DiagramErrorBoundary';
 import { DiagramLegend } from 'DiagramLegend';
