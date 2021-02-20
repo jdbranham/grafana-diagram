@@ -265,7 +265,7 @@ export const updateDiagramStyle = (
   indicators.forEach(indicator => {
     processDiagramSeriesModel(svg, indicator, options);
   });
-  reduceComposites(indicators, options.composites).forEach(indicator => {
+  reduceComposites(indicators, options.composites ?? []).forEach(indicator => {
     processDiagramSeriesModel(svg, indicator, options);
   });
 

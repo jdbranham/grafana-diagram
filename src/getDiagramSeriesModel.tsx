@@ -1,6 +1,5 @@
 import {
   DataFrame,
-  DEFAULT_DATE_TIME_FORMAT,
   DisplayValue,
   FieldConfigSource,
   FieldType,
@@ -10,13 +9,15 @@ import {
   getSeriesTimeStep,
   getTimeField,
   hasMsResolution,
-  MS_DATE_TIME_FORMAT,
   NullValueMode,
   reduceField,
   stringToJsRegex,
   TimeZone,
 } from '@grafana/data';
 import { DiagramOptions, DiagramSeriesModel, MetricCharacterReplacement } from './config/types';
+
+export const DEFAULT_DATE_TIME_FORMAT = 'YYYY-MM-DD HH:mm:ss';
+export const MS_DATE_TIME_FORMAT = 'YYYY-MM-DD HH:mm:ss.SSS';
 
 const replaceMetricCharacters = (metricName: string, metricCharacterReplacements: MetricCharacterReplacement[]) => {
   // a datasource sending bad data will have a type other than string, set it to "MISSING_METRIC_TARGET" and return

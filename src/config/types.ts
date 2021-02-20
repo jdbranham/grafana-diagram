@@ -54,9 +54,8 @@ export interface CompositeMetric {
 
 export interface DiagramOptions {
   pluginVersion: string;
-  anonymousTracking: boolean;
   nodeSize: NodeSizeOptions;
-  composites: CompositeMetric[];
+  composites?: CompositeMetric[];
   metricCharacterReplacements: MetricCharacterReplacement[];
   style: string;
   legend: LegendOptions;

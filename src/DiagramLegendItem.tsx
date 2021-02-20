@@ -38,11 +38,11 @@ export const DiagramLegendListItem: React.FunctionComponent<DiagramLegendItemPro
           `}
         >
           {' '}
-          {item.displayValues.forEach(stat => {
+          {item.displayValues.forEach(stat => (
             <div>
               {stat.title && `${capitalize(stat.title)}:`} {formattedValueToString(stat)}
-            </div>;
-          })}
+            </div>
+          ))}
         </div>
       )}
     </>
