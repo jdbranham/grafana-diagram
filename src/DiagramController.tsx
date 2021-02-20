@@ -1,6 +1,7 @@
 import { AbsoluteTimeRange, FieldConfigSource, GrafanaTheme, InterpolateFunction, TimeZone } from '@grafana/data';
-import { CustomScrollbar, LegendItem, stylesFactory } from '@grafana/ui';
+import { CustomScrollbar, ErrorBoundary, LegendItem, stylesFactory } from '@grafana/ui';
 import { defaultMermaidOptions } from 'config/diagramDefaults';
+import DiagramErrorBoundary from 'DiagramErrorBoundary';
 import { DiagramLegend } from 'DiagramLegend';
 import { css } from 'emotion';
 import { merge } from 'lodash';
@@ -203,15 +204,17 @@ export class DiagramPanelController extends React.Component<DiagramPanelControll
         {this.props.options.legend.show && (
           <div className={this.state.legendContainer}>
             <CustomScrollbar hideHorizontalTrack>
-              <DiagramLegend
-                items={this.getLegendItems()}
-                displayMode={this.props.options.legend.displayMode}
-                placement={this.props.options.legend.placement}
-                sortBy={this.props.options.legend.sortBy}
-                sortDesc={this.props.options.legend.sortDesc}
-                onLabelClick={(item, event) => {}}
-                onToggleSort={this.onToggleSort}
-              />
+              <DiagramErrorBoundary fallback="Error rendering Legend">
+                <DiagramLegend
+                  items={this.getLegendItems()}
+                  displayMode={this.props.options.legend.displayMode}
+                  placement={this.props.options.legend.placement}
+                  sortBy={this.props.options.legend.sortBy}
+                  sortDesc={this.props.options.legend.sortDesc}
+                  onLabelClick={(item, event) => {}}
+                  onToggleSort={this.onToggleSort}
+                />
+              </DiagramErrorBoundary>
             </CustomScrollbar>
           </div>
         )}
