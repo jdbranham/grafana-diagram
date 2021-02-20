@@ -126,20 +126,35 @@ export class DiagramPanelController extends React.Component<DiagramPanelControll
     }
   }
 
+  async getRemoteDiagramDefinition(url: string) {
+    const response = await fetch(url);
+    return await response.text();
+  }
+
+  loadDiagramDefinition() {
+    if (this.props.options.contentUrl) {
+      return this.getRemoteDiagramDefinition(this.props.options.contentUrl);
+    } else {
+      return Promise.resolve(this.props.options.content);
+    }
+  }
+
   initializeMermaid() {
     const options = merge({}, defaultMermaidOptions, { theme: this.props.theme.isDark ? 'dark' : 'base' });
     mermaidAPI.initialize(options);
     // parseError = this.handleParseError.bind(this);
     if (this.diagramRef) {
       try {
-        const diagramId = `diagram-${this.props.id}`;
-        const interpolated = this.props.replaceVariables(this.contentProcessor(this.props.options.content));
-        // if parsing the graph definition fails, the error handler will be called but the renderCallback() may also still be called.
-        this.diagramRef.innerHTML = mermaidAPI.render(diagramId, interpolated, this.renderCallback);
-        updateDiagramStyle(this.diagramRef, this.props.data, this.props.options, diagramId);
-        if (this.bindFunctions) {
-          this.bindFunctions(this.diagramRef);
-        }
+        this.loadDiagramDefinition().then(diagramDefinition => {
+          const diagramId = `diagram-${this.props.id}`;
+          const interpolated = this.props.replaceVariables(this.contentProcessor(diagramDefinition));
+          // if parsing the graph definition fails, the error handler will be called but the renderCallback() may also still be called.
+          this.diagramRef.innerHTML = mermaidAPI.render(diagramId, interpolated, this.renderCallback);
+          updateDiagramStyle(this.diagramRef, this.props.data, this.props.options, diagramId);
+          if (this.bindFunctions) {
+            this.bindFunctions(this.diagramRef);
+          }
+        });
       } catch (err) {
         this.diagramRef.innerHTML = `<div><p>Error rendering diagram. Check the diagram definition</p><p>${err}</p></div>`;
       }
