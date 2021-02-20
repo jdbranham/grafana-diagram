@@ -144,8 +144,8 @@ export class DiagramPanelController extends React.Component<DiagramPanelControll
     mermaidAPI.initialize(options);
     // parseError = this.handleParseError.bind(this);
     if (this.diagramRef) {
-      try {
-        this.loadDiagramDefinition().then(diagramDefinition => {
+      this.loadDiagramDefinition().then(diagramDefinition => {
+        try {
           const diagramId = `diagram-${this.props.id}`;
           const interpolated = this.props.replaceVariables(this.contentProcessor(diagramDefinition));
           // if parsing the graph definition fails, the error handler will be called but the renderCallback() may also still be called.
@@ -154,10 +154,10 @@ export class DiagramPanelController extends React.Component<DiagramPanelControll
           if (this.bindFunctions) {
             this.bindFunctions(this.diagramRef);
           }
-        });
-      } catch (err) {
-        this.diagramRef.innerHTML = `<div><p>Error rendering diagram. Check the diagram definition</p><p>${err}</p></div>`;
-      }
+        } catch (err) {
+          this.diagramRef.innerHTML = `<div><p>Error rendering diagram. Check the diagram definition</p><p>${err}</p></div>`;
+        }
+      });
     }
   }
 
