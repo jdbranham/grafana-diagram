@@ -52,8 +52,8 @@
         "path": "img/theme_custom.png"
       }
     ],
-    "version": "%VERSION%",
-    "updated": "%TODAY%"
+    "version": "1.7.2",
+    "updated": "2021-04-21"
   },
   "dependencies": {
     "grafanaDependency": "7.x",
