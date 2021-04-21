@@ -63,6 +63,7 @@ export interface DiagramOptions {
   moddedSeriesVal: number;
   valueName: ValueType;
   content: string;
+  contentUrl?: string;
   mode: DiagramPanelMode;
   mermaidServiceUrl: string;
   useBasicAuth: boolean;

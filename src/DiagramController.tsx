@@ -1,6 +1,7 @@
 import { AbsoluteTimeRange, FieldConfigSource, GrafanaTheme, InterpolateFunction, TimeZone } from '@grafana/data';
 import { CustomScrollbar, LegendItem, stylesFactory } from '@grafana/ui';
 import { defaultMermaidOptions } from 'config/diagramDefaults';
+import DiagramErrorBoundary from 'DiagramErrorBoundary';
 import { DiagramLegend } from 'DiagramLegend';
 import { css } from 'emotion';
 import { merge } from 'lodash';
@@ -125,23 +126,38 @@ export class DiagramPanelController extends React.Component<DiagramPanelControll
     }
   }
 
+  async getRemoteDiagramDefinition(url: string) {
+    const response = await fetch(url);
+    return await response.text();
+  }
+
+  loadDiagramDefinition() {
+    if (this.props.options.contentUrl) {
+      return this.getRemoteDiagramDefinition(this.props.options.contentUrl);
+    } else {
+      return Promise.resolve(this.props.options.content);
+    }
+  }
+
   initializeMermaid() {
     const options = merge({}, defaultMermaidOptions, { theme: this.props.theme.isDark ? 'dark' : 'base' });
     mermaidAPI.initialize(options);
     // parseError = this.handleParseError.bind(this);
     if (this.diagramRef) {
-      try {
-        const diagramId = `diagram-${this.props.id}`;
-        const interpolated = this.props.replaceVariables(this.contentProcessor(this.props.options.content));
-        // if parsing the graph definition fails, the error handler will be called but the renderCallback() may also still be called.
-        this.diagramRef.innerHTML = mermaidAPI.render(diagramId, interpolated, this.renderCallback);
-        updateDiagramStyle(this.diagramRef, this.props.data, this.props.options, diagramId);
-        if (this.bindFunctions) {
-          this.bindFunctions(this.diagramRef);
+      this.loadDiagramDefinition().then(diagramDefinition => {
+        try {
+          const diagramId = `diagram-${this.props.id}`;
+          const interpolated = this.props.replaceVariables(this.contentProcessor(diagramDefinition));
+          // if parsing the graph definition fails, the error handler will be called but the renderCallback() may also still be called.
+          this.diagramRef.innerHTML = mermaidAPI.render(diagramId, interpolated, this.renderCallback);
+          updateDiagramStyle(this.diagramRef, this.props.data, this.props.options, diagramId);
+          if (this.bindFunctions) {
+            this.bindFunctions(this.diagramRef);
+          }
+        } catch (err) {
+          this.diagramRef.innerHTML = `<div><p>Error rendering diagram. Check the diagram definition</p><p>${err}</p></div>`;
         }
-      } catch (err) {
-        this.diagramRef.innerHTML = `<div><p>Error rendering diagram. Check the diagram definition</p><p>${err}</p></div>`;
-      }
+      });
     }
   }
 
@@ -203,15 +219,17 @@ export class DiagramPanelController extends React.Component<DiagramPanelControll
         {this.props.options.legend.show && (
           <div className={this.state.legendContainer}>
             <CustomScrollbar hideHorizontalTrack>
-              <DiagramLegend
-                items={this.getLegendItems()}
-                displayMode={this.props.options.legend.displayMode}
-                placement={this.props.options.legend.placement}
-                sortBy={this.props.options.legend.sortBy}
-                sortDesc={this.props.options.legend.sortDesc}
-                onLabelClick={(item, event) => {}}
-                onToggleSort={this.onToggleSort}
-              />
+              <DiagramErrorBoundary fallback="Error rendering Legend">
+                <DiagramLegend
+                  items={this.getLegendItems()}
+                  displayMode={this.props.options.legend.displayMode}
+                  placement={this.props.options.legend.placement}
+                  sortBy={this.props.options.legend.sortBy}
+                  sortDesc={this.props.options.legend.sortDesc}
+                  onLabelClick={(item, event) => {}}
+                  onToggleSort={this.onToggleSort}
+                />
+              </DiagramErrorBoundary>
             </CustomScrollbar>
           </div>
         )}

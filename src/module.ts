@@ -183,6 +183,11 @@ const createPanelPlugin = () => {
           defaultValue: defaults.useBackground,
         })
         .addTextInput({
+          name: 'Diagram URL',
+          path: 'contentUrl',
+          description: `Get the diagram definition from a URL`,
+        })
+        .addTextInput({
           name: 'Diagram definition',
           path: 'content',
           description: `This area uses Mermaid syntax - http://knsv.github.io/mermaid/`,
