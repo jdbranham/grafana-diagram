@@ -1,6 +1,6 @@
 {
   "name": "grafana-diagram",
-  "version": "1.7.1",
+  "version": "1.7.2",
   "description": "Display diagrams and charts in Grafana with colored metric indicators",
   "scripts": {
     "build": "grafana-toolkit plugin:build",
