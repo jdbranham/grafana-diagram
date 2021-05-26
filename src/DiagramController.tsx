@@ -1,8 +1,7 @@
 import { AbsoluteTimeRange, FieldConfigSource, GrafanaTheme, InterpolateFunction, TimeZone } from '@grafana/data';
-import { CustomScrollbar, LegendItem, stylesFactory } from '@grafana/ui';
+import { CustomScrollbar, VizLegendItem, stylesFactory, VizLegend } from '@grafana/ui';
 import { defaultMermaidOptions } from 'config/diagramDefaults';
 import DiagramErrorBoundary from 'DiagramErrorBoundary';
-import { DiagramLegend } from 'DiagramLegend';
 import { css } from 'emotion';
 import { merge } from 'lodash';
 import mermaid from 'mermaid';
@@ -35,7 +34,7 @@ interface DiagramPanelControllerState {
 const getDiagramWithLegendStyles = stylesFactory(({ options }: DiagramPanelControllerProps) => ({
   wrapper: css`
     display: flex;
-    flex-direction: ${options.legend.placement === 'under' ? 'column' : 'row'};
+    flex-direction: ${options.legend.placement === 'bottom' ? 'column' : 'row'};
     height: 100%;
   `,
   diagramContainer: css`
@@ -44,7 +43,7 @@ const getDiagramWithLegendStyles = stylesFactory(({ options }: DiagramPanelContr
   `,
   legendContainer: css`
     padding: 10px 0;
-    max-height: ${options.legend.placement === 'under' ? '35%' : 'none'};
+    max-height: ${options.legend.placement === 'bottom' ? '35%' : 'none'};
   `,
 }));
 
@@ -144,7 +143,7 @@ export class DiagramPanelController extends React.Component<DiagramPanelControll
     mermaidAPI.initialize(options);
     // parseError = this.handleParseError.bind(this);
     if (this.diagramRef) {
-      this.loadDiagramDefinition().then(diagramDefinition => {
+      this.loadDiagramDefinition().then((diagramDefinition) => {
         try {
           const diagramId = `diagram-${this.props.id}`;
           const interpolated = this.props.replaceVariables(this.contentProcessor(diagramDefinition));
@@ -194,16 +193,18 @@ export class DiagramPanelController extends React.Component<DiagramPanelControll
   };
 
   getLegendItems = () => {
-    return this.props.data.reduce<LegendItem[]>((acc, s) => {
+    return this.props.data.reduce<VizLegendItem[]>((acc, s) => {
       return this.shouldHideLegendItem(s.data, this.props.options.legend.hideEmpty, this.props.options.legend.hideZero)
         ? acc
         : acc.concat([
             {
               label: s.label,
               color: '',
-              isVisible: s.isVisible,
+              disabled: s.isVisible,
               yAxis: 0,
-              displayValues: s.info || [],
+              getDisplayValues: () => {
+                return s.info || [];
+              },
             },
           ]);
     }, []);
@@ -220,7 +221,7 @@ export class DiagramPanelController extends React.Component<DiagramPanelControll
           <div className={this.state.legendContainer}>
             <CustomScrollbar hideHorizontalTrack>
               <DiagramErrorBoundary fallback="Error rendering Legend">
-                <DiagramLegend
+                <VizLegend
                   items={this.getLegendItems()}
                   displayMode={this.props.options.legend.displayMode}
                   placement={this.props.options.legend.placement}
