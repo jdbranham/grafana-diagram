@@ -1,5 +1,5 @@
 import { PanelProps } from '@grafana/data';
-import { stylesFactory, useTheme } from '@grafana/ui';
+import { stylesFactory, useTheme2 } from '@grafana/ui';
 import { DiagramPanelController } from 'DiagramController';
 import { css, cx } from 'emotion';
 import { getDiagramSeriesModel } from 'getDiagramSeriesModel';
@@ -20,7 +20,7 @@ export const DiagramPanel: React.FC<DiagramPanelOptions> = ({
   onOptionsChange,
   onChangeTimeRange,
 }) => {
-  const theme = useTheme();
+  const theme = useTheme2();
   const styles = getStyles();
 
   if (!data) {
@@ -31,7 +31,7 @@ export const DiagramPanel: React.FC<DiagramPanelOptions> = ({
     );
   }
 
-  const diagramModels = getDiagramSeriesModel(data.series, timeZone, options, fieldConfig);
+  const diagramModels = getDiagramSeriesModel(data.series, timeZone, options, theme, fieldConfig);
 
   return (
     <div
@@ -44,7 +44,7 @@ export const DiagramPanel: React.FC<DiagramPanelOptions> = ({
       )}
     >
       <DiagramPanelController
-        theme={theme}
+        theme={theme.v1}
         id={id}
         data={diagramModels}
         timeZone={timeZone}
