@@ -61,7 +61,7 @@ const statSelectOptions: Array<SelectableValue<ValueType>> = [
 
 const addStyleEditors = (builder: PanelOptionsEditorBuilder<DiagramOptions>) => {
   // dark common
-  commonTextKeys.forEach(obj => {
+  commonTextKeys.forEach((obj) => {
     builder.addTextInput({
       name: obj.name,
       path: `mermaidThemeVariablesDark.common.${obj.key}`,
@@ -73,7 +73,7 @@ const addStyleEditors = (builder: PanelOptionsEditorBuilder<DiagramOptions>) => 
   });
 
   // light common
-  commonTextKeys.forEach(obj => {
+  commonTextKeys.forEach((obj) => {
     builder.addTextInput({
       name: obj.name,
       path: `mermaidThemeVariablesLight.common.${obj.key}`,
@@ -85,7 +85,7 @@ const addStyleEditors = (builder: PanelOptionsEditorBuilder<DiagramOptions>) => 
   });
 
   // dark common
-  commonColorKeys.forEach(obj => {
+  commonColorKeys.forEach((obj) => {
     builder.addColorPicker({
       name: obj.name,
       path: `mermaidThemeVariablesDark.common.${obj.key}`,
@@ -97,7 +97,7 @@ const addStyleEditors = (builder: PanelOptionsEditorBuilder<DiagramOptions>) => 
   });
 
   // light common
-  commonColorKeys.forEach(obj => {
+  commonColorKeys.forEach((obj) => {
     builder.addColorPicker({
       name: obj.name,
       path: `mermaidThemeVariablesLight.common.${obj.key}`,
@@ -109,7 +109,7 @@ const addStyleEditors = (builder: PanelOptionsEditorBuilder<DiagramOptions>) => 
   });
 
   // dark flowchart
-  flowChartKeys.forEach(obj => {
+  flowChartKeys.forEach((obj) => {
     builder.addColorPicker({
       name: obj.name,
       path: `mermaidThemeVariablesDark.flowChart.${obj.key}`,
@@ -121,7 +121,7 @@ const addStyleEditors = (builder: PanelOptionsEditorBuilder<DiagramOptions>) => 
   });
 
   // light flowchart
-  flowChartKeys.forEach(obj => {
+  flowChartKeys.forEach((obj) => {
     builder.addColorPicker({
       name: obj.name,
       path: `mermaidThemeVariablesLight.flowChart.${obj.key}`,
@@ -153,15 +153,14 @@ const createPanelPlugin = () => {
     .setPanelChangeHandler(diagramPanelChangeHandler)
     // Field Configuration Options
     .useFieldConfig({
-      standardOptions: [
-        FieldConfigProperty.Unit,
-        FieldConfigProperty.Decimals,
-        FieldConfigProperty.Thresholds,
-        FieldConfigProperty.Mappings,
-        //FieldConfigProperty.Links,
-        FieldConfigProperty.NoValue,
+      disableStandardOptions: [
+        FieldConfigProperty.Min,
+        FieldConfigProperty.Max,
+        FieldConfigProperty.DisplayName,
+        FieldConfigProperty.Links,
+        FieldConfigProperty.Color,
       ],
-      useCustomConfig: builder => {
+      useCustomConfig: (builder) => {
         builder.addSelect({
           name: 'Value by',
           path: 'valueName',
@@ -174,7 +173,7 @@ const createPanelPlugin = () => {
         });
       },
     })
-    .setPanelOptions(builder => {
+    .setPanelOptions((builder) => {
       builder
         // Display Options
         .addBooleanSwitch({

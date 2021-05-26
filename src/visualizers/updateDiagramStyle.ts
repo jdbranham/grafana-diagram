@@ -18,7 +18,7 @@ const selectElementById = (container: HTMLElement, id: string): Selection<any, a
 const selectElementByEdgeLabel = (container: HTMLElement, id: string): Selection<any, any, any, any> => {
   return select(container)
     .selectAll('span')
-    .filter(function() {
+    .filter(function () {
       return select(this).text() === id;
     });
 };
@@ -26,7 +26,7 @@ const selectElementByEdgeLabel = (container: HTMLElement, id: string): Selection
 const selectDivElementByAlias = (container: HTMLElement, alias: string): Selection<any, any, any, any> => {
   const targetElement = select(container)
     .selectAll('div')
-    .filter(function() {
+    .filter(function () {
       return select(this).text() === alias;
     });
   const node = targetElement.node();
@@ -42,7 +42,7 @@ const selectDivElementByAlias = (container: HTMLElement, alias: string): Selecti
 const selectTextElementByAlias = (container: HTMLElement, alias: string): Selection<any, any, any, any> => {
   return select(container)
     .selectAll('text')
-    .filter(function() {
+    .filter(function () {
       return select(this).text() === alias;
     });
 };
@@ -126,7 +126,7 @@ const styleTextEdgeLabel = (
   indicator: MetricIndicator,
   useBackground: boolean
 ) => {
-  targetElement.each(el => {
+  targetElement.each((el) => {
     var markerBox = {
       x: el.getBBox().x,
       y: el.getBBox().y + el.getBBox().height + 10,
@@ -198,9 +198,9 @@ const processDiagramSeriesModel = (container: HTMLElement, indicator: MetricIndi
 
 const reduceComposites = (indicators: MetricIndicator[], composites: CompositeMetric[]): MetricIndicator[] => {
   return composites
-    .map(c => {
-      const candidates = c.members.flatMap(m => {
-        return indicators.filter(i => i.metricName === m);
+    .map((c) => {
+      const candidates = c.members.flatMap((m) => {
+        return indicators.filter((i) => i.metricName === m);
       });
       if (candidates.length > 0) {
         const compositeIndicator = candidates.reduce((prev, current) => {
@@ -221,14 +221,14 @@ const reduceComposites = (indicators: MetricIndicator[], composites: CompositeMe
         return null;
       }
     })
-    .filter(c => c != null) as any;
+    .filter((c) => c != null) as any;
 };
 
 const reduceModels = (models: DiagramSeriesModel[]): MetricIndicator[] => {
   return models
-    .filter(m => m.valueField.config.custom)
-    .flatMap(m => {
-      const dv = m.info?.find(dv => dv.title === m.valueField.config.custom.valueName);
+    .filter((m) => m.valueField.config.custom)
+    .flatMap((m) => {
+      const dv = m.info?.find((dv) => dv.title === m.valueField.config.custom.valueName);
       if (!dv) {
         return null;
       }
@@ -238,7 +238,7 @@ const reduceModels = (models: DiagramSeriesModel[]): MetricIndicator[] => {
         valueName: dv.title,
       };
     })
-    .filter(m => m != null) as any;
+    .filter((m) => m != null) as any;
 };
 
 export const updateDiagramStyle = (
@@ -257,15 +257,13 @@ export const updateDiagramStyle = (
 
   const svg = svgNode as HTMLElement;
   if (options.maxWidth) {
-    select(svg)
-      .style('max-width', '100%')
-      .style('max-height', '100%');
+    select(svg).style('max-width', '100%').style('max-height', '100%');
   }
 
-  indicators.forEach(indicator => {
+  indicators.forEach((indicator) => {
     processDiagramSeriesModel(svg, indicator, options);
   });
-  reduceComposites(indicators, options.composites ?? []).forEach(indicator => {
+  reduceComposites(indicators, options.composites ?? []).forEach((indicator) => {
     processDiagramSeriesModel(svg, indicator, options);
   });
 
