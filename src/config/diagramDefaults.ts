@@ -49,7 +49,7 @@ export const defaultLegendOptions: LegendOptions = {
   asTable: true,
   hideEmpty: false,
   hideZero: false,
-  placement: 'under',
+  placement: 'bottom',
   displayMode: LegendDisplayMode.Table,
   sortBy: 'last',
   sortDesc: true,

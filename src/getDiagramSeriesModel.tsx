@@ -8,6 +8,7 @@ import {
   getFlotPairs,
   getSeriesTimeStep,
   getTimeField,
+  GrafanaTheme2,
   hasMsResolution,
   NullValueMode,
   reduceField,
@@ -48,6 +49,7 @@ export const getDiagramSeriesModel = (
   dataFrames: DataFrame[],
   timeZone: TimeZone,
   options: DiagramOptions,
+  theme: GrafanaTheme2,
   fieldOptions?: FieldConfigSource
 ) => {
   const models: DiagramSeriesModel[] = [];
@@ -60,6 +62,7 @@ export const getDiagramSeriesModel = (
         thresholds: fieldOptions?.defaults?.thresholds,
       },
     },
+    theme,
     timeZone,
   });
 
@@ -112,6 +115,7 @@ export const getDiagramSeriesModel = (
               unit: `time:${useMsDateFormat ? MS_DATE_TIME_FORMAT : DEFAULT_DATE_TIME_FORMAT}`,
             },
           },
+          theme,
         });
 
         models.push({

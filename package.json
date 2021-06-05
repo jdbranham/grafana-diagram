@@ -21,16 +21,16 @@
     "email": "bugs@savantly.net"
   },
   "devDependencies": {
-    "@grafana/data": "7.3.7",
-    "@grafana/toolkit": "7.3.7",
-    "@grafana/ui": "7.3.7",
+    "@grafana/data": "next",
+    "@grafana/toolkit": "next",
+    "@grafana/ui": "next",
     "@types/d3": "^5.7.2",
     "@types/lodash": "^4.14.161",
     "@types/mermaid": "^8.2.1",
     "emotion": "10.0.27"
   },
   "peerDependencies": {
-    "lodash": "^4.17.11"
+    "lodash": "^4.17.21"
   },
   "dependencies": {
     "mermaid": "^8.8.0"
