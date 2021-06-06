@@ -25,7 +25,7 @@ const replaceMetricCharacters = (metricName: string, metricCharacterReplacements
   if (typeof metricName !== 'string') {
     return 'DATASOURCE_SENT_INVALID_METRIC_TARGET';
   }
-  var replacedText = metricName.replace(/"|,|;|=|:|{|}/g, '_');
+  var replacedText = metricName.replace(/"|,|;|=|:|{|}|\//g, '_');
   for (var index in metricCharacterReplacements) {
     const replacement = metricCharacterReplacements[index];
     // start with a simple replacement
