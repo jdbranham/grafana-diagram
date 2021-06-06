@@ -200,7 +200,7 @@ export class DiagramPanelController extends React.Component<DiagramPanelControll
             {
               label: s.label,
               color: '',
-              disabled: s.isVisible,
+              disabled: !s.isVisible,
               yAxis: 0,
               getDisplayValues: () => {
                 return s.info || [];
