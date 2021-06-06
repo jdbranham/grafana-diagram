@@ -126,7 +126,8 @@ export class DiagramPanelController extends React.Component<DiagramPanelControll
   }
 
   async getRemoteDiagramDefinition(url: string) {
-    const response = await fetch(url);
+    const templateUrl = this.props.replaceVariables(url);
+    const response = await fetch(templateUrl);
     return await response.text();
   }
 
