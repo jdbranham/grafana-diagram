@@ -6,6 +6,7 @@ import { diagramPanelMigrationHandler } from './config/diagramPanelMigrationHand
 import { DiagramOptions, ValueType } from './config/types';
 import { DiagramPanel } from './DiagramPanel';
 import { SupportEditor } from './editors/SupportEditor';
+import { MetricCharacterReplacementEditor } from 'editors/MetricReplacementEditor';
 
 interface PanelProperty {
   key: string;
@@ -224,6 +225,15 @@ const createPanelPlugin = () => {
           name: 'Composite metrics',
           category: ['Composites'],
           description: 'Combine series into a composite metric',
+        })
+        // Advanced
+        .addCustomEditor({
+          editor: MetricCharacterReplacementEditor,
+          id: 'metricCharacterReplacements',
+          path: 'metricCharacterReplacements',
+          name: 'Metric Character Replacements',
+          category: ['Advanced'],
+          description: 'Match/replace charactes in the metric name',
         });
 
       builder = addStyleEditors(builder);
