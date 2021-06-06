@@ -52,11 +52,11 @@
         "path": "img/theme_custom.png"
       }
     ],
-    "version": "1.7.2",
-    "updated": "2021-04-21"
+    "version": "1.7.3",
+    "updated": "2021-06-05"
   },
   "dependencies": {
-    "grafanaDependency": "7.x",
+    "grafanaDependency": ">=7.x",
     "plugins": []
   }
 }
