@@ -8,7 +8,7 @@ import {
   getFlotPairs,
   getSeriesTimeStep,
   getTimeField,
-  GrafanaTheme2,
+  GrafanaTheme,
   hasMsResolution,
   NullValueMode,
   reduceField,
@@ -49,7 +49,7 @@ export const getDiagramSeriesModel = (
   dataFrames: DataFrame[],
   timeZone: TimeZone,
   options: DiagramOptions,
-  theme: GrafanaTheme2,
+  theme: GrafanaTheme,
   fieldOptions?: FieldConfigSource
 ) => {
   const models: DiagramSeriesModel[] = [];
