@@ -31,19 +31,13 @@ export const MetricCharacterReplacementEditor: React.FC<
     notify();
   };
 
-  const handlePatternChange = (
-    ev: FormEvent<HTMLInputElement>,
-    index: number
-  ) => {
+  const handlePatternChange = (ev: FormEvent<HTMLInputElement>, index: number) => {
     const _state = _.cloneDeep(state);
     _state[index].replacementPattern = ev.currentTarget.value;
     setState(_state);
   };
 
-  const handleReplacementTextChange = (
-    ev: FormEvent<HTMLInputElement>,
-    index: number
-  ) => {
+  const handleReplacementTextChange = (ev: FormEvent<HTMLInputElement>, index: number) => {
     const _state = _.cloneDeep(state);
     _state[index].replaceWithText = ev.currentTarget.value;
     setState(_state);

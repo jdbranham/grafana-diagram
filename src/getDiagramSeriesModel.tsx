@@ -134,7 +134,6 @@ export const getDiagramSeriesModel = (
       }
     }
   }
-  console.debug(models);
 
   return models;
 };
