@@ -133,7 +133,7 @@ export class DiagramPanelController extends React.Component<DiagramPanelControll
 
   loadDiagramDefinition() {
     if (this.props.options.contentUrl) {
-      return this.getRemoteDiagramDefinition(this.props.options.contentUrl);
+      return this.getRemoteDiagramDefinition(this.props.replaceVariables(this.props.options.contentUrl));
     } else {
       return Promise.resolve(this.props.options.content);
     }
