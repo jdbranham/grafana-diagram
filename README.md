@@ -176,8 +176,8 @@ In the diagram the value of the matching series will be mapped to text:
 
 
 Special thanks to the Mermaid contributors -  
-https://github.com/knsv/mermaid/graphs/contributors  
-https://knsv.github.io/mermaid/  
+https://github.com/mermaid-js/mermaid/graphs/contributors  
+https://mermaid-js.github.io/  
 
 and the D3 contributors -  
 https://github.com/d3/d3/graphs/contributors  
