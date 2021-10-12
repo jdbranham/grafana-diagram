@@ -83,11 +83,13 @@ const styleD3Shapes = (
   if (div.node()) {
     const divElement = div.node() as HTMLElement;
     resizeGrouping(div, nodeSize);
-    let content = divElement.innerText + `<br/> ${formattedValueToString(indicator)}`;
+    let content = divElement.innerText;
     if (indicator.isComposite) {
-      content += `<br/>${indicator.originalName}`;
-      divElement.style.marginTop = `-${nodeSize.minHeight / 4}px`;
+      content += `<br/>${indicator.originalName}: ${formattedValueToString(indicator)}`;
+    } else {
+      content += `<br/> ${formattedValueToString(indicator)}`;
     }
+    divElement.style.paddingTop = `${nodeSize.minHeight / 8}px`;
     // TODO: Add Field/Series Links??
     divElement.innerHTML = `<div style="margin:auto">${content}</div>`;
   }
@@ -200,7 +202,16 @@ const reduceComposites = (indicators: MetricIndicator[], composites: CompositeMe
   return composites
     .map(c => {
       const candidates = c.members.flatMap(m => {
-        return indicators.filter(i => i.metricName === m);
+        return indicators.filter((i) => {
+          if (i.metricName === m.identifier) {
+            if (m.displayName !== '') {
+              i.originalName = m.displayName;
+            }
+            return i;
+          } else {
+            return;
+          }
+        });
       });
       if (candidates.length > 0) {
         const compositeIndicator = candidates.reduce((prev, current) => {
@@ -214,7 +225,6 @@ const reduceComposites = (indicators: MetricIndicator[], composites: CompositeMe
           }
         });
         compositeIndicator.isComposite = true;
-        compositeIndicator.originalName = compositeIndicator.metricName;
         compositeIndicator.metricName = c.name;
         return compositeIndicator;
       } else {

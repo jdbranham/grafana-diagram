@@ -45,9 +45,14 @@ export interface MetricCharacterReplacement {
   replaceWithText: string;
 }
 
+export interface CompositeMember {
+  identifier: string;
+  displayName: string;
+}
+
 export interface CompositeMetric {
   name: string;
-  members: string[];
+  members: CompositeMember[];
   valueName: ValueType;
   showLowestValue: boolean;
 }
