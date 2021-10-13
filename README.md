@@ -1,4 +1,4 @@
- [![savantly.net](https://savantly.net/images/logo.svg)](http://savantly.net)
+ [![savantly.net](https://savantly.net/img/logo.png)](http://savantly.net)
 
 [![Build Status](https://travis-ci.org/jdbranham/grafana-diagram.svg?branch=grafana-7x)](https://travis-ci.org/jdbranham/grafana-diagram)
 
