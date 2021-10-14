@@ -202,7 +202,7 @@ const reduceComposites = (indicators: MetricIndicator[], composites: CompositeMe
   return composites
     .map(c => {
       const candidates = c.members.flatMap(m => {
-        return indicators.filter((i) => {
+        return indicators.filter(i => {
           if (i.metricName === m.identifier) {
             if (m.displayName !== '') {
               i.originalName = m.displayName;

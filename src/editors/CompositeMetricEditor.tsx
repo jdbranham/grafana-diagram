@@ -35,12 +35,12 @@ export const CompositeMetricEditor: React.FC<StandardEditorProps<
     notify();
   };
   const removeMemberFromComposite = (composite: CompositeMetric, member: string) => {
-    composite.members.splice(composite.members.map((m) => m.identifier).indexOf(member));
+    composite.members.splice(composite.members.map(m => m.identifier).indexOf(member));
     notify();
   };
 
   const addMemberToComposite = (composite: CompositeMetric) => {
-    composite.members.push({identifier: '', displayName: ''});
+    composite.members.push({ identifier: '', displayName: '' });
     notify();
   };
 
@@ -81,7 +81,10 @@ export const CompositeMetricEditor: React.FC<StandardEditorProps<
             <div className="gf-form-inline">
               <div className="gf-form">
                 <label className="gf-form-label">
-                  <i className="fa fa-trash pointer" onClick={() => removeMemberFromComposite(composite, m.identifier)}></i>
+                  <i
+                    className="fa fa-trash pointer"
+                    onClick={() => removeMemberFromComposite(composite, m.identifier)}
+                  ></i>
                 </label>
               </div>
               <div className="gf-form">
