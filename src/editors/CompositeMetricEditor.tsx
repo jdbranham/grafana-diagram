@@ -1,6 +1,6 @@
 import { StandardEditorProps } from '@grafana/data';
 import { Checkbox } from '@grafana/ui';
-import { CompositeMetric } from 'config/types';
+import { CompositeMember, CompositeMetric } from 'config/types';
 import { DiagramPanelControllerProps } from 'DiagramController';
 import React, { FormEvent, useState } from 'react';
 
@@ -35,12 +35,12 @@ export const CompositeMetricEditor: React.FC<StandardEditorProps<
     notify();
   };
   const removeMemberFromComposite = (composite: CompositeMetric, member: string) => {
-    composite.members.splice(composite.members.indexOf(member));
+    composite.members.splice(composite.members.map(m => m.identifier).indexOf(member));
     notify();
   };
 
   const addMemberToComposite = (composite: CompositeMetric) => {
-    composite.members.push('');
+    composite.members.push({ identifier: '', displayName: '' });
     notify();
   };
 
@@ -55,7 +55,12 @@ export const CompositeMetricEditor: React.FC<StandardEditorProps<
   };
 
   const handleMemberSelect = (ev: FormEvent<HTMLSelectElement>, index: number, composite: CompositeMetric) => {
-    composite.members[index] = ev.currentTarget.value;
+    composite.members[index].identifier = ev.currentTarget.value;
+    notify();
+  };
+
+  const handleMemberInput = (ev: FormEvent<HTMLInputElement>, index: number, composite: CompositeMetric) => {
+    composite.members[index].displayName = ev.currentTarget.value;
     notify();
   };
 
@@ -69,20 +74,43 @@ export const CompositeMetricEditor: React.FC<StandardEditorProps<
     });
 
   const memberList = (composite: CompositeMetric) => {
-    return composite.members.map((m, i) => {
+    return composite.members.map((m: CompositeMember, i) => {
       return (
-        <div className="gf-form-inline">
+        <div>
           <div className="gf-form">
-            <label className="gf-form-label">
-              <i className="fa fa-trash pointer" onClick={() => removeMemberFromComposite(composite, m)}></i>
-            </label>
+            <div className="gf-form-inline">
+              <div className="gf-form">
+                <label className="gf-form-label">
+                  <i
+                    className="fa fa-trash pointer"
+                    onClick={() => removeMemberFromComposite(composite, m.identifier)}
+                  ></i>
+                </label>
+              </div>
+              <div className="gf-form">
+                <select value={m.identifier} onChange={ev => handleMemberSelect(ev, i, composite)}>
+                  <option></option>
+                  {memberOptions(m.identifier)}
+                </select>
+              </div>
+            </div>
           </div>
           <div className="gf-form">
-            <select value={m} onChange={ev => handleMemberSelect(ev, i, composite)}>
-              <option></option>
-              {memberOptions(m)}
-            </select>
+            <div className="gf-form-inline">
+              <div className="gf-form">
+                <label className="gf-form-label">DisplayName</label>
+              </div>
+              <div className="gf-form">
+                <input
+                  value={m.displayName}
+                  type="text"
+                  onChange={ev => handleMemberInput(ev, i, composite)}
+                  className="gf-form-input width-10"
+                ></input>
+              </div>
+            </div>
           </div>
+          <hr />
         </div>
       );
     });
