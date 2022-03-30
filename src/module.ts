@@ -190,7 +190,7 @@ const createPanelPlugin = () => {
         .addTextInput({
           name: 'Diagram definition',
           path: 'content',
-          description: `This area uses Mermaid syntax - http://knsv.github.io/mermaid/`,
+          description: `This area uses Mermaid syntax - https://mermaid-js.github.io/`,
           defaultValue: defaults.content,
           settings: {
             rows: 10,
