@@ -127,7 +127,13 @@ export class DiagramPanelController extends React.Component<DiagramPanelControll
   }
 
   async getRemoteDiagramDefinition(url: string) {
-    const response = await fetch(url);
+    const fetch = require('node-fetch');
+    const https = require('https');
+
+    const httpsAgent = new https.Agent({
+      rejectUnauthorized: false,
+    });
+    const response = await fetch(url, { agent: httpsAgent });
     return await response.text();
   }
 
