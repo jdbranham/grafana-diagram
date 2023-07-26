@@ -8,6 +8,7 @@ import {
   getFlotPairs,
   getSeriesTimeStep,
   getTimeField,
+  GrafanaTheme2,
   hasMsResolution,
   NullValueMode,
   reduceField,
@@ -24,8 +25,8 @@ const replaceMetricCharacters = (metricName: string, metricCharacterReplacements
   if (typeof metricName !== 'string') {
     return 'DATASOURCE_SENT_INVALID_METRIC_TARGET';
   }
-  var replacedText = metricName.replace(/"|,|;|=|:|{|}/g, '_');
-  for (var index in metricCharacterReplacements) {
+  let replacedText = metricName.replace(/"|,|;|=|:|{|}|\//g, '_');
+  for (let index in metricCharacterReplacements) {
     const replacement = metricCharacterReplacements[index];
     // start with a simple replacement
     let pattern = replacement.replacementPattern;
@@ -48,6 +49,7 @@ export const getDiagramSeriesModel = (
   dataFrames: DataFrame[],
   timeZone: TimeZone,
   options: DiagramOptions,
+  theme: GrafanaTheme2,
   fieldOptions?: FieldConfigSource
 ) => {
   const models: DiagramSeriesModel[] = [];
@@ -60,6 +62,7 @@ export const getDiagramSeriesModel = (
         thresholds: fieldOptions?.defaults?.thresholds,
       },
     },
+    theme,
     timeZone,
   });
 
@@ -112,6 +115,7 @@ export const getDiagramSeriesModel = (
               unit: `time:${useMsDateFormat ? MS_DATE_TIME_FORMAT : DEFAULT_DATE_TIME_FORMAT}`,
             },
           },
+          theme,
         });
 
         models.push({
@@ -130,9 +134,6 @@ export const getDiagramSeriesModel = (
       }
     }
   }
-
-  console.log('generated models:');
-  console.log(models);
 
   return models;
 };

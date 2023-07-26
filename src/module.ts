@@ -6,6 +6,7 @@ import { diagramPanelMigrationHandler } from './config/diagramPanelMigrationHand
 import { DiagramOptions, ValueType } from './config/types';
 import { DiagramPanel } from './DiagramPanel';
 import { SupportEditor } from './editors/SupportEditor';
+import { MetricCharacterReplacementEditor } from 'editors/MetricReplacementEditor';
 
 interface PanelProperty {
   key: string;
@@ -61,7 +62,7 @@ const statSelectOptions: Array<SelectableValue<ValueType>> = [
 
 const addStyleEditors = (builder: PanelOptionsEditorBuilder<DiagramOptions>) => {
   // dark common
-  commonTextKeys.forEach(obj => {
+  commonTextKeys.forEach((obj) => {
     builder.addTextInput({
       name: obj.name,
       path: `mermaidThemeVariablesDark.common.${obj.key}`,
@@ -73,7 +74,7 @@ const addStyleEditors = (builder: PanelOptionsEditorBuilder<DiagramOptions>) => 
   });
 
   // light common
-  commonTextKeys.forEach(obj => {
+  commonTextKeys.forEach((obj) => {
     builder.addTextInput({
       name: obj.name,
       path: `mermaidThemeVariablesLight.common.${obj.key}`,
@@ -85,7 +86,7 @@ const addStyleEditors = (builder: PanelOptionsEditorBuilder<DiagramOptions>) => 
   });
 
   // dark common
-  commonColorKeys.forEach(obj => {
+  commonColorKeys.forEach((obj) => {
     builder.addColorPicker({
       name: obj.name,
       path: `mermaidThemeVariablesDark.common.${obj.key}`,
@@ -97,7 +98,7 @@ const addStyleEditors = (builder: PanelOptionsEditorBuilder<DiagramOptions>) => 
   });
 
   // light common
-  commonColorKeys.forEach(obj => {
+  commonColorKeys.forEach((obj) => {
     builder.addColorPicker({
       name: obj.name,
       path: `mermaidThemeVariablesLight.common.${obj.key}`,
@@ -109,7 +110,7 @@ const addStyleEditors = (builder: PanelOptionsEditorBuilder<DiagramOptions>) => 
   });
 
   // dark flowchart
-  flowChartKeys.forEach(obj => {
+  flowChartKeys.forEach((obj) => {
     builder.addColorPicker({
       name: obj.name,
       path: `mermaidThemeVariablesDark.flowChart.${obj.key}`,
@@ -121,7 +122,7 @@ const addStyleEditors = (builder: PanelOptionsEditorBuilder<DiagramOptions>) => 
   });
 
   // light flowchart
-  flowChartKeys.forEach(obj => {
+  flowChartKeys.forEach((obj) => {
     builder.addColorPicker({
       name: obj.name,
       path: `mermaidThemeVariablesLight.flowChart.${obj.key}`,
@@ -153,15 +154,14 @@ const createPanelPlugin = () => {
     .setPanelChangeHandler(diagramPanelChangeHandler)
     // Field Configuration Options
     .useFieldConfig({
-      standardOptions: [
-        FieldConfigProperty.Unit,
-        FieldConfigProperty.Decimals,
-        FieldConfigProperty.Thresholds,
-        FieldConfigProperty.Mappings,
-        //FieldConfigProperty.Links,
-        FieldConfigProperty.NoValue,
+      disableStandardOptions: [
+        FieldConfigProperty.Min,
+        FieldConfigProperty.Max,
+        FieldConfigProperty.DisplayName,
+        FieldConfigProperty.Links,
+        FieldConfigProperty.Color,
       ],
-      useCustomConfig: builder => {
+      useCustomConfig: (builder) => {
         builder.addSelect({
           name: 'Value by',
           path: 'valueName',
@@ -174,7 +174,7 @@ const createPanelPlugin = () => {
         });
       },
     })
-    .setPanelOptions(builder => {
+    .setPanelOptions((builder) => {
       builder
         // Display Options
         .addBooleanSwitch({
@@ -190,7 +190,7 @@ const createPanelPlugin = () => {
         .addTextInput({
           name: 'Diagram definition',
           path: 'content',
-          description: `This area uses Mermaid syntax - https://mermaid-js.github.io/`,
+          description: `This area uses Mermaid syntax - http://knsv.github.io/mermaid/`,
           defaultValue: defaults.content,
           settings: {
             rows: 10,
@@ -225,6 +225,15 @@ const createPanelPlugin = () => {
           name: 'Composite metrics',
           category: ['Composites'],
           description: 'Combine series into a composite metric',
+        })
+        // Advanced
+        .addCustomEditor({
+          editor: MetricCharacterReplacementEditor,
+          id: 'metricCharacterReplacements',
+          path: 'metricCharacterReplacements',
+          name: 'Metric Character Replacements',
+          category: ['Advanced'],
+          description: 'Match/replace charactes in the metric name',
         });
 
       builder = addStyleEditors(builder);
