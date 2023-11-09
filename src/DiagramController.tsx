@@ -138,31 +138,34 @@ export class DiagramPanelController extends React.Component<DiagramPanelControll
     }
   }
 
-  initializeMermaid() {
+  async initializeMermaid() {
     const options = merge({}, defaultMermaidOptions, { theme: this.props.theme.isDark ? 'dark' : 'base' });
-    // mermaidAPI.initialize(options);
     mermaid.initialize(options);
-    // parseError = this.handleParseError.bind(this);
+  
     if (this.diagramRef) {
-      this.loadDiagramDefinition().then((diagramDefinition) => {
+      const diagramDefinition = await this.loadDiagramDefinition();
+      try {
+        const diagramId = `diagram-${this.props.id}`;
+        const interpolated = this.props.replaceVariables(this.contentProcessor(diagramDefinition));
+  
         try {
-          const diagramId = `diagram-${this.props.id}`;
-          const interpolated = this.props.replaceVariables(this.contentProcessor(diagramDefinition));
-          // if parsing the graph definition fails, the error handler will be called but the renderCallback() may also still be called.
-          try {
-            this.diagramRef.innerHTML = mermaidAPI.render(diagramId, interpolated, this.renderCallback);
-          } catch (err) {
-            console.log("Trying to apply default theme : ", err);
-            this.diagramRef.innerHTML = mermaidAPI.render(diagramId, diagramDefinition, this.renderCallback);
-          }
-          updateDiagramStyle(this.diagramRef, this.props.data, this.props.options, diagramId);
-          if (this.bindFunctions) {
-            this.bindFunctions(this.diagramRef);
+          const { svg, bindFunctions } = await mermaidAPI.render(diagramId, interpolated);
+          this.diagramRef.innerHTML = svg;
+          if (bindFunctions) {
+            bindFunctions(this.diagramRef);
           }
         } catch (err) {
-          this.diagramRef.innerHTML = `<div><p>Error rendering diagram. Check the diagram definition</p><p>${err}</p></div>`;
+          console.log("Trying to apply the default theme: ", err);
+          const { svg, bindFunctions } = await mermaidAPI.render(diagramId, diagramDefinition);
+          this.diagramRef.innerHTML = svg;
+          if (bindFunctions) {
+            bindFunctions(this.diagramRef);
+          }
         }
-      });
+        updateDiagramStyle(this.diagramRef, this.props.data, this.props.options, diagramId);
+      } catch (err) {
+        this.diagramRef.innerHTML = `<div><p>Error rendering diagram. Check the diagram definition</p><p>${err}</p></div>`;
+      }
     }
   }
 
