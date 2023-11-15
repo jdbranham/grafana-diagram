@@ -18,7 +18,7 @@ const selectElementById = (container: HTMLElement, id: string): Selection<any, a
 const selectElementByEdgeLabel = (container: HTMLElement, id: string): Selection<any, any, any, any> => {
   return select(container)
     .selectAll('span')
-    .filter(function() {
+    .filter(function () {
       return select(this).text() === id;
     });
 };
@@ -26,7 +26,7 @@ const selectElementByEdgeLabel = (container: HTMLElement, id: string): Selection
 const selectDivElementByAlias = (container: HTMLElement, alias: string): Selection<any, any, any, any> => {
   const targetElement = select(container)
     .selectAll('div')
-    .filter(function() {
+    .filter(function () {
       return select(this).text() === alias;
     });
   const node = targetElement.node();
@@ -42,8 +42,16 @@ const selectDivElementByAlias = (container: HTMLElement, alias: string): Selecti
 const selectTextElementByAlias = (container: HTMLElement, alias: string): Selection<any, any, any, any> => {
   return select(container)
     .selectAll('text')
-    .filter(function() {
+    .filter(function () {
       return select(this).text() === alias;
+    });
+};
+
+const selectTextElementContainingAlias = (container: HTMLElement, alias: string): Selection<any, any, any, any> => {
+  return select(container)
+    .selectAll('text')
+    .filter(function () {
+      return select(this).text().includes(alias);
     });
 };
 
@@ -83,13 +91,11 @@ const styleD3Shapes = (
   if (div.node()) {
     const divElement = div.node() as HTMLElement;
     resizeGrouping(div, nodeSize);
-    let content = divElement.innerText;
+    let content = divElement.innerText + `<br/> ${formattedValueToString(indicator)}`;
     if (indicator.isComposite) {
-      content += `<br/>${indicator.originalName}: ${formattedValueToString(indicator)}`;
-    } else {
-      content += `<br/> ${formattedValueToString(indicator)}`;
+      content += `<br/>${indicator.originalName}`;
+      divElement.style.marginTop = `-${nodeSize.minHeight / 4}px`;
     }
-    divElement.style.paddingTop = `${nodeSize.minHeight / 8}px`;
     // TODO: Add Field/Series Links??
     divElement.innerHTML = `<div style="margin:auto">${content}</div>`;
   }
@@ -128,8 +134,8 @@ const styleTextEdgeLabel = (
   indicator: MetricIndicator,
   useBackground: boolean
 ) => {
-  targetElement.each(el => {
-    var markerBox = {
+  targetElement.each((el) => {
+    let markerBox = {
       x: el.getBBox().x,
       y: el.getBBox().y + el.getBBox().height + 10,
       width: el.getBBox().width,
@@ -160,6 +166,24 @@ const styleTextEdgeLabel = (
     }
   });
 };
+
+const styleSequenceDiagramEdgeLabel = (
+  targetElement: Selection<any, any, any, any>,
+  indicator: MetricIndicator,
+  useBackground: boolean,
+  nodeSize: NodeSizeOptions
+) => {
+  const spanElement = targetElement.append('tspan');
+  spanElement.classed('diagram-value', true);
+  spanElement.html(formattedValueToString(indicator));
+  if (indicator.color) {
+    if (useBackground) {
+      spanElement.style('background-color', indicator.color);
+    } else {
+      spanElement.style('color', indicator.color);
+    }
+  }
+}
 
 const injectCustomStyle = (container: HTMLElement, diagramStyle: string, diagramId: string) => {
   const diagramDiv = select(container);
@@ -195,23 +219,20 @@ const processDiagramSeriesModel = (container: HTMLElement, indicator: MetricIndi
     return;
   }
 
+  targetElement = selectTextElementContainingAlias(container, key);
+  if (!targetElement.empty()) {
+    styleSequenceDiagramEdgeLabel(targetElement, indicator, options.useBackground, options.nodeSize);
+    return;
+  }
+
   console.log('could not find a diagram node with id/text: ' + key);
 };
 
 const reduceComposites = (indicators: MetricIndicator[], composites: CompositeMetric[]): MetricIndicator[] => {
   return composites
-    .map(c => {
-      const candidates = c.members.flatMap(m => {
-        return indicators.filter(i => {
-          if (i.metricName === m.identifier) {
-            if (m.displayName !== '') {
-              i.originalName = m.displayName;
-            }
-            return i;
-          } else {
-            return;
-          }
-        });
+    .map((c) => {
+      const candidates = c.members.flatMap((m) => {
+        return indicators.filter((i) => i.metricName === m);
       });
       if (candidates.length > 0) {
         const compositeIndicator = candidates.reduce((prev, current) => {
@@ -225,20 +246,21 @@ const reduceComposites = (indicators: MetricIndicator[], composites: CompositeMe
           }
         });
         compositeIndicator.isComposite = true;
+        compositeIndicator.originalName = compositeIndicator.metricName;
         compositeIndicator.metricName = c.name;
         return compositeIndicator;
       } else {
         return null;
       }
     })
-    .filter(c => c != null) as any;
+    .filter((c) => c != null) as any;
 };
 
 const reduceModels = (models: DiagramSeriesModel[]): MetricIndicator[] => {
   return models
-    .filter(m => m.valueField.config.custom)
-    .flatMap(m => {
-      const dv = m.info?.find(dv => dv.title === m.valueField.config.custom.valueName);
+    .filter((m) => m.valueField.config.custom)
+    .flatMap((m) => {
+      const dv = m.info?.find((dv) => dv.title === m.valueField.config.custom.valueName);
       if (!dv) {
         return null;
       }
@@ -248,7 +270,7 @@ const reduceModels = (models: DiagramSeriesModel[]): MetricIndicator[] => {
         valueName: dv.title,
       };
     })
-    .filter(m => m != null) as any;
+    .filter((m) => m != null) as any;
 };
 
 export const updateDiagramStyle = (
@@ -267,15 +289,13 @@ export const updateDiagramStyle = (
 
   const svg = svgNode as HTMLElement;
   if (options.maxWidth) {
-    select(svg)
-      .style('max-width', '100%')
-      .style('max-height', '100%');
+    select(svg).style('max-width', '100%').style('max-height', '100%');
   }
 
-  indicators.forEach(indicator => {
+  indicators.forEach((indicator) => {
     processDiagramSeriesModel(svg, indicator, options);
   });
-  reduceComposites(indicators, options.composites ?? []).forEach(indicator => {
+  reduceComposites(indicators, options.composites ?? []).forEach((indicator) => {
     processDiagramSeriesModel(svg, indicator, options);
   });
 

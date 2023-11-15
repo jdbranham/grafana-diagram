@@ -1,9 +1,8 @@
-import { AbsoluteTimeRange, FieldConfigSource, GrafanaTheme, InterpolateFunction, TimeZone } from '@grafana/data';
-import { CustomScrollbar, LegendItem, stylesFactory } from '@grafana/ui';
+import { AbsoluteTimeRange, FieldConfigSource, GrafanaTheme2, InterpolateFunction, TimeZone } from '@grafana/data';
+import { CustomScrollbar, VizLegendItem, stylesFactory, VizLegend } from '@grafana/ui';
 import { defaultMermaidOptions } from 'config/diagramDefaults';
 import DiagramErrorBoundary from 'DiagramErrorBoundary';
-import { DiagramLegend } from 'DiagramLegend';
-import { css } from 'emotion';
+import { css } from '@emotion/css';
 import { merge } from 'lodash';
 import mermaid from 'mermaid';
 import React from 'react';
@@ -13,7 +12,7 @@ import { DiagramOptions, DiagramSeriesModel, DiagramSeriesValue } from './config
 const mermaidAPI = mermaid.mermaidAPI;
 
 export interface DiagramPanelControllerProps {
-  theme: GrafanaTheme;
+  theme: GrafanaTheme2;
   id: number;
   width: number;
   height: number;
@@ -35,7 +34,7 @@ interface DiagramPanelControllerState {
 const getDiagramWithLegendStyles = stylesFactory(({ options }: DiagramPanelControllerProps) => ({
   wrapper: css`
     display: flex;
-    flex-direction: ${options.legend.placement === 'under' ? 'column' : 'row'};
+    flex-direction: ${options.legend.placement === 'bottom' ? 'column' : 'row'};
     height: 100%;
   `,
   diagramContainer: css`
@@ -44,7 +43,7 @@ const getDiagramWithLegendStyles = stylesFactory(({ options }: DiagramPanelContr
   `,
   legendContainer: css`
     padding: 10px 0;
-    max-height: ${options.legend.placement === 'under' ? '35%' : 'none'};
+    max-height: ${options.legend.placement === 'bottom' ? '35%' : 'none'};
   `,
 }));
 
@@ -141,15 +140,21 @@ export class DiagramPanelController extends React.Component<DiagramPanelControll
 
   initializeMermaid() {
     const options = merge({}, defaultMermaidOptions, { theme: this.props.theme.isDark ? 'dark' : 'base' });
-    mermaidAPI.initialize(options);
+    // mermaidAPI.initialize(options);
+    mermaid.initialize(options);
     // parseError = this.handleParseError.bind(this);
     if (this.diagramRef) {
-      this.loadDiagramDefinition().then(diagramDefinition => {
+      this.loadDiagramDefinition().then((diagramDefinition) => {
         try {
           const diagramId = `diagram-${this.props.id}`;
           const interpolated = this.props.replaceVariables(this.contentProcessor(diagramDefinition));
           // if parsing the graph definition fails, the error handler will be called but the renderCallback() may also still be called.
-          this.diagramRef.innerHTML = mermaidAPI.render(diagramId, interpolated, this.renderCallback);
+          try {
+            this.diagramRef.innerHTML = mermaidAPI.render(diagramId, interpolated, this.renderCallback);
+          } catch (err) {
+            console.log("Trying to apply default theme : ", err);
+            this.diagramRef.innerHTML = mermaidAPI.render(diagramId, diagramDefinition, this.renderCallback);
+          }
           updateDiagramStyle(this.diagramRef, this.props.data, this.props.options, diagramId);
           if (this.bindFunctions) {
             this.bindFunctions(this.diagramRef);
@@ -194,16 +199,18 @@ export class DiagramPanelController extends React.Component<DiagramPanelControll
   };
 
   getLegendItems = () => {
-    return this.props.data.reduce<LegendItem[]>((acc, s) => {
+    return this.props.data.reduce<VizLegendItem[]>((acc, s) => {
       return this.shouldHideLegendItem(s.data, this.props.options.legend.hideEmpty, this.props.options.legend.hideZero)
         ? acc
         : acc.concat([
             {
               label: s.label,
               color: '',
-              isVisible: s.isVisible,
+              disabled: !s.isVisible,
               yAxis: 0,
-              displayValues: s.info || [],
+              getDisplayValues: () => {
+                return s.info || [];
+              },
             },
           ]);
     }, []);
@@ -220,7 +227,7 @@ export class DiagramPanelController extends React.Component<DiagramPanelControll
           <div className={this.state.legendContainer}>
             <CustomScrollbar hideHorizontalTrack>
               <DiagramErrorBoundary fallback="Error rendering Legend">
-                <DiagramLegend
+                <VizLegend
                   items={this.getLegendItems()}
                   displayMode={this.props.options.legend.displayMode}
                   placement={this.props.options.legend.placement}

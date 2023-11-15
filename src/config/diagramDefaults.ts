@@ -10,7 +10,7 @@ export const defaultFlowChartConfig: mermaidAPI.FlowChartConfig & { useMaxWidth:
 };
 
 export const defaultMermaidOptions: mermaidAPI.Config = {
-  securityLevel: 'loose',
+  // securityLevel: 'loose',
   logLevel: 3, //1:debug, 2:info, 3:warn, 4:error, 5:fatal
   //cloneCssStyles: true, // - This options controls whether or not the css rules should be copied into the generated svg
   startOnLoad: false, // - This options controls whether or mermaid starts when the page loads
@@ -49,7 +49,7 @@ export const defaultLegendOptions: LegendOptions = {
   asTable: true,
   hideEmpty: false,
   hideZero: false,
-  placement: 'under',
+  placement: 'bottom',
   displayMode: LegendDisplayMode.Table,
   sortBy: 'last',
   sortDesc: true,
