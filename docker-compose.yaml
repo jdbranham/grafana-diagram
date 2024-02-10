@@ -11,4 +11,3 @@ services:
       - 3000:3000/tcp
     volumes:
       - ./dist:/var/lib/grafana/plugins/jdbranham-diagram-panel
-      - ./provisioning:/etc/grafana/provisioning

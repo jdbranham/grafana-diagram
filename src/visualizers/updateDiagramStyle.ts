@@ -183,7 +183,7 @@ const styleSequenceDiagramEdgeLabel = (
       spanElement.style('color', indicator.color);
     }
   }
-}
+};
 
 const injectCustomStyle = (container: HTMLElement, diagramStyle: string, diagramId: string) => {
   const diagramDiv = select(container);
@@ -232,7 +232,16 @@ const reduceComposites = (indicators: MetricIndicator[], composites: CompositeMe
   return composites
     .map((c) => {
       const candidates = c.members.flatMap((m) => {
-        return indicators.filter((i) => i.metricName === m);
+        return indicators.filter((i) => {
+          if (i.metricName === m.identifier) {
+            if (m.displayName !== '') {
+              i.originalName = m.displayName;
+            }
+            return i;
+          } else {
+            return;
+          }
+        });
       });
       if (candidates.length > 0) {
         const compositeIndicator = candidates.reduce((prev, current) => {
