@@ -1,15 +1,15 @@
+import type { FlowchartDiagramConfig, MermaidConfig } from 'mermaid/dist/config.type';
 import { LegendDisplayMode } from '@grafana/ui';
-import mermaidAPI from 'mermaid/mermaidAPI';
 import { MermaidThemeVariables } from 'config/theme';
 import { DiagramOptions, LegendOptions } from 'config/types';
 
-export const defaultFlowChartConfig: mermaidAPI.FlowChartConfig & { useMaxWidth: boolean } = {
+export const defaultFlowChartConfig: FlowchartDiagramConfig & { useMaxWidth: boolean } = {
   curve: 'linear',
   htmlLabels: true,
   useMaxWidth: true,
 };
 
-export const defaultMermaidOptions: mermaidAPI.Config = {
+export const defaultMermaidOptions: MermaidConfig = {
   // securityLevel: 'loose',
   logLevel: 3, //1:debug, 2:info, 3:warn, 4:error, 5:fatal
   //cloneCssStyles: true, // - This options controls whether or not the css rules should be copied into the generated svg
@@ -38,7 +38,8 @@ export const defaultMermaidOptions: mermaidAPI.Config = {
     leftPadding: 75, // - the space allocated for the section name to the left of the activities.
     gridLineStartPadding: 35, // - Vertical starting position of the grid lines
     fontSize: 11, // - font size ...
-    fontFamily: '"Open-Sans", "sans-serif"', // - font family ...
+    // @ts-expect-error
+    fontFamily: '"Open Sans", sans-serif', // - font family ...
     numberSectionStyles: 3, // - the number of alternating section styles
   },
 };
