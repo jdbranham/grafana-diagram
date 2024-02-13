@@ -73,7 +73,7 @@ export const defaultMermaidThemeVariables: MermaidThemeVariables = {
 
 export const defaults: DiagramOptions = {
   pluginVersion: '',
-  nodeSize: { minWidth: 30, minHeight: 40 },
+  nodeSize: { minWidth: 30, minHeight: 30 },
   composites: [],
   metricCharacterReplacements: [],
   style: '',
@@ -82,7 +82,7 @@ export const defaults: DiagramOptions = {
   moddedSeriesVal: 0,
   valueName: 'last',
   content: `graph LR
-      A --> B
+      A-series --> B-series
     `,
   mode: 'content', //allowed values: 'content' and 'url'
   mermaidServiceUrl: '',
