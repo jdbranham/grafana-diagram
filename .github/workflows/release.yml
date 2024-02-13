@@ -8,7 +8,7 @@ on:
         required: true
   push:
     tags:
-      - '^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-.+)$' # Run workflow on semver tags
+      - '^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-.+)$' # Run workflow on semver tags
 
 jobs:
   release:

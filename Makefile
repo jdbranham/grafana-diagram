@@ -1,5 +1,5 @@
 VERSION := $(shell cat VERSION)
-TAGGED_VERSION := $(VERSION)
+TAGGED_VERSION := v$(VERSION)
 NEXT_VERSION := $(shell echo $(VERSION) | awk -F. '{$$NF = $$NF + 1;} 1' | sed 's/ /./g')
 
 
