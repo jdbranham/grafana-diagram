@@ -1,14 +1,9 @@
 name: Release
 
 on:
-  workflow_dispatch: 
-    inputs:
-      tag:
-        description: 'Tag to release'
-        required: true
   push:
     tags:
-      - '^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-.+)$' # Run workflow on semver tags
+      - 'v*' # Run workflow on version tags, e.g. v1.0.0.
 
 jobs:
   release:
