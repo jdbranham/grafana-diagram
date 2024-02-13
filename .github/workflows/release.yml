@@ -1,6 +1,11 @@
 name: Release
 
 on:
+  workflow_dispatch: 
+    inputs:
+      tag:
+        description: 'Tag to release'
+        required: true
   push:
     tags:
       - '^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-.+)$' # Run workflow on semver tags
