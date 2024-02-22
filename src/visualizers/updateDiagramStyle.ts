@@ -55,6 +55,16 @@ const selectTextElementContainingAlias = (container: HTMLElement, alias: string)
     });
 };
 
+const fetchParentsUntilShapeElementFound = (element: HTMLElement, selector: string): HTMLElement | null => {  
+  if (element.matches(selector)) {
+    return element;
+  }
+  if (element.parentElement) {
+    return fetchParentsUntilShapeElementFound(element.parentElement, selector);
+  }
+  return null;
+}
+
 const resizeGrouping = (element: Selection<any, any, any, any> | null | undefined, nodeSize: NodeSizeOptions) => {
   if (!element) {
     return;
@@ -114,6 +124,7 @@ const styleFlowChartEdgeLabel = (
   useBackground: boolean,
   nodeSize: NodeSizeOptions
 ) => {
+  const parentShapeElement = fetchParentsUntilShapeElementFound(targetElement.node(), '.node.flowchart-label');
   const edgeParent = select(targetElement.node().parentNode);
   edgeParent.append('br');
   const v = edgeParent.append('span');
@@ -123,6 +134,7 @@ const styleFlowChartEdgeLabel = (
   if (indicator.color) {
     if (useBackground) {
       v.style('background-color', indicator.color);
+      parentShapeElement?.firstElementChild?.setAttribute('style', `fill: ${indicator.color}`);
     } else {
       v.style('color', indicator.color);
     }
