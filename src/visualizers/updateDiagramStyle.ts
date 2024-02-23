@@ -304,6 +304,10 @@ export const updateDiagramStyle = (
     select(svg).style('max-width', '100%').style('max-height', '100%');
   }
 
+  if (svg.parentElement && !options.maxWidth) {
+    svg.parentElement.setAttribute('style', 'overflow-y: scroll');
+  }
+  
   indicators.forEach((indicator) => {
     processDiagramSeriesModel(svg, indicator, options);
   });
