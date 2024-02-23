@@ -123,8 +123,7 @@ const styleFlowChartEdgeLabel = (
   indicator: MetricIndicator,
   useBackground: boolean,
   nodeSize: NodeSizeOptions
-) => {
-  const parentShapeElement = fetchParentsUntilShapeElementFound(targetElement.node(), '.node.flowchart-label');
+) => {  
   const edgeParent = select(targetElement.node().parentNode);
   edgeParent.append('br');
   const v = edgeParent.append('span');
@@ -134,6 +133,7 @@ const styleFlowChartEdgeLabel = (
   if (indicator.color) {
     if (useBackground) {
       v.style('background-color', indicator.color);
+      const parentShapeElement = fetchParentsUntilShapeElementFound(targetElement.node(), '.node.flowchart-label');
       parentShapeElement?.firstElementChild?.setAttribute('style', `fill: ${indicator.color}`);
     } else {
       v.style('color', indicator.color);
@@ -307,7 +307,7 @@ export const updateDiagramStyle = (
   if (svg.parentElement && !options.maxWidth) {
     svg.parentElement.setAttribute('style', 'overflow-y: scroll');
   }
-  
+
   indicators.forEach((indicator) => {
     processDiagramSeriesModel(svg, indicator, options);
   });
