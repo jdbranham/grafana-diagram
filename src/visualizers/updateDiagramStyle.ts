@@ -12,7 +12,7 @@ type MetricIndicator = DisplayValue & {
 };
 
 const selectElementById = (container: HTMLElement, id: string): Selection<any, any, any, any> => {
-  return select(document.getElementById('#' + id));
+  return select(container.querySelector(`[data-id="${id}"]`));
 };
 
 const selectElementByEdgeLabel = (container: HTMLElement, id: string): Selection<any, any, any, any> => {
