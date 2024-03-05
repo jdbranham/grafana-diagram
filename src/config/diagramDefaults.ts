@@ -7,6 +7,7 @@ export const defaultFlowChartConfig: FlowchartDiagramConfig & { useMaxWidth: boo
   curve: 'linear',
   htmlLabels: true,
   useMaxWidth: true,
+  padding: 40
 };
 
 export const defaultMermaidOptions: MermaidConfig = {

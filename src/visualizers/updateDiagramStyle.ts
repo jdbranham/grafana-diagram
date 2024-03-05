@@ -12,7 +12,7 @@ type MetricIndicator = DisplayValue & {
 };
 
 const selectElementById = (container: HTMLElement, id: string): Selection<any, any, any, any> => {
-  return select(container.querySelector('#' + id));
+  return select(container.querySelector(`[data-id="${id}"]`));
 };
 
 const selectElementByEdgeLabel = (container: HTMLElement, id: string): Selection<any, any, any, any> => {
@@ -54,6 +54,16 @@ const selectTextElementContainingAlias = (container: HTMLElement, alias: string)
       return select(this).text().includes(alias);
     });
 };
+
+const fetchParentsUntilShapeElementFound = (element: HTMLElement, selector: string): HTMLElement | null => {  
+  if (element.matches(selector)) {
+    return element;
+  }
+  if (element.parentElement) {
+    return fetchParentsUntilShapeElementFound(element.parentElement, selector);
+  }
+  return null;
+}
 
 const resizeGrouping = (element: Selection<any, any, any, any> | null | undefined, nodeSize: NodeSizeOptions) => {
   if (!element) {
@@ -113,7 +123,7 @@ const styleFlowChartEdgeLabel = (
   indicator: MetricIndicator,
   useBackground: boolean,
   nodeSize: NodeSizeOptions
-) => {
+) => {  
   const edgeParent = select(targetElement.node().parentNode);
   edgeParent.append('br');
   const v = edgeParent.append('span');
@@ -123,6 +133,8 @@ const styleFlowChartEdgeLabel = (
   if (indicator.color) {
     if (useBackground) {
       v.style('background-color', indicator.color);
+      const parentShapeElement = fetchParentsUntilShapeElementFound(targetElement.node(), '.node.flowchart-label');
+      parentShapeElement?.firstElementChild?.setAttribute('style', `fill: ${indicator.color}`);
     } else {
       v.style('color', indicator.color);
     }
@@ -290,6 +302,10 @@ export const updateDiagramStyle = (
   const svg = svgNode as HTMLElement;
   if (options.maxWidth) {
     select(svg).style('max-width', '100%').style('max-height', '100%');
+  }
+
+  if (svg.parentElement && !options.maxWidth) {
+    svg.parentElement.setAttribute('style', 'overflow-y: scroll');
   }
 
   indicators.forEach((indicator) => {
