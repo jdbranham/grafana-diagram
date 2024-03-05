@@ -1,6 +1,6 @@
 {
   "name": "grafana-diagram",
-  "version": "1.10.3",
+  "version": "1.10.4",
   "description": "Display diagrams and charts in Grafana with colored metric indicators",
   "scripts": {
     "build": "webpack -c ./.config/webpack/webpack.config.ts --env production",
