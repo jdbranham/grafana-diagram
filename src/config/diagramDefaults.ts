@@ -16,6 +16,7 @@ export const defaultMermaidOptions: MermaidConfig = {
   startOnLoad: false, // - This options controls whether or mermaid starts when the page loads
   arrowMarkerAbsolute: true, // - This options controls whether or arrow markers in html code will be absolute paths or an anchor, #. This matters if you are using base tag settings.
   flowchart: defaultFlowChartConfig,
+  maxEdges: 5000,
   sequence: {
     diagramMarginX: 50, // - margin to the right and left of the sequence diagram
     diagramMarginY: 10, // - margin to the over and under the sequence diagram
