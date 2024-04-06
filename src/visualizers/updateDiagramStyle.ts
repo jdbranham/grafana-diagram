@@ -237,7 +237,7 @@ const processDiagramSeriesModel = (container: HTMLElement, indicator: MetricIndi
     return;
   }
 
-  console.log('could not find a diagram node with id/text: ' + key);
+  //console.log('could not find a diagram node with id/text: ' + key);
 };
 
 const reduceComposites = (indicators: MetricIndicator[], composites: CompositeMetric[]): MetricIndicator[] => {
