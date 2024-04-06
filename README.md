@@ -1,4 +1,4 @@
- [![savantly.net](https://savantly.net/img/logo.png)](https://savantly.net)
+[![savantly.net](https://raw.githubusercontent.com/jdbranham/grafana-diagram/master/src/img/logo-scaled.png)](https://savantly.net)
 
 [![Marketplace](https://img.shields.io/badge/dynamic/json?logo=grafana&color=F47A20&label=marketplace&prefix=v&query=%24.items%5B%3F%28%40.slug%20%3D%3D%20%22jdbranham-diagram-panel%22%29%5D.version&url=https%3A%2F%2Fgrafana.com%2Fapi%2Fplugins)](https://grafana.com/grafana/plugins/jdbranham-diagram-panel)
 [![Downloads](https://img.shields.io/badge/dynamic/json?logo=grafana&color=F47A20&label=downloads&query=%24.items%5B%3F%28%40.slug%20%3D%3D%20%22jdbranham-diagram-panel%22%29%5D.downloads&url=https%3A%2F%2Fgrafana.com%2Fapi%2Fplugins)](https://grafana.com/grafana/plugins/jdbranham-diagram-panel)
