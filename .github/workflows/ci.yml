@@ -14,24 +14,26 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Setup Node.js environment
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
+          check-latest: true
+          cache: yarn
+          cache-dependency-path: yarn.lock
 
       - name: Install dependencies
-        run: npm ci
+        run: yarn install --immutable
 
       - name: Check types
-        run: npm run typecheck
+        run: yarn typecheck
       - name: Lint
-        run: npm run lint
+        run: NODE_OPTIONS=--max_old_space_size=4096 yarn lint
       - name: Unit tests
-        run: npm run test:ci
+        run: yarn test:ci
       - name: Build frontend
-        run: npm run build
+        run: yarn build
 
       - name: Check for backend
         id: check-for-backend
@@ -43,20 +45,20 @@ jobs:
 
       - name: Setup Go environment
         if: steps.check-for-backend.outputs.has-backend == 'true'
-        uses: actions/setup-go@v3
+        uses: actions/setup-go@v5
         with:
           go-version: '1.21'
 
       - name: Test backend
         if: steps.check-for-backend.outputs.has-backend == 'true'
-        uses: magefile/mage-action@v2
+        uses: magefile/mage-action@v3
         with:
           version: latest
           args: coverage
 
       - name: Build backend
         if: steps.check-for-backend.outputs.has-backend == 'true'
-        uses: magefile/mage-action@v2
+        uses: magefile/mage-action@v3
         with:
           version: latest
           args: buildAll
@@ -82,7 +84,7 @@ jobs:
         run: docker-compose down
 
       - name: Archive E2E output
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: steps.check-for-e2e.outputs.has-e2e == 'true' && steps.run-e2e-tests.outcome != 'success'
         with:
           name: cypress-videos
