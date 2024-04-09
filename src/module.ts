@@ -52,7 +52,7 @@ const flowChartKeys: PanelProperty[] = [
   },
 ];
 
-const statSelectOptions: SelectableValue<ValueType>[] = [
+const statSelectOptions: Array<SelectableValue<ValueType>> = [
   { label: 'mean', value: 'mean', description: 'Use the mean value of all datapoints' },
   { label: 'min', value: 'min', description: 'Use the minimum datapoint value' },
   { label: 'max', value: 'max', description: 'Use the maximum datapoint value' },
