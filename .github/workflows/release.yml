@@ -13,23 +13,25 @@ jobs:
       # GRAFANA_API_KEY: ${{ secrets.GRAFANA_API_KEY }}
       GRAFANA_ACCESS_POLICY_TOKEN: ${{ secrets.GRAFANA_ACCESS_POLICY_TOKEN }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Setup Node.js environment
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
+          check-latest: true
+          cache: yarn
+          cache-dependency-path: yarn.lock
 
       - name: Setup Go environment
-        uses: actions/setup-go@v3
+        uses: actions/setup-go@v5
         with:
           go-version: '1.21'
 
       - name: Install dependencies
-        run: npm ci
+        run: yarn install --immutable
 
       - name: Build and test frontend
-        run: npm run build
+        run: yarn build
 
       - name: Check for backend
         id: check-for-backend
@@ -41,14 +43,14 @@ jobs:
 
       - name: Test backend
         if: steps.check-for-backend.outputs.has-backend == 'true'
-        uses: magefile/mage-action@v2
+        uses: magefile/mage-action@v3
         with:
           version: latest
           args: coverage
 
       - name: Build backend
         if: steps.check-for-backend.outputs.has-backend == 'true'
-        uses: magefile/mage-action@v2
+        uses: magefile/mage-action@v3
         with:
           version: latest
           args: buildAll
