@@ -155,7 +155,7 @@ export class DiagramPanelController extends React.Component<DiagramPanelControll
             bindFunctions(this.diagramRef);
           }
         } catch (err) {
-          console.log("Trying to apply the default theme: ", err);
+          //console.log("Trying to apply the default theme: ", err);
           const { svg, bindFunctions } = await mermaidAPI.render(diagramId, diagramDefinition);
           this.diagramRef.innerHTML = svg;
           if (bindFunctions) {
@@ -183,7 +183,7 @@ export class DiagramPanelController extends React.Component<DiagramPanelControll
 
   renderCallback(svgCode: string, bindFunctions: any) {
     if (this && bindFunctions) {
-      console.log('binding diagram functions');
+      //console.log('binding diagram functions');
       this.bindFunctions = bindFunctions;
     }
   }
