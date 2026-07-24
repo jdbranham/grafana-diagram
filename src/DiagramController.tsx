@@ -2,7 +2,7 @@ import { AbsoluteTimeRange, FieldConfigSource, GrafanaTheme2, InterpolateFunctio
 import { CustomScrollbar, VizLegendItem, stylesFactory, VizLegend } from '@grafana/ui';
 import { defaultMermaidOptions } from 'config/diagramDefaults';
 import DiagramErrorBoundary from 'DiagramErrorBoundary';
-import { css } from '@emotion/css';
+import { css, cx } from '@emotion/css';
 import { merge } from 'lodash';
 import mermaid from 'mermaid';
 import React from 'react';
@@ -50,25 +50,13 @@ const getDiagramWithLegendStyles = stylesFactory(({ options }: DiagramPanelContr
 export class DiagramPanelController extends React.Component<DiagramPanelControllerProps, DiagramPanelControllerState> {
   diagramRef!: HTMLDivElement;
   bindFunctions?: Function;
+  renderToken = 0;
 
   constructor(props: DiagramPanelControllerProps) {
     super(props);
     this.onToggleSort = this.onToggleSort.bind(this);
     this.setDiagramRef = this.setDiagramRef.bind(this);
     this.renderCallback = this.renderCallback.bind(this);
-  }
-
-  static getDerivedStateFromProps(props: DiagramPanelControllerProps, state: DiagramPanelControllerState) {
-    const { diagramContainer, wrapper, legendContainer } = getDiagramWithLegendStyles(props);
-    if (!state) {
-      return {
-        diagramContainer,
-        wrapper,
-        legendContainer,
-      };
-    } else {
-      return null;
-    }
   }
 
   setDiagramRef(element: HTMLDivElement) {
@@ -143,24 +131,24 @@ export class DiagramPanelController extends React.Component<DiagramPanelControll
     mermaid.initialize(options);
   
     if (this.diagramRef) {
+      const token = ++this.renderToken;
       const diagramDefinition = await this.loadDiagramDefinition();
+      if (token !== this.renderToken) {
+        return;
+      }
       try {
-        const diagramId = `diagram-${this.props.id}`;
+        const diagramId = `diagram-${this.props.id}-${token}`;
         const interpolated = this.props.replaceVariables(this.contentProcessor(diagramDefinition));
   
-        try {
-          const { svg, bindFunctions } = await mermaidAPI.render(diagramId, interpolated);
-          this.diagramRef.innerHTML = svg;
-          if (bindFunctions) {
-            bindFunctions(this.diagramRef);
-          }
-        } catch (err) {
-          //console.log("Trying to apply the default theme: ", err);
-          const { svg, bindFunctions } = await mermaidAPI.render(diagramId, diagramDefinition);
-          this.diagramRef.innerHTML = svg;
-          if (bindFunctions) {
-            bindFunctions(this.diagramRef);
-          }
+        const rendered = await mermaidAPI
+          .render(diagramId, interpolated)
+          .catch(() => mermaidAPI.render(diagramId, diagramDefinition));
+        if (token !== this.renderToken) {
+          return;
+        }
+        this.diagramRef.innerHTML = rendered.svg;
+        if (rendered.bindFunctions) {
+          rendered.bindFunctions(this.diagramRef);
         }
         updateDiagramStyle(this.diagramRef, this.props.data, this.props.options, diagramId);
       } catch (err) {
@@ -202,6 +190,7 @@ export class DiagramPanelController extends React.Component<DiagramPanelControll
   };
 
   getLegendItems = () => {
+    const { stats } = this.props.options.legend;
     return this.props.data.reduce<VizLegendItem[]>((acc, s) => {
       return this.shouldHideLegendItem(s.data, this.props.options.legend.hideEmpty, this.props.options.legend.hideZero)
         ? acc
@@ -212,7 +201,8 @@ export class DiagramPanelController extends React.Component<DiagramPanelControll
               disabled: !s.isVisible,
               yAxis: 0,
               getDisplayValues: () => {
-                return s.info || [];
+                const info = s.info || [];
+                return stats && stats.length > 0 ? info.filter((dv) => stats.includes(dv.title as string)) : info;
               },
             },
           ]);
@@ -220,14 +210,15 @@ export class DiagramPanelController extends React.Component<DiagramPanelControll
   };
 
   render() {
+    const { diagramContainer, wrapper, legendContainer } = getDiagramWithLegendStyles(this.props);
     return (
-      <div className={`diagram-container diagram-container-${this.props.id}` && this.state.wrapper}>
+      <div className={cx('diagram-container', `diagram-container-${this.props.id}`, wrapper)}>
         <div
           ref={this.setDiagramRef}
-          className={`diagram diagram-${this.props.id}` && this.state.diagramContainer}
+          className={cx('diagram', `diagram-${this.props.id}`, diagramContainer)}
         ></div>
         {this.props.options.legend.show && (
-          <div className={this.state.legendContainer}>
+          <div className={legendContainer}>
             <CustomScrollbar hideHorizontalTrack>
               <DiagramErrorBoundary fallback="Error rendering Legend">
                 <VizLegend
@@ -236,6 +227,13 @@ export class DiagramPanelController extends React.Component<DiagramPanelControll
                   placement={this.props.options.legend.placement}
                   sortBy={this.props.options.legend.sortBy}
                   sortDesc={this.props.options.legend.sortDesc}
+                  // Newer Grafana (verified 13.1.0) renders the table-legend header row
+                  // `sr-only` (visually hidden) unless the legend is marked sortable; it
+                  // showed unconditionally on 12.3.1. `isSortable` postdates the pinned
+                  // @grafana/ui@9 types but is honored by the host Grafana's VizLegend at
+                  // runtime (sorting is already wired up via onToggleSort below).
+                  // @ts-expect-error isSortable is provided by the runtime @grafana/ui
+                  isSortable
                   onLabelClick={(item, event) => {}}
                   onToggleSort={this.onToggleSort}
                 />

@@ -1,4 +1,5 @@
 import { FieldConfigProperty, PanelOptionsEditorBuilder, PanelPlugin, SelectableValue } from '@grafana/data';
+import { LegendDisplayMode } from '@grafana/ui';
 import { defaults } from './config/diagramDefaults';
 import { diagramPanelChangeHandler } from './config/diagramPanelChangeHandler';
 import { CompositeMetricEditor } from './editors/CompositeMetricEditor';
@@ -216,6 +217,46 @@ const createPanelPlugin = () => {
           description: 'Show the legend',
           category: ['Legend'],
           defaultValue: defaults.legend.show,
+        })
+        .addRadio({
+          name: 'Legend placement',
+          path: 'legend.placement',
+          description: 'Where to place the legend relative to the diagram',
+          category: ['Legend'],
+          defaultValue: defaults.legend.placement,
+          settings: {
+            options: [
+              { value: 'bottom', label: 'Bottom' },
+              { value: 'right', label: 'Right' },
+            ],
+          },
+          showIf: (currentOptions) => currentOptions.legend.show,
+        })
+        .addRadio({
+          name: 'Legend mode',
+          path: 'legend.displayMode',
+          description: 'Table shows a sortable header row with values; list shows names only',
+          category: ['Legend'],
+          defaultValue: defaults.legend.displayMode,
+          settings: {
+            options: [
+              { value: LegendDisplayMode.Table, label: 'Table' },
+              { value: LegendDisplayMode.List, label: 'List' },
+            ],
+          },
+          showIf: (currentOptions) => currentOptions.legend.show,
+        })
+        .addMultiSelect<string, any>({
+          name: 'Legend values',
+          path: 'legend.stats',
+          description: 'Which reductions to show as legend table columns',
+          category: ['Legend'],
+          defaultValue: defaults.legend.stats as any,
+          settings: {
+            options: statSelectOptions,
+          },
+          showIf: (currentOptions) =>
+            currentOptions.legend.show && currentOptions.legend.displayMode === LegendDisplayMode.Table,
         })
         // Composites
         .addCustomEditor({

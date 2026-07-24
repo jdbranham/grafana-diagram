@@ -47,14 +47,6 @@ const selectTextElementByAlias = (container: HTMLElement, alias: string): Select
     });
 };
 
-const selectTextElementContainingAlias = (container: HTMLElement, alias: string): Selection<any, any, any, any> => {
-  return select(container)
-    .selectAll('text')
-    .filter(function () {
-      return select(this).text().includes(alias);
-    });
-};
-
 const fetchParentsUntilShapeElementFound = (element: HTMLElement, selector: string): HTMLElement | null => {  
   if (element.matches(selector)) {
     return element;
@@ -133,69 +125,40 @@ const styleFlowChartEdgeLabel = (
   if (indicator.color) {
     if (useBackground) {
       v.style('background-color', indicator.color);
+      // Color the edge label too, so the whole connection matches (nodes color name+value together).
+      targetElement.style('background-color', indicator.color);
       const parentShapeElement = fetchParentsUntilShapeElementFound(targetElement.node(), '.node.flowchart-label');
       parentShapeElement?.firstElementChild?.setAttribute('style', `fill: ${indicator.color}`);
     } else {
       v.style('color', indicator.color);
+      // Color the edge label too, not just the appended value.
+      targetElement.style('color', indicator.color);
     }
   }
 };
 
-const styleTextEdgeLabel = (
-  targetElement: Selection<any, any, any, any>,
-  indicator: MetricIndicator,
-  useBackground: boolean
-) => {
-  targetElement.each((el) => {
-    let markerBox = {
-      x: el.getBBox().x,
-      y: el.getBBox().y + el.getBBox().height + 10,
-      width: el.getBBox().width,
-      height: el.getBBox().height,
-    };
+const styleSequenceText = (targetElement: Selection<any, any, any, any>, indicator: MetricIndicator) => {
+  targetElement.each(function (this: SVGTextElement) {
+    const textNode = this;
+    const isActor = (textNode.getAttribute('class') || '').includes('actor');
+    const anchorX = textNode.querySelector('tspan')?.getAttribute('x') ?? textNode.getAttribute('x');
+    const y = Number.parseFloat(textNode.getAttribute('y') || '');
+    if (!Number.isNaN(y)) {
+      textNode.setAttribute('y', String(y + (isActor ? -9 : 8)));
+    }
+    select(textNode)
+      .append('tspan')
+      .classed('diagram-value', true)
+      .attr('x', anchorX)
+      .attr('dy', isActor ? '1.2em' : '1.5em')
+      .text(formattedValueToString(indicator));
     if (indicator.color) {
-      const rect = select(el.parentNode)
-        .insert('rect')
-        .attr('x', markerBox.x)
-        .attr('y', markerBox.y)
-        .attr('width', markerBox.width)
-        .attr('height', markerBox.height);
-      const textNode = select(el.parentNode)
-        .insert('text')
-        .text(formattedValueToString(indicator))
-        .attr('x', markerBox.x + markerBox.width / 2)
-        .attr('y', markerBox.y + markerBox.height - 1)
-        .attr('width', markerBox.width)
-        .attr('height', markerBox.height)
-        .style('text-anchor', 'middle');
-      if (indicator.color) {
-        if (useBackground) {
-          rect.style('fill', indicator.color);
-        } else {
-          textNode.style('color', indicator.color);
-        }
-      }
+      // Color the whole text (message/actor label) and its value tspan, so a connection
+      // (message) matches how an actor/node colors its name+value together.
+      select(textNode).style('fill', indicator.color).selectAll('tspan').style('fill', indicator.color);
     }
   });
 };
-
-const styleSequenceDiagramEdgeLabel = (
-  targetElement: Selection<any, any, any, any>,
-  indicator: MetricIndicator,
-  useBackground: boolean,
-  nodeSize: NodeSizeOptions
-) => {
-  const spanElement = targetElement.append('tspan');
-  spanElement.classed('diagram-value', true);
-  spanElement.html(formattedValueToString(indicator));
-  if (indicator.color) {
-    if (useBackground) {
-      spanElement.style('background-color', indicator.color);
-    } else {
-      spanElement.style('color', indicator.color);
-    }
-  }
-}
 
 const injectCustomStyle = (container: HTMLElement, diagramStyle: string, diagramId: string) => {
   const diagramDiv = select(container);
@@ -227,13 +190,7 @@ const processDiagramSeriesModel = (container: HTMLElement, indicator: MetricIndi
 
   targetElement = selectTextElementByAlias(container, key);
   if (!targetElement.empty()) {
-    styleTextEdgeLabel(targetElement, indicator, options.useBackground);
-    return;
-  }
-
-  targetElement = selectTextElementContainingAlias(container, key);
-  if (!targetElement.empty()) {
-    styleSequenceDiagramEdgeLabel(targetElement, indicator, options.useBackground, options.nodeSize);
+    styleSequenceText(targetElement, indicator);
     return;
   }
 
