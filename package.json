@@ -13,7 +13,9 @@
     "sign": "npx --yes @grafana/sign-plugin@latest",
     "test": "jest --watch --onlyChanged",
     "test:ci": "jest --passWithNoTests --maxWorkers 4",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "docs:serve": "plugin-docs-cli serve --port 3001 --reload",
+    "docs:validate": "plugin-docs-cli validate"
   },
   "homepage": "https://github.com/jdbranham/grafana-diagram#readme",
   "repository": {
@@ -29,6 +31,7 @@
   "devDependencies": {
     "@babel/core": "^7.23.2",
     "@grafana/eslint-config": "7.0.0",
+    "@grafana/plugin-docs-cli": "^0.7.0",
     "@grafana/tsconfig": "^1.3.0-rc1",
     "@swc/core": "^1.3.96",
     "@swc/helpers": "^0.5.3",
