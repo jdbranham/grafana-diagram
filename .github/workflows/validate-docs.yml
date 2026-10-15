@@ -1,0 +1,46 @@
+name: Validate documentation
+
+on:
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - 'catalog-docs/**'
+      - 'src/plugin.json'
+  pull_request:
+    branches:
+      - main
+      - master
+    paths:
+      - 'catalog-docs/**'
+      - 'src/plugin.json'
+
+jobs:
+  validate:
+    name: Validate plugin docs
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install --immutable --prefer-offline
+
+      - name: Validate plugin documentation
+        run: |
+          DOCS_PATH=$(jq -r '.docsPath // empty' src/plugin.json)
+          if [ -z "$DOCS_PATH" ]; then
+            echo "docsPath not set in src/plugin.json, skipping"
+            exit 0
+          fi
+
+          yarn run docs:validate

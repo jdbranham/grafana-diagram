@@ -8,19 +8,20 @@
       "name": "Jeremy Branham",
       "url": "https://savantly.net"
     },
-    "keywords": [
-      "diagram",
-      "chart",
-      "flow",
-      "gantt"
-    ],
+    "keywords": ["diagram", "chart", "flow", "gantt"],
     "logos": {
       "small": "img/logo.svg",
       "large": "img/logo.svg"
     },
     "links": [
-      {"name": "Project site", "url": "https://github.com/jdbranham/grafana-diagram"},
-      {"name": "Apache License", "url": "https://github.com/jdbranham/grafana-diagram/blob/master/LICENSE"}
+      {
+        "name": "Project site",
+        "url": "https://github.com/jdbranham/grafana-diagram"
+      },
+      {
+        "name": "Apache License",
+        "url": "https://github.com/jdbranham/grafana-diagram/blob/master/LICENSE"
+      }
     ],
     "screenshots": [
       {
@@ -58,5 +59,6 @@
   "dependencies": {
     "grafanaDependency": ">=9.0.9",
     "plugins": []
-  }
+  },
+  "docsPath": "catalog-docs"
 }
